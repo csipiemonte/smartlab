@@ -12,7 +12,7 @@ MQTTClient_v1.ino sketch can be work with WiFi and Ethernet shield. Ethernet on 
  management and require a periodacal hardware reset. It is tested in the following configuration:
 - Arduino Mega 2560 rev3
 - Arduino WiFi Shield
-- Arduino IDE 1.5.6-r2
+- Arduino IDE 1.5.6-r2. You can download it from [Arduino Previous IDE Versions](http://arduino.cc/en/Main/OldSoftwareReleases)
 - TI LM35 (temperature sensor)
 The Arduino updates its local time from a NTP server. If you want to use a different sensor, you have to create e new convertion function in according to the sensor datasheet. 
 
@@ -34,7 +34,7 @@ patch -p1 < pubsubclient_20140706
 Install libraries
 --------------
 To install a library, you have to copy the directory that contains all source files into your libraries folder. Restart Arduino to rescan for new libraries. For more information look Arduino [guide](http://arduino.cc/en/Guide/Libraries).
-Install all required and SDP libraries. For example:
+Install all required and SDP libraries. For example, if you have installed Arduino IDE in /opt directory, you can use the following instructions:
 
 ```
 cp libraries/
