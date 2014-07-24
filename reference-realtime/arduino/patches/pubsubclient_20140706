@@ -1,0 +1,85 @@
+diff -Naur old/PubSubClient/PubSubClient.cpp new/PubSubClient/PubSubClient.cpp
+--- old/PubSubClient/PubSubClient.cpp	2014-07-23 13:59:26.837967813 +0200
++++ new/PubSubClient/PubSubClient.cpp	2014-07-23 14:09:24.937967321 +0200
+@@ -327,7 +327,7 @@
+ }
+ 
+ boolean PubSubClient::write(uint8_t header, uint8_t* buf, uint16_t length) {
+-   uint8_t lenBuf[4];
++   uint8_t lenBuf[4] = {0};
+    uint8_t llen = 0;
+    uint8_t digit;
+    uint8_t pos = 0;
+@@ -347,10 +347,28 @@
+    for (int i=0;i<llen;i++) {
+       buf[5-llen+i] = lenBuf[i];
+    }
+-   rc = _client->write(buf+(4-llen),length+1+llen);
++
++   int nw = length+1+llen;
++   int rctot = 0;
++   uint8_t *bufferSend = buf+(4-llen);
++
++#define MAX 90
++
++   while ( rctot < nw)
++   {
++	   int npart = nw - rctot;
++	   int nwrite =  (npart>MAX)?MAX:npart;
++	   rc = _client->write(bufferSend,nwrite);
++	   if (rc < nwrite)
++		   return false;
++
++	   rctot += nwrite;
++	   bufferSend += nwrite;
++   }
++   //rc = _client->write(buf+(4-llen),length+1+llen);
+    
+    lastOutActivity = millis();
+-   return (rc == 1+llen+length);
++   return rctot == nw;
+ }
+ 
+ boolean PubSubClient::subscribe(char* topic) {
+@@ -420,7 +438,10 @@
+       rc = false;
+    } else {
+       rc = (int)_client->connected();
+-      if (!rc) _client->stop();
++      if (!rc)
++      {
++    	  //_client->stop();
++      }
+    }
+    return rc;
+ }
+diff -Naur old/PubSubClient/PubSubClient.h new/PubSubClient/PubSubClient.h
+--- old/PubSubClient/PubSubClient.h	2014-07-23 13:59:26.837967813 +0200
++++ new/PubSubClient/PubSubClient.h	2014-07-23 14:00:43.237967750 +0200
+@@ -12,7 +12,7 @@
+ #include "Stream.h"
+ 
+ // MQTT_MAX_PACKET_SIZE : Maximum packet size
+-#define MQTT_MAX_PACKET_SIZE 128
++#define MQTT_MAX_PACKET_SIZE 512
+ 
+ // MQTT_KEEPALIVE : keepAlive interval in Seconds
+ #define MQTT_KEEPALIVE 15
+@@ -41,6 +41,8 @@
+ class PubSubClient {
+ private:
+    Client* _client;
++   uint8_t *ip;
++   char* domain;
+    uint8_t buffer[MQTT_MAX_PACKET_SIZE];
+    uint16_t nextMsgId;
+    unsigned long lastOutActivity;
+@@ -51,8 +53,6 @@
+    uint8_t readByte();
+    boolean write(uint8_t header, uint8_t* buf, uint16_t length);
+    uint16_t writeString(char* string, uint8_t* buf, uint16_t pos);
+-   uint8_t *ip;
+-   char* domain;
+    uint16_t port;
+    Stream* stream;
+ public:
