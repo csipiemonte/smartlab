@@ -28,7 +28,7 @@ To apply the patch use the command:
 ```
 git clone https://github.com/knolleary/pubsubclient
 cd pubsubclient
-patch -p1 '<' pubsubclient_20140706
+patch -p1 < pubsubclient_20140706
 ```
 
 Install libraries
