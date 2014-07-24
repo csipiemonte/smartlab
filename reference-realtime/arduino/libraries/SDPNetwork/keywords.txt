@@ -1,0 +1,32 @@
+#######################################
+# Syntax Coloring Map
+####################################### 
+# Class
+#######################################
+NetworkConfig	KEYWORD1
+NTPClient	KEYWORD1
+
+
+#######################################
+# Methods and Functions 
+#######################################
+ip	KEYWORD2
+dhcp	KEYWORD2
+dns	KEYWORD2
+gateway	KEYWORD2
+netmask	KEYWORD2
+off	KEYWORD2
+on	KEYWORD2
+receive	KEYWORD2
+send	KEYWORD2
+setDHCP	KEYWORD2
+setDNS	KEYWORD2
+setIPAddress	KEYWORD2
+setGateway	KEYWORD2
+setNetmask	KEYWORD2
+setSystemTime	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

@@ -1,0 +1,37 @@
+#######################################
+# Syntax Coloring Map 
+####################################### 
+# Class
+#######################################
+AnalogSensor	KEYWORD1
+DifferentialLinearSensor	KEYWORD1
+DifferentialSensor	KEYWORD1
+GenericSensor	KEYWORD1
+
+#######################################
+# Methods and Functions 
+#######################################	
+alfa		KEYWORD2
+beta		KEYWORD2
+calibrate		KEYWORD2
+digital		KEYWORD2
+getWorkingElectrode		KEYWORD2
+getAuxiliaryElectrode		KEYWORD2
+id	KEYWORD2
+measure		KEYWORD2
+measureAvg	KEYWORD2
+digital		KEYWORD2
+isWarmed	KEYWORD2
+isConnected	KEYWORD2
+pin	KEYWORD2
+setAlfa	KEYWORD2
+setBeta	KEYWORD2
+setID	KEYWORD2
+setTWarm	KEYWORD2
+tWarm		KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

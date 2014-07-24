@@ -1,0 +1,23 @@
+#######################################
+# Syntax Coloring Map
+####################################### 
+# Class
+#######################################
+Interval	KEYWORD1
+IntervalMicroSeconds	KEYWORD1
+IntervalSeconds	KEYWORD1
+
+#######################################
+# Methods and Functions 
+#######################################	
+getTimeAsString	KEYWORD2
+reset	KEYWORD2
+residualTime	KEYWORD2
+start	KEYWORD2
+time	KEYWORD2
+update	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
