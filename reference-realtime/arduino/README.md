@@ -20,7 +20,7 @@ Requirement
 --------------
 SDP libraries require:
 - [Time](http://playground.arduino.cc/code/time) 
-- [PubSubClient](https://github.com/csipiemonte/pubsubclient). This library is a fork from [pubsubclient project](https://github.com/knolleary/pubsubclient), if you get this code, you have to apply the patch *pubsubclient_20140706*.
+- [PubSubClient](https://github.com/csipiemonte/pubsubclient). This library is a fork from [pubsubclient project](https://github.com/knolleary/pubsubclient), if you get the original code, you have to apply the patch *pubsubclient_20140706*.
 - [MemoryFree](http://playground.arduino.cc/code/AvailableMemory) only for debug
 
 To apply the patch use the command:
