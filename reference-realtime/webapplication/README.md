@@ -9,13 +9,15 @@ Installation
 -----------
 
  *  Installation of the Broker MQTT
-The broker MQTT chosen for the realization of the reference solution is mosquitto. The software can be installed via the package management system of Ubuntu.
+ 
+ The broker MQTT chosen for the realization of the reference solution is mosquitto. The software can be installed via the package management system of Ubuntu.
 ```
 sudo apt-get install mosquitto mosquitto-clients
 ```
 
  *  Installation of the server Websocket
-The implementation WebSocket choice for the reference solution is based on Node.JS and Socket.IO. 
+ 
+ The implementation WebSocket choice for the reference solution is based on Node.JS and Socket.IO. 
 Node.JS must be installed by downloading and compiling from source.
 
  Prerequisites for Node.js:
@@ -48,7 +50,8 @@ cp node.sh /etc/profile.d/
 ```
 
  *  Installation of the web page
-The final part is to insert the page html demo and the necessary dependencies JavaScript within a web server. For example, if you installed Apache from the official repositories of Ubuntu, just copy the necessary files into a folder under "/var/www".
+ 
+ The final part is to insert the page html demo and the necessary dependencies JavaScript within a web server. For example, if you installed Apache from the official repositories of Ubuntu, just copy the necessary files into a folder under "/var/www".
 ```
 sudo apt-get install apache2
 sudo mkdir /var/www/sdp-ref
