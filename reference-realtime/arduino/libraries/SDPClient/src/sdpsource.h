@@ -172,10 +172,11 @@ class SDPSource
      *
      * \param[in] stream Data stream associated to sensor
      * \param[in] measure Measure measurement to send
+     * \param[in] tenant publishing tenant(or domain)
      *
      * \return
      */
-    uint8_t publish(SDPStream& stream, Measure& measure);
+    uint8_t publish(SDPStream& stream, Measure& measure, const char* tenant = DEFAULT_TENANT);
 
     /**
      * This function keep connection alive and receive message from MQTT broker.
@@ -226,6 +227,12 @@ class SDPSource
 
     /// Separator field (constant string)
     static const char *SEPARATOR;
+
+    /// MQTT connection type
+    static const char *CONNECTION_TYPE;
+
+    /// Separator field (constant string)
+    static const char *DEFAULT_TENANT;
 
     /// Character used to concatenate Sensor ID and stream ID
     static const char CONC_CHAR;

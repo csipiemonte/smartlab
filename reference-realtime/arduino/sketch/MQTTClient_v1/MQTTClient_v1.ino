@@ -119,20 +119,20 @@
  * NETWORK_DNS         : Primary DNS of the network.
  *
  ******************************************************************************************/
-//! Arduino MAC address (make this unique). It is used by Ethernet shield
+//! Arduino MAC address (make this unique)
 #define ARDUINO_MAC_ADDRESS { 0xDE, 0xED, 0xBA, 0xDE, 0xFE, 0xED }
 
 //! Arduino IP address 
-#define ARDUINO_IP_ADDRESS  { 192, 168, 1, 100 } 
+#define ARDUINO_IP_ADDRESS  { 192, 168, 253, 229 } //{ 192,168, 0, 100 }
 
 //! IP address mask (usually this value) 
 #define NETWORK_SUBNET  { 255, 255, 255,0 };
 
 //! Default gateway (your router) 
-#define NETWORK_GATEWAY { 192, 168, 1, 254 };
+#define NETWORK_GATEWAY { 192, 168, 253, 254 };
 
-//! DNS address (e.g. 208.67.222.222 from open DNS)
-#define NETWORK_DNS  { 208, 67, 222, 222 };
+//! DNS address
+#define NETWORK_DNS  { 194, 116, 4, 64 };
 
 
 
@@ -154,10 +154,10 @@
 #define WIRELESS_TYPE 2
 
 // Wireless SSID
-#define WIRELESS_SSID "network";
+#define WIRELESS_SSID "InlabTest2";
 
 // Wireless key or password
-#define WIRELESS_KEY "password";
+#define WIRELESS_KEY "1nl4b$4cc3ss-p01nt";
 
 // Wireless index (WEP code)
 #define WIRELESS_INDEX 0
@@ -173,7 +173,7 @@
  *
  ******************************************************************************************/
 //! IP address of NTP server (e.g. 193.204.114.232 - ntp1.inrim.it)
-#define NTP_SERVER_IP { 193, 204, 114, 232 };
+#define NTP_SERVER_IP { 194, 116, 4, 64 };
 
 
 
@@ -189,7 +189,8 @@
  *
  ******************************************************************************************/
 //! IP address of MQTT broker
-#define MQTT_SERVER_IP { 192, 169, 1, 60 };
+#define MQTT_SERVER_IP { 194, 116, 5, 164 };
+//#define MQTT_SERVER_IP { 130, 192, 69, 159 };
 
 //! domain of MQTT broker
 #define MQTT_SERVER_DOMAIN "smartdatanet.it";
@@ -200,6 +201,8 @@
 /******************************************************************************************
  * Smart object description
  * In this section you can set all main parameter of the smart object.
+ *
+ * TENANT                  : Publishing tenant (or domain)
  *
  * SENSOR_ANALOG_INPUT_PIN : Number if the analog input where the sensor is connected
  *
@@ -216,6 +219,9 @@
  * POLLING_TIME  : Time between two consecutive reads of a sensor. It is in seconds
  *
  ******************************************************************************************/
+//! Publishing Tenant
+#define TENANT "smartlab"
+ 
 //! Analog input pin of the Arduino connected to the sensor
 #define SENSOR_ANALOG_INPUT_PIN  0
 
@@ -638,7 +644,7 @@ void loop()
 
         // Publish measurement
         int n = 0;
-        if ( n = (MTTQClient.publish(stream,m)) )
+        if ( n = (MTTQClient.publish(stream,m, TENANT)) )
         {
          Serial.println( F("done") );
         }

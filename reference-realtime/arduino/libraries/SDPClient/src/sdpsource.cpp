@@ -22,6 +22,10 @@ const char* SDPSource::LABEL_TIME = "\"time\":\"";
 const char* SDPSource::LABEL_COMPONENTS = "\"components\":";
 const char* SDPSource::LABEL_COMPONENT_0 = "\"c0\":\"";
 const char* SDPSource::SEPARATOR = "\",";
+
+const char* SDPSource::CONNECTION_TYPE = "input";
+const char* SDPSource::DEFAULT_TENANT = "smartlab";
+
 const char SDPSource::CONC_CHAR = '/';
 
 SDPSource::SDPSource() :
@@ -112,25 +116,44 @@ uint8_t SDPSource::publish(char* topic, char* msg)
   return n;
 }
 
-uint8_t SDPSource::publish(SDPStream& stream, Measure& measure)
+uint8_t SDPSource::publish(SDPStream& stream, Measure& measure, const char* tenant)
 {
-#define TOPIC_SIZE 128
+  #define TOPIC_SIZE 128
 
   char topic[TOPIC_SIZE] = { 0 };
 
   GenericSensor *pSensor = (GenericSensor*) stream.sensor();
   GenericSensor &sensor = (*pSensor);
 
-  int lenStreamId = strlen(stream.id());
-  int lenSensorId = strlen(sensor.id());
+  size_t lenStreamId = strlen(stream.id());
+  size_t lenSensorId = strlen(sensor.id());
+  size_t lenType = strlen(CONNECTION_TYPE);
+  size_t lenTenant = strlen(tenant);
 
-  if ((lenStreamId + lenSensorId + 3) > TOPIC_SIZE)
+
+  if ((lenType + lenTenant + lenStreamId + lenSensorId + 5) > TOPIC_SIZE)
   {
     return 0;
   }
-  memcpy(&topic[0], sensor.id(), lenSensorId);
-  topic[lenSensorId] = CONC_CHAR;
-  memcpy(&topic[lenSensorId + 1], stream.id(), lenStreamId);
+
+  // Create topic
+  size_t cIndex = 0;
+
+  memcpy(&topic[cIndex], CONNECTION_TYPE, lenType);
+  cIndex+=lenType;
+  topic[cIndex++] = CONC_CHAR;
+
+  memcpy(&topic[cIndex], tenant, lenTenant);
+  cIndex+=lenTenant;
+  topic[cIndex++] = CONC_CHAR;
+
+  memcpy(&topic[cIndex], sensor.id(), lenSensorId);
+  cIndex+=lenSensorId;
+  topic[cIndex++] = '_';
+  memcpy(&topic[cIndex++], stream.id(), lenStreamId);
+
+  Serial.print("topic: ");
+  Serial.println(topic);
 
   if (!createJSON(stream, measure))
   {
