@@ -119,20 +119,17 @@
  * NETWORK_DNS         : Primary DNS of the network.
  *
  ******************************************************************************************/
-//! Arduino MAC address (make this unique)
-#define ARDUINO_MAC_ADDRESS { 0xDE, 0xED, 0xBA, 0xDE, 0xFE, 0xED }
-
 //! Arduino IP address 
-#define ARDUINO_IP_ADDRESS  { 192, 168, 253, 229 } //{ 192,168, 0, 100 }
+#define ARDUINO_IP_ADDRESS  { 192, 168, 1, 100 } 
 
 //! IP address mask (usually this value) 
 #define NETWORK_SUBNET  { 255, 255, 255,0 };
 
 //! Default gateway (your router) 
-#define NETWORK_GATEWAY { 192, 168, 253, 254 };
+#define NETWORK_GATEWAY { 192, 168, 1, 254 };
 
-//! DNS address
-#define NETWORK_DNS  { 194, 116, 4, 64 };
+//! DNS address (e.g. 208.67.222.222 from open DNS)
+#define NETWORK_DNS  { 208, 67, 222, 222 };
 
 
 
@@ -154,13 +151,14 @@
 #define WIRELESS_TYPE 2
 
 // Wireless SSID
-#define WIRELESS_SSID "InlabTest2";
+#define WIRELESS_SSID "network";
 
 // Wireless key or password
-#define WIRELESS_KEY "1nl4b$4cc3ss-p01nt";
+#define WIRELESS_KEY "password";
 
 // Wireless index (WEP code)
 #define WIRELESS_INDEX 0
+
 
 
 
@@ -173,7 +171,7 @@
  *
  ******************************************************************************************/
 //! IP address of NTP server (e.g. 193.204.114.232 - ntp1.inrim.it)
-#define NTP_SERVER_IP { 194, 116, 4, 64 };
+#define NTP_SERVER_IP { 193, 204, 114, 232 };
 
 
 
@@ -189,12 +187,16 @@
  *
  ******************************************************************************************/
 //! IP address of MQTT broker
-#define MQTT_SERVER_IP { 194, 116, 5, 164 };
-//#define MQTT_SERVER_IP { 130, 192, 69, 159 };
+#define MQTT_SERVER_IP { 192, 169, 1, 60 };
 
-//! domain of MQTT broker
+//! Domain of MQTT broker
 #define MQTT_SERVER_DOMAIN "smartdatanet.it";
 
+//! MQTT Username
+#define USERNAME "smartlab"
+
+//! MQTT Username
+#define PASSWORD "smartlab$1"
 
 
 
@@ -395,7 +397,7 @@ AnalogSensor sensor(SENSOR_ANALOG_INPUT_PIN);
 SDPStream stream;
 
 //! SDP source
-SDPSource MTTQClient(MQTTserver, client, "");
+SDPSource MTTQClient(MQTTserver, client, USERNAME);
 
 //! Smart object state
 uint8_t state = IDLE;
@@ -569,7 +571,11 @@ void setup()
 
   
   // Create connection with the SPD server
+/*  
+  MTTQClient.setUsername(USERNAME);
+  MTTQClient.setPassword(PASSWORD);
   MTTQClient.connect();
+*/
   
   state = NTPUPDATE;
 }

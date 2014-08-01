@@ -56,6 +56,13 @@ class SDPSource
 
       //! Max size for message (or JSON) to send to the server
       MSG_SIZE = 1024,
+
+      //! Max size for username
+      USERNAME_SIZE = 15,
+
+      //! Max size for password
+      PASSWORD_SIZE = 15,
+
     };
 
     //! Default identifier value
@@ -88,6 +95,22 @@ class SDPSource
      *
      */
     virtual ~SDPSource();
+
+    /**
+     * Sets the MQTT username.
+     *
+     * \param[in] user MQTT username.
+     *
+     */
+    void setUsername(char * user) { memcpy(m_username, user, USERNAME_SIZE); };
+
+    /**
+     * Sets the MQTT username.
+     *
+     * \param[in] user MQTT username.
+     *
+     */
+    void setPassword(char * pass) { memcpy(m_password, pass, PASSWORD_SIZE); };
 
     /**
      * Sets the client identifier.
@@ -130,7 +153,8 @@ class SDPSource
     }
 
     /**
-     * Create a MQTT connection with the Smart Data server.
+     * Creates a MQTT connection with the Smart Data server. If field username is set, the node authenticates
+     * itself on the MQTT broker.
      *
      * \return NO_ERRORS or #_sdpsource_error code error otherwise
      */
@@ -280,6 +304,12 @@ class SDPSource
 
     //! Message to send to the server
     char m_message[MSG_SIZE];
+
+    //! MQTT Username
+    char m_username[USERNAME_SIZE];
+
+    //! MQTT Password
+    char m_password[PASSWORD_SIZE];
 
     //! Publish subscriber client
     PubSubClient *m_subclient;

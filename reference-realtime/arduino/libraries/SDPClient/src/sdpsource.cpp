@@ -33,6 +33,10 @@ SDPSource::SDPSource() :
 {
   m_server = NULL;
   m_netclient = NULL;
+
+  memset(m_username, 0, USERNAME_SIZE);
+  memset(m_password, 0, PASSWORD_SIZE);
+
   memset(m_message, 0, MSG_SIZE);
   memset(m_id, 0, ID_SIZE);
   memcpy(m_id, DEFAULT_ID, strlen(DEFAULT_ID));
@@ -43,6 +47,10 @@ SDPSource::SDPSource(SDPServer& server, Client& client, const char* id) :
 {
   this->m_server = &server;
   this->m_netclient = &client;
+
+  memset(m_username, 0, USERNAME_SIZE);
+  memset(m_password, 0, PASSWORD_SIZE);
+
   memset(m_message, 0, MSG_SIZE);
   memset(m_id, 0, ID_SIZE);
   memcpy(m_id, id, strlen(id));
@@ -89,7 +97,14 @@ int8_t SDPSource::connect()
   } else
   {
   }
-  return m_subclient->connect(m_id);
+  if (strlen(m_username))
+  {
+    Serial.println("authentication");
+    return m_subclient->connect( m_id, m_username, m_password);
+  }
+
+  Serial.println("no authentication");
+  return m_subclient->connect( m_id );
 }
 
 int8_t SDPSource::disconnect()
