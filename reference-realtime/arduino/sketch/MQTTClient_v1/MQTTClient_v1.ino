@@ -185,6 +185,11 @@
  *
  * MQTT_SERVER_DOMAIN : Doamin of the MQTT server.
  *
+ * MQTT_USERNAME      : MQTT username. It is empty no client authentication.
+ *                      This value is used as client identifier on the MQTT broker
+ *
+ * MQTT_PASSWORD      : MQTT password
+ *
  ******************************************************************************************/
 //! IP address of MQTT broker
 #define MQTT_SERVER_IP { 192, 169, 1, 60 };
@@ -193,10 +198,10 @@
 #define MQTT_SERVER_DOMAIN "smartdatanet.it";
 
 //! MQTT Username
-#define USERNAME "smartlab"
+#define MQTT_USERNAME "smartlab"
 
 //! MQTT Username
-#define PASSWORD "smartlab$1"
+#define MQTT_PASSWORD "smartlab$1"
 
 
 

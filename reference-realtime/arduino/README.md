@@ -179,6 +179,13 @@ This version use MQTT username as *Client Idenfier*. MQTT authentication is not 
 
 //! domain of MQTT broker
 #define MQTT_SERVER_DOMAIN "smartdatanet.it";
+#define MQTT_SERVER_DOMAIN "smartdatanet.it";
+
+//! MQTT Username
+#define USERNAME "smartlab"
+
+//! MQTT Username
+#define PASSWORD "smartlab$1"
 
 
 
