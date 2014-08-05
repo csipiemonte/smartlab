@@ -67,6 +67,16 @@ This version supports MQTT authentication. To use it, you must set up the follow
 ```
 
 This sketch uses the USERNAME value as *Client Identifier* and it sends it to the MQTT broker. Please check that it is unique.
+To not use MQTT authentication you have to comment the following line:
+
+```
+// Create connection with the SPD server
+/*
+MTTQClient.setUsername(USERNAME);
+MTTQClient.setPassword(PASSWORD);
+*/
+```
+
 This is an example of configuration (at the moment GPS location are not used):
 
 ```
