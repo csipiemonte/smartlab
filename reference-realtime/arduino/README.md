@@ -56,7 +56,18 @@ Sketch MQTT
 The sketch *MQTTClient_v1.ino* can be used with WiFi and Ethernet shield. The ethernet shield on Arduino Mega has got some bugs in connection management and require a periodacal hardware reset.
 The Arduino node takes current time from a NTP server in the setup function, and periodically updates it  in the loop.
 You can configure node behavior comment or uncomment some MACRO at the begin of the sketch. This is an example for WiFi connection and automatic configuration (DHCP). Change IP address of the MQTT broker with your working one and WiFi configuration with your networnk SSID and keyword (for WEP or WPA).
-This version use MQTT username as *Client Idenfier*. MQTT authentication is not tested yet.
+This version supports MQTT authentication. To use it, you must set up the following parameters:
+
+```
+//! MQTT Username
+#define USERNAME "smartlab"
+
+//! MQTT Username
+#define PASSWORD "smartlab$1"
+```
+
+This sketch uses the USERNAME value as *Client Identifier* and it sends it to the MQTT broker. Please check that it is unique.
+This is an example of configuration (at the moment GPS location are not used):
 
 ```
 /******************************************************************************************
@@ -178,7 +189,6 @@ This version use MQTT username as *Client Idenfier*. MQTT authentication is not 
 #define MQTT_SERVER_IP { 192, 169, 1, 60 };
 
 //! domain of MQTT broker
-#define MQTT_SERVER_DOMAIN "smartdatanet.it";
 #define MQTT_SERVER_DOMAIN "smartdatanet.it";
 
 //! MQTT Username

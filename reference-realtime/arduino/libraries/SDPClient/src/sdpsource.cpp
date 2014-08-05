@@ -160,13 +160,13 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure, const char* tena
 
   memcpy(&topic[cIndex], tenant, lenTenant);
   cIndex+=lenTenant;
+/*
   topic[cIndex++] = CONC_CHAR;
-
   memcpy(&topic[cIndex], sensor.id(), lenSensorId);
   cIndex+=lenSensorId;
   topic[cIndex++] = '_';
   memcpy(&topic[cIndex++], stream.id(), lenStreamId);
-
+*/
   Serial.print("topic: ");
   Serial.println(topic);
 

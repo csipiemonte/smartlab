@@ -119,6 +119,9 @@
  * NETWORK_DNS         : Primary DNS of the network.
  *
  ******************************************************************************************/
+//! Arduino MAC address (make this unique)
+#define ARDUINO_MAC_ADDRESS { 0xDE, 0xED, 0xBA, 0xDE, 0xFE, 0xED }
+
 //! Arduino IP address 
 #define ARDUINO_IP_ADDRESS  { 192, 168, 1, 100 } 
 
@@ -192,7 +195,7 @@
  *
  ******************************************************************************************/
 //! IP address of MQTT broker
-#define MQTT_SERVER_IP { 192, 169, 1, 60 };
+#define MQTT_SERVER_IP { 158, 102, 203, 200 };
 
 //! Domain of MQTT broker
 #define MQTT_SERVER_DOMAIN "smartdatanet.it";
@@ -576,9 +579,9 @@ void setup()
 
   
   // Create connection with the SPD server
-/*  
   MTTQClient.setUsername(USERNAME);
   MTTQClient.setPassword(PASSWORD);
+/* 
   MTTQClient.connect();
 */
   
@@ -837,7 +840,7 @@ bool ntpupdate()
 {
   ntp.send();
   // wait to see if a reply is available
-  delay(1000);
+  delay(3000);
   
   if ( ntp.receive() )
   {
