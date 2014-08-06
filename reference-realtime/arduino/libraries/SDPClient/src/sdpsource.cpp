@@ -99,11 +99,9 @@ int8_t SDPSource::connect()
   }
   if (strlen(m_username))
   {
-    Serial.println("authentication");
     return m_subclient->connect( m_id, m_username, m_password);
   }
 
-  Serial.println("no authentication");
   return m_subclient->connect( m_id );
 }
 
@@ -167,8 +165,6 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure, const char* tena
   topic[cIndex++] = '_';
   memcpy(&topic[cIndex++], stream.id(), lenStreamId);
 */
-  Serial.print("topic: ");
-  Serial.println(topic);
 
   if (!createJSON(stream, measure))
   {

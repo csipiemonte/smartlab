@@ -9,7 +9,7 @@
 
  created 1 Jul 2014
  by Marco Boeris Frusca
- modified 1 Aug 2014
+ modified 3 Jul 2014
  by Marco Boeris Frusca
 
  */
@@ -119,7 +119,7 @@
  * NETWORK_DNS         : Primary DNS of the network.
  *
  ******************************************************************************************/
-//! Arduino MAC address (make this unique)
+//! Arduino MAC address (make this unique). It is used by Ethernet shield
 #define ARDUINO_MAC_ADDRESS { 0xDE, 0xED, 0xBA, 0xDE, 0xFE, 0xED }
 
 //! Arduino IP address 
@@ -161,7 +161,6 @@
 
 // Wireless index (WEP code)
 #define WIRELESS_INDEX 0
-
 
 
 
@@ -405,7 +404,7 @@ AnalogSensor sensor(SENSOR_ANALOG_INPUT_PIN);
 SDPStream stream;
 
 //! SDP source
-SDPSource MTTQClient(MQTTserver, client, USERNAME);
+SDPSource MTTQClient(MQTTserver, client, MQTT_USERNAME);
 
 //! Smart object state
 uint8_t state = IDLE;
@@ -579,9 +578,9 @@ void setup()
 
   
   // Create connection with the SPD server
-  MTTQClient.setUsername(USERNAME);
-  MTTQClient.setPassword(PASSWORD);
-/* 
+  MTTQClient.setUsername(MQTT_USERNAME);
+  MTTQClient.setPassword(MQTT_PASSWORD);
+/*  
   MTTQClient.connect();
 */
   
