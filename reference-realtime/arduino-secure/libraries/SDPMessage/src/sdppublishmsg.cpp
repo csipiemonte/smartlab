@@ -32,8 +32,8 @@ PROGMEM const char* PublishJSON::LABEL[] =       // change "string_table" name t
 
 
 
-prog_char SecureJSON::LABEL_MESSAGE[] PROGMEM  = {"message"};
-prog_char SecureJSON::LABEL_DIGEST[] PROGMEM  = {"digest"};
+prog_char SecureJSON::LABEL_MESSAGE[] PROGMEM  = {"object"};
+prog_char SecureJSON::LABEL_DIGEST[] PROGMEM  = {"signature"};
 
 PROGMEM const char* SecureJSON::LABEL[] =       // change "string_table" name to suit
 {
