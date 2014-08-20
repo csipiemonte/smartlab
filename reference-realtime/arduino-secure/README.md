@@ -72,7 +72,7 @@ doxygen sdp.doxygen
 
 Sketch MQTT
 --------------
-The sketch *MQTTClient.sec.ino* can be used with WiFi and Ethernet shield. The ethernet shield on Arduino Mega has got some bugs in connection management and require a periodacal hardware reset.
+The sketch *MQTTClient_sec.ino* can be used with WiFi and Ethernet shield. The ethernet shield on Arduino Mega has got some bugs in connection management and require a periodacal hardware reset.
 The Arduino node takes current time from a NTP server in the setup function, and periodically updates it  in the loop.
 You can configure node behavior comment or uncomment some MACRO at the begin of the sketch. This is an example for WiFi connection and automatic configuration (DHCP). Change IP address of the MQTT broker with your working one and WiFi configuration with your networnk SSID and keyword (for WEP or WPA).
 This version supports MQTT authentication. To use it, you must set up the following parameters:
