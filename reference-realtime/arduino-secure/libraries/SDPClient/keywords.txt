@@ -1,0 +1,61 @@
+#######################################
+# Syntax Coloring Map
+####################################### 
+# Class
+#######################################
+SDPServer	KEYWORD1
+SDPSource	KEYWORD1
+SDPStream	KEYWORD1
+
+#######################################
+# Methods and Functions 
+#######################################	
+add	KEYWORD2
+altitude	KEYWORD2
+connect	KEYWORD2
+disconnect	KEYWORD2
+domain	KEYWORD2
+id	KEYWORD2
+ip	KEYWORD2
+isConnected	KEYWORD2
+isDefinedByIP	KEYWORD2
+isValid	KEYWORD2
+latitude	KEYWORD2
+longitude	KEYWORD2
+mobile	KEYWORD2
+port	KEYWORD2
+position	KEYWORD2
+publish	KEYWORD2
+reset	KEYWORD2
+sensor	KEYWORD2
+server	KEYWORD2
+service	KEYWORD2
+setAltitude	KEYWORD2
+setLatitude	KEYWORD2
+setDomain	KEYWORD2
+setId	KEYWORD2
+setIPAddress	KEYWORD2
+setLongitude	KEYWORD2
+setMobile	KEYWORD2
+setPort	KEYWORD2
+setPosition	KEYWORD2
+setSensor	KEYWORD2
+setServer	KEYWORD2
+setService	KEYWORD2
+setTimestamp	KEYWORD2
+setValue	KEYWORD2
+timestamp	KEYWORD2
+value	KEYWORD2
+setDomain	KEYWORD2
+setIPAddress	KEYWORD2
+setPort	KEYWORD2
+setService	KEYWORD2
+ip	KEYWORD2
+domain	KEYWORD2
+port	KEYWORD2
+service	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

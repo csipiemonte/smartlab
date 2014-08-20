@@ -1,0 +1,62 @@
+#######################################
+# Syntax Coloring Map 
+####################################### 
+# Class
+#######################################
+AnalogSensor	KEYWORD1
+avgMeasure	KEYWORD1
+DifferentialLinearSensor	KEYWORD1
+DifferentialSensor	KEYWORD1
+GenericSensor	KEYWORD1
+GPSPosition	KEYWORD1
+Measure	KEYWORD1
+
+#######################################
+# Methods and Functions 
+#######################################	
+alfa		KEYWORD2
+beta		KEYWORD2
+calibrate		KEYWORD2
+digital		KEYWORD2
+getWorkingElectrode		KEYWORD2
+getAuxiliaryElectrode		KEYWORD2
+id	KEYWORD2
+measure		KEYWORD2
+measureAvg	KEYWORD2
+digital		KEYWORD2
+isWarmed	KEYWORD2
+isConnected	KEYWORD2
+pin	KEYWORD2
+setAlfa	KEYWORD2
+setBeta	KEYWORD2
+setID	KEYWORD2
+setTWarm	KEYWORD2
+tWarm		KEYWORD2
+
+add	KEYWORD2
+altitude	KEYWORD2
+id	KEYWORD2
+isValid	KEYWORD2
+latitude	KEYWORD2
+longitude	KEYWORD2
+mobile	KEYWORD2
+position	KEYWORD2
+reset	KEYWORD2
+sensor	KEYWORD2
+setAltitude	KEYWORD2
+setLatitude	KEYWORD2
+setId	KEYWORD2
+setLongitude	KEYWORD2
+setMobile	KEYWORD2
+setPosition	KEYWORD2
+setSensor	KEYWORD2
+setTimestamp	KEYWORD2
+setValue	KEYWORD2
+timestamp	KEYWORD2
+value	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

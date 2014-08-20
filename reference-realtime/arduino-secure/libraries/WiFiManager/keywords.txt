@@ -1,0 +1,32 @@
+#######################################
+# Syntax Coloring Map
+####################################### 
+# Class
+#######################################
+WiFiManager	KEYWORD1
+
+#######################################
+# Methods and Functions 
+#######################################	
+config	KEYWORD2
+connect	KEYWORD2
+key	KEYWORD2
+keyIndex	KEYWORD2
+isFirmwareValid	KEYWORD2
+isShieldConnected	KEYWORD2
+refresh	KEYWORD2
+resetPin	KEYWORD2
+resetShield	KEYWORD2
+setKey	KEYWORD2
+setKeyIndex	KEYWORD2
+setResetPin	KEYWORD2
+setSSID	KEYWORD2
+setType	KEYWORD2
+ssid	KEYWORD2
+status	KEYWORD2
+type	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
