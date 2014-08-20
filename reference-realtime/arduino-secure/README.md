@@ -15,6 +15,7 @@ This code extends the features of the [*reference implementation*](https://githu
 the sketch will send a JSON according tO the [*smartdatanet specification*](http://www.smartdatanet.it/).
 - *libraries/* directory has got all classes and interfaces that implement SDP specification.
 - *sketch/* directory has got an example of sketch that uses SDP Arduino libraries.
+
 MQTTClient_sec.ino sketch can be work with WiFi and Ethernet shield. Ethernet on Arduino Mega has got some bugs in connection management and require a periodacal hardware reset. It is tested in the following configuration:
 - Arduino Mega 2560 rev3
 - Arduino WiFi Shield
@@ -27,10 +28,10 @@ Requirement
 Libraries required are:
 - [Time](http://playground.arduino.cc/code/time) 
 - [PubSubClient](https://github.com/csipiemonte/pubsubclient). This library is a fork from [pubsubclient project](https://github.com/knolleary/pubsubclient), if you get the original code, you have to apply the patch *pubsubclient_20140706*.
-- [MemoryFree](http://playground.arduino.cc/code/AvailableMemory) only for debug
 - [aJson] This library is a fork from [aJson project](https://github.com/interactive-matter/aJson).
 - [Cryptosuite](https://github.com/csipiemonte/Cryptosuite). This library is a fork from [cryptosuite project](https://github.com/Cathedrow/Cryptosuite).
 - [arduino-base64](https://github.com/csipiemonte/arduino-base64). This library is a fork from [arduino-base64 project](https://github.com/adamvr/arduino-base64).
+- [MemoryFree](http://playground.arduino.cc/code/AvailableMemory) only for debug
 
 
 Install libraries
