@@ -53,6 +53,9 @@
 /*----------------------------------------------------------------------------------------
 /* CONFIGURATION
 /*----------------------------------------------------------------------------------------*/
+//! ArduinI IDE version. Commet this line if you se a old version of IDE (<= 1.5.6)
+#define IDE_GT_1_5_6 1
+
 
 //! Debug memory usage
 #define DEBUG_MEMORY
@@ -82,7 +85,7 @@
  *                      Comment it to use a domain definition
  *
  * SECURE_JSON        : use secure json. Default value is 0 (not). Comment it if you want 
-  *                     to use standard SDP JSON. 
+ *                     to use standard SDP JSON. 
  ******************************************************************************************/
 //! Global macro value to define if network connection is cable or Wi-Fi
 #define WIFI 1
@@ -291,7 +294,6 @@
  * HMAC_KEYWORD_LENGTH : length of the h-MAc secret
  *
  ******************************************************************************************/
-
 //! H-MAC secret or keyword
 //#define HMAC_KEYWORD  { 0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19 };
 #define HMAC_KEYWORD  { 's','m','a','r','t','l','a','b' };
@@ -383,7 +385,9 @@ NetworkConfig netConfig;
 
 
 #ifdef WIFI
+
 //! Wireless network SSID (name)
+#ifdef IDE_GT_1_5_6
 prog_char w_ssid[] PROGMEM = WIRELESS_SSID;
 
 //! Wireless network password
@@ -395,6 +399,21 @@ PROGMEM const char *wireless_table[] = 	   // change "string_table" name to suit
   w_ssid,
   w_key
 };
+#else
+//! Wireless network SSID (name)
+const char w_ssid[] PROGMEM = WIRELESS_SSID;
+
+//! Wireless network password
+const char w_key[] PROGMEM = WIRELESS_KEY;
+
+//! Flash table for wireless configuration
+const char* const wireless_table[] PROGMEM =
+{   
+  w_ssid,
+  w_key
+};
+
+#endif
 
 //! Wireless network key Index number (needed only for WEP)
 int keyIndex = WIRELESS_INDEX ;
@@ -445,6 +464,7 @@ IPAddress ntpServer(ntpServerIP);
 NTPClient ntp(ntpServer);
 
 
+#ifdef IDE_GT_1_5_6
 
 // MQTT broker
 //! MQTT username (for authentication on MQTT broker
@@ -459,6 +479,23 @@ PROGMEM const char *mqtt_table[] = 	   // change "string_table" name to suit
   mqtt_username,
   mqtt_password,
 };
+#else
+
+// MQTT broker
+//! MQTT username (for authentication on MQTT broker
+const char mqtt_username[] PROGMEM = MQTT_USERNAME;
+
+//! MQTT username (for authentication on MQTT broker
+const char mqtt_password[] PROGMEM = MQTT_PASSWORD;
+
+//! Flash table for wireless configuration
+const char* const mqtt_table[] PROGMEM =
+{   
+  mqtt_username,
+  mqtt_password,
+};
+
+#endif
 
 //! Port number of MQTT broker. Default number is 1883
 uint16_t serverPort = 1883;
@@ -496,8 +533,8 @@ sdp::client::SDPSource MTTQClient(MQTTserver, client, MQTT_CLIENTID);
 //! Smart object state
 uint8_t state = IDLE;
 
-
-//! 
+#ifdef IDE_GT_1_5_6
+//! Tenant
 prog_char tenant[] PROGMEM = TENANT;
 
 //! Sensor Identifier
@@ -513,6 +550,24 @@ PROGMEM const char *node_table[] = 	   // change "string_table" name to suit
   sensor_id,
   stream_id,
 };
+#else
+//! Tenant
+const char tenant[] PROGMEM = TENANT;
+
+//! Sensor Identifier
+const char sensor_id[] PROGMEM = SENSOR_IDENTIFIER;
+
+//! Stream Identifier
+const char stream_id[] PROGMEM = STREAM_IDENTIFIER;
+
+//! Flash table for wireless configuration
+const char* const node_table[] PROGMEM
+{
+  tenant,
+  sensor_id,
+  stream_id,
+};
+#endif
 
 uint8_t hmacKey[HMAC_KEYWORD_LENGTH] = HMAC_KEYWORD;
 
@@ -785,8 +840,11 @@ void loop()
         // Publish measurement
         int n = 0;
 
-//        if ( n = (MTTQClient.publish(stream, m, TENANT)) )
+#ifdef IDE_GT_1_5_6
         if ( n = (MTTQClient.publish(stream, m, getFlashString(node_table, NODE_TENANT))) )
+#else
+        if ( n = (MTTQClient.publish(stream, m, getFlashString((const char**) node_table, NODE_TENANT))) )
+#endif
         {
          Serial.println( F("done") );
         }
@@ -908,12 +966,13 @@ void startNetwork()
     case 2 : { wifiHandler.setType(WiFiManager::WL_WPA);}; break;
     default : { wifiHandler.setType(WiFiManager::WL_OPEN); }; break;
   }
+#ifdef IDE_GT_1_5_6
   wifiHandler.setSSID(getFlashString(wireless_table, W_SSID));
   wifiHandler.setKey(getFlashString(wireless_table, W_KEY));
-/*
-  wifiHandler.setSSID(ssid);
-  wifiHandler.setKey(pass);
-*/
+#else
+  wifiHandler.setSSID(getFlashString((const char**) wireless_table, W_SSID));
+  wifiHandler.setKey(getFlashString((const char**) wireless_table, W_KEY));
+#endif
 /*
   Serial.print("SSID: ");
   Serial.println(wifiHandler.ssid());
