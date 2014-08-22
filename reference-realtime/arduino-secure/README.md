@@ -59,6 +59,8 @@ SDP JSON signature is coded in Base64 format and it is calculated taking the JSO
 {"object":{"stream":"temperature","sensor":"550e8400-e29b-41d4-a716-446655440000","values":[{"time":"2014-08-20T15:26:57Z","components":{"c0":24.41406},"validity":"valid"}]},"signature":"9rfugFJ7qm0my+wu/a0WrlNArYYg3ntnd78xOSwqipg="}
 ```
 
+**Note:**
+MQTT publish packet can be large maximum 256 Byte!
 
 Documentation
 --------------
