@@ -43,6 +43,13 @@ Install all required and SDP libraries. For example, if you have installed Ardui
 cp libraries/
 cp -r SDP* /opt/arduino-1.5.6-r2/libraries/
 ```
+If you use the lastest version of Arduino IDE (>= 1.5.7) you have to patch the Time library:
+
+```
+cd arduino-1.5.7/libraries/
+patch -p1 < Time_ide_1.5.7.patch
+```
+
 
 
 Secure JSON format
