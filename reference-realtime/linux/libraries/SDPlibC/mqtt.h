@@ -58,6 +58,6 @@ SenderMqtt newSenderMqtt(char* _ip, char* _port, char* _client, char* _topic);
 //riceve e parsifica il messaggio
 int sendMessageMqtt(SenderMqtt sender, char *message);
 void parseJsonMessage(char *bufferJson);
-char *substring(char *string, int position, int length);
+
 
 #endif

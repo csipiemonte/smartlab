@@ -520,7 +520,7 @@ void parseJsonMessage(char *bufferJson)
 		jsonObj= cJSON_GetObjectItem( json, "url" );
 		out=cJSON_Print(jsonObj);
 		printf("valore oggetto %s\n",out);
-		free(out);
+		//free(out);
 	}
     char sendline[1000], recvline[1000];
 char* ptr;
@@ -564,7 +564,7 @@ if (write(sockfd, sendline, strlen(sendline))>= 0)
 {
 printf("nessun errore nella scrittura\n");
     /// Read the response
- /*   while ((n = read(sockfd, recvline, 100000)) > 0) 
+    while ((n = read(sockfd, recvline, 100000)) > 0) 
     {
         recvline[n] = '\0';
 
@@ -574,7 +574,7 @@ printf("nessun errore nella scrittura\n");
 
         // check len for OutResponse here ?
         snprintf(OutResponse, 10,"%s", ptr);
-    }   */
+    }   
  
     printf("valore della risposta=%s\n",OutResponse);
 }
@@ -585,37 +585,16 @@ else
 printf("carico il firmware\n");
 
 char command[100];
+memset(command,0,100);
 strcat(command,"avrdude -p m2560 -P /dev/ttyACM0 -c stk500v2 -b 115200 -U flash:w:");
-char* substr = substring(substr, 21, strlen(out));
+char *substr = malloc (20*sizeof(char));
+memset(substr,0,20);
+substr = strndup(out+22, strlen(out)-1);//substring(out, 23, strlen(out)-2);
+
 strcat(command,substr);
-printf("valore del comando:\n",command);
+printf("valore del comando:%s strlen=%d\n",substr,strlen(out));
+free(out);
 
 }
 
 
-char *substring(char *string, int position, int length) 
-{
-   char *pointer;
-   int c;
- 
-   pointer = malloc(length+1);
- 
-   if (pointer == NULL)
-   {
-      printf("Unable to allocate memory.\n");
-      exit(EXIT_FAILURE);
-   }
- 
-   for (c = 0 ; c < position -1 ; c++) 
-      string++; 
- 
-   for (c = 0 ; c < length ; c++)
-   {
-      *(pointer+c) = *string;      
-      string++;   
-   }
- 
-   *(pointer+c) = '\0';
- 
-   return pointer;
-}
