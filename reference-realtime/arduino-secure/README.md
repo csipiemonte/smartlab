@@ -76,7 +76,7 @@ A standard for the format of the configuration message sent to the Arduino in no
 The Arduino subscribes itself to this topic on the MQTT broker:
 
 ```
-config/<tenant/<sensor_name>
+config/<tenant>/<sensor_name>
 ```
 
 When a new configuration is published on this topic, arduino node received the new one and process it. To save memory and make simple the process of this message on Arduino board, on this family the new configuration is sent ad CSV (Comma Separated Values). For example the configuration has this parameter:
@@ -153,6 +153,8 @@ This is an example of configuration (at the moment GPS location are not used):
  *
  * SECURE_JSON        : use secure json. Default value is 0 (not). Comment it if you want 
  *                      to use standard SDP JSON. 
+ * CONFIGURATION      : change configuration runtime receiving the new one from the broker
+ *                      MQTT (work in progress)
  ******************************************************************************************/
 //! Global macro value to define if network connection is cable or Wi-Fi
 #define WIFI 1
@@ -161,11 +163,32 @@ This is an example of configuration (at the moment GPS location are not used):
 //#define STATIC_NETWORK_CFG 1
 
 //! Global macro value to define if MQTT server is defined by IP address or domain string. Comment this define to use domain string
-#define SDP_SERVER_AS_IP 1
+//#define SDP_SERVER_AS_IP 1
 
 //! Global macro value to define if use secure JSON or standard SDP JSON
-#define SECURE_JSON 1
+//#define SECURE_JSON 1
 
+//! Global macro value to define if handle changing configuration form remote using the broker MQTT
+//#define CONFIGURATION 1
+
+
+
+#ifdef WIFI
+
+// Arduino IDE
+#include <WiFi.h>
+#include <WiFiUdp.h>
+
+// Non-standard library
+#include <wifimanager.h>
+
+#else
+
+// Arduino IDE
+#include <Ethernet.h>
+#include <EthernetUdp.h>
+
+#endif
 
 
 /******************************************************************************************
@@ -188,16 +211,16 @@ This is an example of configuration (at the moment GPS location are not used):
 #define ARDUINO_MAC_ADDRESS { 0xDE, 0xED, 0xBA, 0xDE, 0xFE, 0xED }
 
 //! Arduino IP address 
-#define ARDUINO_IP_ADDRESS  { 192, 168, 1, 100 } 
+#define ARDUINO_IP_ADDRESS  { 192, 168, 253, 229 } //{ 192,168, 0, 100 }
 
 //! IP address mask (usually this value) 
 #define NETWORK_SUBNET  { 255, 255, 255,0 };
 
 //! Default gateway (your router) 
-#define NETWORK_GATEWAY { 192, 168, 1, 254 };
+#define NETWORK_GATEWAY { 192, 168, 253, 254 };
 
-//! DNS address (e.g. 208.67.222.222 from open DNS)
-#define NETWORK_DNS  { 208, 67, 222, 222 };
+//! DNS address
+#define NETWORK_DNS  { 194, 116, 4, 64 };
 
 
 
@@ -219,10 +242,10 @@ This is an example of configuration (at the moment GPS location are not used):
 #define WIRELESS_TYPE 2
 
 // Wireless SSID
-#define WIRELESS_SSID "network";
+#define WIRELESS_SSID "InlabTest2";
 
 // Wireless key or password
-#define WIRELESS_KEY "password";
+#define WIRELESS_KEY "1nl4b$4cc3ss-p01nt";
 
 // Wireless index (WEP code)
 #define WIRELESS_INDEX 0
@@ -237,9 +260,9 @@ This is an example of configuration (at the moment GPS location are not used):
  * NTP_SERVER_IP     : IP address of the MQTT server.
  *
  ******************************************************************************************/
-//! IP address of NTP server (e.g. 193.204.114.232 - ntp1.inrim.it)
+//! IP address of NTP server
 #define NTP_SERVER_IP { 193, 204, 114, 232 };
-
+//#define NTP_SERVER_IP { 194, 116, 4, 64 };
 
 
 
@@ -248,28 +271,37 @@ This is an example of configuration (at the moment GPS location are not used):
  * In this section you can set up the MQTT server configuration. If it is defined 
  * SDP_SERVER_AS_IP you have to set MQTT_SERVER_IP value, otherwise MQTT_SERVER_DOMAIN.
  *
+ * MQTT_CLIENTID      : Client Identifier
+ *
  * MQTT_SERVER_IP     : IP address of the MQTT server.
  *
  * MQTT_SERVER_DOMAIN : Doamin of the MQTT server.
  *
  ******************************************************************************************/
 //! IP address of MQTT broker
-#define MQTT_SERVER_IP { 192, 169, 1, 60 };
+//#define MQTT_SERVER_IP { 194, 116, 5, 164 };
+#define MQTT_SERVER_IP { 194, 116, 5, 191 };
+//#define MQTT_SERVER_IP { 158, 102, 203, 201 }; 
 
 //! domain of MQTT broker
-#define MQTT_SERVER_DOMAIN "smartdatanet.it";
+#define MQTT_SERVER_DOMAIN "stream.smartdatanet.it";
+
+//! Client Identifier
+#define MQTT_CLIENTID "Ardu0001"
 
 //! MQTT Username
-#define USERNAME "smartlab"
+#define MQTT_USERNAME "smartlab"
 
 //! MQTT Username
-#define PASSWORD "smartlab$1"
+#define MQTT_PASSWORD "Ux0mu5it"
 
 
 
 /******************************************************************************************
  * Smart object description
  * In this section you can set all main parameter of the smart object.
+ *
+ * TENANT                  : Publishing tenant (or domain)
  *
  * SENSOR_ANALOG_INPUT_PIN : Number if the analog input where the sensor is connected
  *
@@ -286,6 +318,9 @@ This is an example of configuration (at the moment GPS location are not used):
  * POLLING_TIME  : Time between two consecutive reads of a sensor. It is in seconds
  *
  ******************************************************************************************/
+//! Publishing Tenant
+#define TENANT "smartlab"
+ 
 //! Analog input pin of the Arduino connected to the sensor
 #define SENSOR_ANALOG_INPUT_PIN  0
 
@@ -321,6 +356,24 @@ This is an example of configuration (at the moment GPS location are not used):
 
 //! domain of MQTT broker
 #define UPDATE_TIME_PERIOD 60000L
+
+
+
+/******************************************************************************************
+ * Secure
+ * In this section you can set up the secure parameters (keyword for h-mac).
+ *
+ * HMAC_KEYWORD        : H-MAC secret or keyword
+ *
+ * HMAC_KEYWORD_LENGTH : length of the h-MAc secret
+ *
+ ******************************************************************************************/
+//! H-MAC secret or keyword
+//#define HMAC_KEYWORD  { 0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19 };
+#define HMAC_KEYWORD  { 's','m','a','r','t','l','a','b' };
+
+//#define HMAC_KEYWORD_LENGTH  25
+#define HMAC_KEYWORD_LENGTH  8
 
 ```
 
