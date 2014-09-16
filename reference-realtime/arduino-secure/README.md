@@ -69,6 +69,30 @@ SDP JSON signature is coded in Base64 format and it is calculated taking the JSO
 **Note:**
 MQTT publish packet can be large maximum 256 Byte!
 
+Remote configuration update
+--------------
+The remote configuration update is a developing SDP feature. It uses the broker MQTT to receive the new configuration.
+A standard for the format of the configuration message sent to the Arduino in not already defined, so this a proposal.
+The Arduino subscribes itself to this topic on the MQTT broker:
+
+```
+config/<tenant/<sensor_name>
+```
+
+When a new configuration is published on this topic, arduino node received the new one and process it. To save memory and make simple the process of this message on Arduino board, on this family the new configuration is sent ad CSV (Comma Separated Values). For example the configuration has this parameter:
+- Polling time
+- Analog pin
+The CSV will be:
+
+```
+10000;0;
+```
+
+**Note:**
+This features is work in progress. The idea is get the fields from the CSV line, change parameters and save new configuration on the local SD. 
+At every boot of the Arduino the new configuration will be loaded from the SD card.
+
+
 Documentation
 --------------
 Arduino SDP libraries use [*doxygen*](http://www.stack.nl/~dimitri/doxygen/) tool to create the source code documentation.
