@@ -82,6 +82,7 @@ config/<tenant>/<sensor_name>
 When a new configuration is published on this topic, arduino node received the new one and process it. To save memory and make simple the process of this message on Arduino board, on this family the new configuration is sent ad CSV (Comma Separated Values). For example the configuration has this parameter:
 - Polling time
 - Analog pin
+
 The CSV will be:
 
 ```
