@@ -83,6 +83,8 @@
  *
  * SECURE_JSON        : use secure json. Default value is 0 (not). Comment it if you want 
  *                     to use standard SDP JSON. 
+ *                      to use standard SDP JSON. 
+ * CONFIGURATION      : change configuration runtime receiving the new one from the broker
  ******************************************************************************************/
 //! Global macro value to define if network connection is cable or Wi-Fi
 #define WIFI 1
@@ -95,6 +97,9 @@
 
 //! Global macro value to define if use secure JSON or standard SDP JSON
 #define SECURE_JSON 1
+
+//! Global macro value to define if handle changing configuration form remote using the broker MQTT
+//#define CONFIGURATION 1
 
 
 
@@ -855,8 +860,10 @@ void loop()
         Serial.println( F("SDP no connection") );
         if ( MTTQClient.connect() )
         {
+#ifdef CONFIGURATION      
           if ( (MTTQClient.subscribe(getFlashString((const char**) node_table, NODE_TENANT), stream, sensor)) )
           {}
+#endif
           Serial.println( F("SDP connected") );
         }
         else
