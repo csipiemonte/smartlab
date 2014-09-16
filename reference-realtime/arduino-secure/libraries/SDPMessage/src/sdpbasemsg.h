@@ -64,12 +64,18 @@ namespace sdp
 
         bool add(const char* label, const char* value)
         {
-          return aJson.addItemToObject(m_json, label, aJson.createItem(value) );
+          aJsonObject* item = NULL;
+          if ( ( item = aJson.createItem(value) ) == NULL )
+          {
+            return NULL;
+          }
+
+          return aJson.addItemToObject(m_json, label, item );
         }
 
         bool add(const char* label, double value)
         {
-          return aJson.addNumberToObject(m_json, label, value );
+          return aJson.addNumberToObject( m_json, label, value );
         }
 
         bool dump(Stream& stream);

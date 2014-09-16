@@ -31,10 +31,11 @@ namespace sdp
 
       public:
         //! Label components
-        static prog_char LABEL_COMPONENTS[] PROGMEM;
-
+        static const char PROGMEM LABEL_COMPONENTS[];
+        
         //! Labels table
-        static PROGMEM const char *LABEL[];
+        static const char* const LABEL[] PROGMEM;
+//        static const char PROGMEM *LABEL[];
 
         /**
          * Default Constructor.
@@ -127,16 +128,20 @@ namespace sdp
 
       public:
         //! Label values
-        static prog_char LABEL_VALUES[] PROGMEM;
+        static const char PROGMEM LABEL_VALUES[];
+//        static prog_char LABEL_VALUES[] PROGMEM;
 
         //! Label stream
-        static prog_char LABEL_STREAM[] PROGMEM;
+        static const char PROGMEM LABEL_STREAM[];
+//        static prog_char LABEL_STREAM[] PROGMEM;
 
         //! Label sensor
-        static prog_char LABEL_SENSOR[] PROGMEM;
+        static const char PROGMEM LABEL_SENSOR[];
+//        static prog_char LABEL_SENSOR[] PROGMEM;
 
         //! Labels table
-        static PROGMEM const char *LABEL[];
+        static const char* const LABEL[] PROGMEM;
+//        static PROGMEM const char *LABEL[];
 
         /**
          * Default Constructor.
@@ -210,13 +215,16 @@ namespace sdp
         };
 
         //! Label values
-        static prog_char LABEL_MESSAGE[] PROGMEM;
+//        static prog_char LABEL_MESSAGE[] PROGMEM;
+        static const char PROGMEM LABEL_MESSAGE[];
 
         //! Label stream
-        static prog_char LABEL_DIGEST[] PROGMEM;
+//        static prog_char LABEL_DIGEST[] PROGMEM;
+        static const char PROGMEM LABEL_DIGEST[];
 
         //! Labels table
-        static PROGMEM const char *LABEL[];
+//        static PROGMEM const char *LABEL[];
+        static const char* const LABEL[] PROGMEM;
 
         /**
          * Default Constructor.

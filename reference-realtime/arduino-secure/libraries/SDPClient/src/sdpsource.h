@@ -15,6 +15,8 @@
 #include "sdpstream.h"
 #include "measure.h"
 
+#include "csvline.h"
+
 // External include
 #include "PubSubClient.h"
 
@@ -203,6 +205,15 @@ namespace sdp
         ;
 
         /**
+         * This function subscribes client to a specific topic.
+         *
+         * \param[in] topic output topic
+         *
+         * \return
+         */
+        uint8_t subscribe(const char* tenant, SDPStream& stream, GenericSensor& sensor);
+
+        /**
          * This function published an information of a specific topic.
          *
          * \param[in] topic output topic
@@ -240,8 +251,11 @@ namespace sdp
         /// Separator field (constant string)
         static const char *DEFAULT_TENANT;
 
-        /// MQTT connection type
+        /// MQTT connection type (send)
         static const char *CONNECTION_TYPE;
+
+        /// MQTT connection type (receive)
+        static const char *CONNECTION_TYPE_1;
 
         /// Character used to concatenate Sensor ID and stream ID
         static const char CONC_CHAR;
@@ -250,6 +264,10 @@ namespace sdp
         static const char* DEFAULT_COMPONENT_LABEL;
 
       private:
+
+        //! Configuration buffer (received from server)
+        static sdp::message::CSVLine *configuration;
+
         /**
          * This routine is called automatically when something comes in from the broker.
          * Also use this to prepare a response.
@@ -290,6 +308,7 @@ namespace sdp
 
         //! Internal flag. TRUE is object is a copy
         bool m_isCopy;
+
     };
 
   }

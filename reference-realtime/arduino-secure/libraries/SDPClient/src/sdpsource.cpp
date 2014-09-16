@@ -20,8 +20,10 @@ using namespace sdp::client;
 const char* SDPSource::DEFAULT_ID = "ARDUINO";
 const char* SDPSource::DEFAULT_TENANT = "smartlab";
 const char* SDPSource::CONNECTION_TYPE = "input";
-const char* SDPSource:: DEFAULT_COMPONENT_LABEL = "c0";
+const char* SDPSource::CONNECTION_TYPE_1 = "config";
+const char* SDPSource::DEFAULT_COMPONENT_LABEL = "c0";
 const char SDPSource::CONC_CHAR = '/';
+sdp::message::CSVLine* SDPSource::configuration = 0;
 
 SDPSource::SDPSource() :
     m_isCopy(false), m_subclient(NULL), m_message(NULL), m_hmacKeylength(0)
@@ -89,7 +91,6 @@ void SDPSource::setId(char * id)
 
 }
 
-
 void SDPSource::setHMACKey(uint8_t * key, size_t length)
 {
   memset(m_hmacKey, 0, HMAC_KEY_SIZE);
@@ -112,7 +113,7 @@ int8_t SDPSource::connect()
           m_server->port(), SDPSource::callback, *(this->m_netclient));
     } else
     {
-      m_subclient = new PubSubClient((uint8_t*) m_server->domain(),
+      m_subclient = new PubSubClient((char*) m_server->domain(),
           m_server->port(), SDPSource::callback, *(this->m_netclient));
     }
   } else
@@ -156,7 +157,7 @@ uint8_t SDPSource::publish(char* topic, char* msg)
 uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
     const char* tenant)
 {
-  #define TOPIC_SIZE 128
+#define TOPIC_SIZE 128
 
   char topic[TOPIC_SIZE] = { 0 };
 
@@ -215,16 +216,10 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
   }
 //  m_message = aJson.print(json.getJson());
 
-
   if(m_hmacKeylength > 0)
   {
     sdp::message::SecureJSON secjson;
-/*
-  uint8_t hmacKey2[]={
-    0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,0x13,0x14,
-    0x15,0x16,0x17,0x18,0x19
-  };
-*/
+
     secjson.setKey( m_hmacKey, m_hmacKeylength);
     secjson.create( json );
 
@@ -238,7 +233,6 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
 
   Serial.print("json: ");
   Serial.println(m_message);
-
 
   uint8_t n = 0;
   if (m_message != NULL)
@@ -261,7 +255,63 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
   return n;
 }
 
-void SDPSource::callback(char* topic, byte* payload, unsigned int length)
+uint8_t SDPSource::subscribe(const char* tenant, SDPStream& stream, GenericSensor& sensor)
 {
 
+  char topic[TOPIC_SIZE] = { 0 };
+
+  size_t lenType = strlen(CONNECTION_TYPE_1);
+  size_t lenTenant = strlen(tenant);
+  size_t lenStreamId = strlen(stream.id());
+  size_t lenSensorId = strlen(sensor.id());
+
+
+  if ((lenType + lenTenant + lenStreamId + lenSensorId + 5) > TOPIC_SIZE)
+  {
+    return 0;
+  }
+
+// Create topic
+  size_t cIndex = 0;
+
+  memcpy(&topic[cIndex], CONNECTION_TYPE_1, lenType);
+
+  cIndex += lenType;
+  topic[cIndex++] = CONC_CHAR;
+
+  memcpy(&topic[cIndex], tenant, lenTenant);
+  cIndex += lenTenant;
+
+  topic[cIndex++] = CONC_CHAR;
+
+  memcpy(&topic[cIndex], sensor.id(), lenSensorId);
+  cIndex += lenSensorId;
+  topic[cIndex++] = '_';
+  memcpy(&topic[cIndex++], stream.id(), lenStreamId);
+
+  if (m_subclient->subscribe(topic))
+  {
+    Serial.println(topic);
+    return 1;
+  }
+  return 0;
+}
+
+void SDPSource::callback(char* topic, byte* payload, unsigned int length)
+{
+  // In order to republish this payload, a copy must be made
+  // as the orignal payload buffer will be overwritten whilst
+  // constructing the PUBLISH packet.
+
+
+  // Free the memory old buffer
+  if (configuration != 0)
+  {
+    delete(configuration);
+    configuration = 0;
+  }
+
+  // Copy the payload to the new buffer
+  SDPSource::configuration = new sdp::message::CSVLine();
+  SDPSource::configuration->set((const char*) payload, length);
 }

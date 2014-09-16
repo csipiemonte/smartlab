@@ -23,6 +23,7 @@
 
 // Arduino IDE
 #include <SPI.h>
+#include <SD.h>
 
 // Non-standard library
 #include <Time.h>
@@ -53,10 +54,6 @@
 /*----------------------------------------------------------------------------------------
 /* CONFIGURATION
 /*----------------------------------------------------------------------------------------*/
-//! ArduinI IDE version. Commet this line if you se a old version of IDE (<= 1.5.6)
-#define IDE_GT_1_5_6 1
-
-
 //! Debug memory usage
 #define DEBUG_MEMORY
 
@@ -94,7 +91,7 @@
 //#define STATIC_NETWORK_CFG 1
 
 //! Global macro value to define if MQTT server is defined by IP address or domain string. Comment this define to use domain string
-#define SDP_SERVER_AS_IP 1
+//#define SDP_SERVER_AS_IP 1
 
 //! Global macro value to define if use secure JSON or standard SDP JSON
 #define SECURE_JSON 1
@@ -210,7 +207,7 @@
 #define MQTT_SERVER_IP { 192, 168, 1, 200 };
 
 //! domain of MQTT broker
-#define MQTT_SERVER_DOMAIN "smartdatanet.it";
+#define MQTT_SERVER_DOMAIN "stream.smartdatanet.it";
 
 //! Client Identifier
 #define MQTT_CLIENTID "Ardu0001"
@@ -373,6 +370,37 @@ enum _sensor_index
   STREAM_ID = 2,
 };
 
+/*
+ * Arduino_boards
+ */
+enum _board
+{
+  //! DEFAULT ARDUINO
+  GENERIC_ARDUINO,
+  
+ //! ARDUINO MEGA
+ ARDUINO_MEGA,
+};
+
+/**
+ * type of arduino board
+ *
+ */
+enum _shield
+{
+  //! Ethernet shield
+  SHIELD_ETHERNET,
+  
+  //! WiFi shield
+  SHIELD_WIFI,
+  
+  //! Sparkfun
+  SHIELD_SPARKFUN,
+  
+  //! Adafruit
+  SHIELD_ADAFRUIT,
+};
+
 
 /*----------------------------------------------------------------------------------------
 /* GLOBAL VARIABLES
@@ -387,19 +415,6 @@ NetworkConfig netConfig;
 #ifdef WIFI
 
 //! Wireless network SSID (name)
-#ifdef IDE_GT_1_5_6
-prog_char w_ssid[] PROGMEM = WIRELESS_SSID;
-
-//! Wireless network password
-prog_char w_key[] PROGMEM = WIRELESS_KEY;
-
-//! Flash table for wireless configuration
-PROGMEM const char *wireless_table[] = 	   // change "string_table" name to suit
-{   
-  w_ssid,
-  w_key
-};
-#else
 //! Wireless network SSID (name)
 const char w_ssid[] PROGMEM = WIRELESS_SSID;
 
@@ -412,8 +427,6 @@ const char* const wireless_table[] PROGMEM =
   w_ssid,
   w_key
 };
-
-#endif
 
 //! Wireless network key Index number (needed only for WEP)
 int keyIndex = WIRELESS_INDEX ;
@@ -463,24 +476,6 @@ IPAddress ntpServer(ntpServerIP);
 //! NTP client
 NTPClient ntp(ntpServer);
 
-
-#ifdef IDE_GT_1_5_6
-
-// MQTT broker
-//! MQTT username (for authentication on MQTT broker
-prog_char mqtt_username[] PROGMEM = MQTT_USERNAME;
-
-//! MQTT username (for authentication on MQTT broker
-prog_char mqtt_password[] PROGMEM = MQTT_PASSWORD;
-
-//! Flash table for wireless configuration
-PROGMEM const char *mqtt_table[] = 	   // change "string_table" name to suit
-{   
-  mqtt_username,
-  mqtt_password,
-};
-#else
-
 // MQTT broker
 //! MQTT username (for authentication on MQTT broker
 const char mqtt_username[] PROGMEM = MQTT_USERNAME;
@@ -494,8 +489,6 @@ const char* const mqtt_table[] PROGMEM =
   mqtt_username,
   mqtt_password,
 };
-
-#endif
 
 //! Port number of MQTT broker. Default number is 1883
 uint16_t serverPort = 1883;
@@ -533,24 +526,6 @@ sdp::client::SDPSource MTTQClient(MQTTserver, client, MQTT_CLIENTID);
 //! Smart object state
 uint8_t state = IDLE;
 
-#ifdef IDE_GT_1_5_6
-//! Tenant
-prog_char tenant[] PROGMEM = TENANT;
-
-//! Sensor Identifier
-prog_char sensor_id[] PROGMEM = SENSOR_IDENTIFIER;
-
-//! Stream Identifier
-prog_char stream_id[] PROGMEM = STREAM_IDENTIFIER;
-
-//! Flash table for wireless configuration
-PROGMEM const char *node_table[] = 	   // change "string_table" name to suit
-{
-  tenant,
-  sensor_id,
-  stream_id,
-};
-#else
 //! Tenant
 const char tenant[] PROGMEM = TENANT;
 
@@ -561,13 +536,12 @@ const char sensor_id[] PROGMEM = SENSOR_IDENTIFIER;
 const char stream_id[] PROGMEM = STREAM_IDENTIFIER;
 
 //! Flash table for wireless configuration
-const char* const node_table[] PROGMEM
+const char* const node_table[] PROGMEM =
 {
   tenant,
   sensor_id,
   stream_id,
 };
-#endif
 
 uint8_t hmacKey[HMAC_KEYWORD_LENGTH] = HMAC_KEYWORD;
 
@@ -701,7 +675,14 @@ void printPosition(GPSPosition &coordinate);
  */
 char* getFlashString(PROGMEM const char *string_table[], byte index);
 
-
+/**
+ * openSD
+ * Opens SD card.
+ *
+ * \param[in] board type of board (Mega, Uno, ...)
+ * \param[in] shield type of shield (Ethernet, Wifi,...)
+ */
+bool openSD(uint8_t board, uint8_t shield);
 
 
 
@@ -716,13 +697,23 @@ void setup()
     ; // wait for serial port to connect. Needed for Leonardo only
   }
   Serial.println( F("Start node") );
+  
+  Serial.print( F("Open SD card...") );
+  if ( !openSD(ARDUINO_MEGA, SHIELD_WIFI) )
+  {
+     Serial.println( F(" failed!") );
+  }
+  else
+  {
+    Serial.println( F(" done.") );    
+  }
 
   Serial.println( );
   Serial.println( F("Configure smart object...") );
   
   // Set up SDP structures (sensor, stream and node position)
-  sensor.setID(getFlashString(node_table, SENSOR_ID));
-  stream.setID(getFlashString(node_table, STREAM_ID));
+  sensor.setID(getFlashString((const char**) node_table, SENSOR_ID));
+  stream.setID(getFlashString((const char**) node_table, STREAM_ID));
   
   stream.setSensor(sensor);
   printStream(stream);
@@ -756,9 +747,8 @@ void setup()
 
   
   // Create connection with the SPD server
-  
-  MTTQClient.setUsername(getFlashString(mqtt_table, MQTT_USER));
-  MTTQClient.setPassword(getFlashString(mqtt_table, MQTT_PASS));
+  MTTQClient.setUsername(getFlashString((const char**) mqtt_table, MQTT_USER));
+  MTTQClient.setPassword(getFlashString((const char**) mqtt_table, MQTT_PASS));
  
 #ifdef SECURE_JSON
   MTTQClient.setHMACKey(hmacKey, HMAC_KEYWORD_LENGTH);
@@ -839,12 +829,7 @@ void loop()
 
         // Publish measurement
         int n = 0;
-
-#ifdef IDE_GT_1_5_6
-        if ( n = (MTTQClient.publish(stream, m, getFlashString(node_table, NODE_TENANT))) )
-#else
         if ( n = (MTTQClient.publish(stream, m, getFlashString((const char**) node_table, NODE_TENANT))) )
-#endif
         {
          Serial.println( F("done") );
         }
@@ -870,7 +855,9 @@ void loop()
         Serial.println( F("SDP no connection") );
         if ( MTTQClient.connect() )
         {
-           Serial.println( F("SDP connected") );
+          if ( (MTTQClient.subscribe(getFlashString((const char**) node_table, NODE_TENANT), stream, sensor)) )
+          {}
+          Serial.println( F("SDP connected") );
         }
         else
         {
@@ -966,13 +953,9 @@ void startNetwork()
     case 2 : { wifiHandler.setType(WiFiManager::WL_WPA);}; break;
     default : { wifiHandler.setType(WiFiManager::WL_OPEN); }; break;
   }
-#ifdef IDE_GT_1_5_6
-  wifiHandler.setSSID(getFlashString(wireless_table, W_SSID));
-  wifiHandler.setKey(getFlashString(wireless_table, W_KEY));
-#else
   wifiHandler.setSSID(getFlashString((const char**) wireless_table, W_SSID));
   wifiHandler.setKey(getFlashString((const char**) wireless_table, W_KEY));
-#endif
+
 /*
   Serial.print("SSID: ");
   Serial.println(wifiHandler.ssid());
@@ -1196,3 +1179,43 @@ char* getFlashString(PROGMEM const char *string_table[], byte index)
   strcpy_P(flashBuffer, (char*) pgm_read_word(&(string_table[index])));
   return flashBuffer;
 }
+
+bool openSD(uint8_t board, uint8_t shield)
+{
+
+  // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
+  // Note that even if it's not used as the CS pin, the hardware SS pin
+  // (10 on most Arduino boards, 53 on the Mega) must be left as an output
+  // or the SD library functions will not work.
+  switch(board)
+  {
+    case ARDUINO_MEGA    : { pinMode(53, OUTPUT); }; break;
+    case GENERIC_ARDUINO : { pinMode(10, OUTPUT); }; break;
+    default              : { pinMode(10, OUTPUT); }; break;
+  }
+  
+  uint8_t m_cspin = 4; 
+  switch(shield)
+  {
+    case SHIELD_WIFI :
+    case SHIELD_ETHERNET : {
+      m_cspin = 4;
+    } break;
+    case SHIELD_SPARKFUN : {
+      m_cspin = 8;
+    } break;
+    case SHIELD_ADAFRUIT : {
+      m_cspin = 10;
+    } break;
+    default: {
+      m_cspin = 4;
+    } break;
+  }
+
+  if (!SD.begin(m_cspin)) {
+    return false;
+  }
+  
+  return true;
+}
+

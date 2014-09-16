@@ -39,7 +39,7 @@ SDPServer::SDPServer(char* domain, uint16_t port) :
   // set service page to NULL
   memset(m_service, 0, SERVICE_SIZE);
   memset(m_domain, 0, DOMAIN_SIZE);
-  memcpy(m_domain, DEFAULT_DOMAIN, strlen(DEFAULT_DOMAIN));
+  memcpy(m_domain, domain, strlen(domain));
 }
 
 SDPServer::SDPServer(uint8_t address[], uint16_t port) :
