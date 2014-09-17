@@ -8,71 +8,46 @@ The reference solution uses a server environment that allow to emulate some of t
 Installation
 -----------
 
- *  Installation of the Broker MQTT
+ *  Installation of ActiveMQ
  
- The broker MQTT chosen for the realization of the reference solution is mosquitto. The software can be installed via the package management system of Ubuntu.
-```
-sudo apt-get install mosquitto mosquitto-clients
-```
-
- *  Installation of the server Websocket
+ Downland the ActiveMq version 5.9.0 to link:
+ http://archive.apache.org/dist/activemq/apache-activemq/5.9.0/apache-activemq-5.9.0-bin.tar.gz 
  
- The implementation WebSocket choice for the reference solution is based on Node.JS and Socket.IO. 
-Node.JS must be installed by downloading and compiling from source.
-
- Prerequisites for Node.js:
-
+ Unpack the archive in the preferred path (in this case used as an example is "/home/<user>/reference/" as the user is used csp)
 ```
-GCC 4.2 or newer
-Python 2.6 or 2.7
-GNU Make 3.81 or newer
-libexecinfo (FreeBSD and OpenBSD only)
+cd /home/csp/reference/
+tar xvf apache-activemq-5.9.0-bin.tar.gz 
 ```
 
- Installation of Node.js:
-```
-tar xzf node-<version>.tar.gz
-cd node-<version>
-./configure
-make
-make install
-```
+ *  Configuration of ActiveMQ
+ 
+ Copy the files for configure ActiveMQ
 
- After installing Node.JS, you must install the necessary add-on modules that are used for the operation of the reference solution. They can be installed using the package management tool that is installed as part of Node.JS: npm. The first of these components is Socket.IO which is the module that provides an implementation of Node.JS websocket. For simplicity, we install all modules globally so that they are accessible to any Linux user (option "-g").
 ```
-sudo npm install –g socket.io
-sudo npm install –g mqtt
-sudo npm install –g forever
+cp activemq.xml credentials.properties /home/csp/reference/apache-activemq-5.9.0/conf 
 ```
- Node.JS is necessary to indicate the location to which you installed the add-on modules that are managed by the tool "npm". For simplicity you can use the file provided in the archive that accompanies this document.
-``` 
-cp node.sh /etc/profile.d/
-```
-
+ 
  *  Installation of the web page
  
- The final part is to insert the page html demo and the necessary dependencies JavaScript within a web server. For example, if you installed Apache from the official repositories of Ubuntu, just copy the necessary files into a folder under "/var/www".
+ The final part is to insert the page html demo and the necessary dependencies JavaScript within a web server. For example, if you installed Apache from the official repositories of Ubuntu, just copy the necessary files into a folder under "/var/www" or "/var/www/html".
 ```
 sudo apt-get install apache2
-sudo mkdir /var/www/sdp-ref
-sudo cp index.html socket.io.js style.css /var/www/sdp-ref
+sudo cp -r sdp-ref/* /var/www/sdp-ref/
 ```
 Usage
 -----   
     
- *  At this point it is necessary to log in again for the changes to be made active. To start the server, you can use the command "node" that it starts in an interactive way.
+ *  At this point it is necessary to launch ActiveMQ. Is possible start the program in debug mode or background mode
+
 ```
-node server.js
-```    
- *  Alternatively, you can use the command "forever" to send the server in the background. Through the same command you can list the active nodes and arrest them.
-``` 
-forever start server.js
-forever list
-   info:    Forever processes running
-   data:        uid  command             script    forever pid  logfile                       uptime        
-   data:    [0] nwGu /usr/local/bin/node server.js 6400    6403 /home/<user>/.forever/nwGu.log 0:0:11:34.604
-forever stop 0
-```    
+cd /home/csp/reference/apache-activemq-5.9.0/bin 
+./activemq console (for debug mode, Ctrl+c for stopping the service)
+./activemq start (for background mode, ./activemq stop for stopping the service)
+```
+  * For testing the reference is possible send the acquisition usage mosquitto
+```
+mosquitto_pub -h 127.0.0.1 -t input/sandbox -m '{"stream": "thermo_a","sensor": "550e8400-e29b-41d4-a716-446655440000", "values": [{"time": "2014-05-13T17:08:58Z","components": {"c0":"40.00"}}]}' -u sandbox -P sandbox\$1
+```
     
  *  Using your browser you can then connect to the server prepared to see the demo page.
 ``` 

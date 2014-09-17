@@ -17,7 +17,7 @@
 <head>		
     
     <!-- javascript for provides realtime communication between your node.js server and clients-->
-    <script src="socket.io.js" charset="utf-8"></script>
+    <script src="stomp.js" charset="utf-8"></script>
     <!-- CSS file -->
     <link rel="stylesheet" href="style.css" type="text/css">    
     <!-- javascript D3js for speedometer-->
@@ -63,30 +63,19 @@
 	window.onload = function () {
 		// IP address of server
 		var ip = location.host;
-		
+		ip="localhost";
 		// connect to server
-		var server = io.connect("http://" + ip + ":8000");
+		var client = Stomp.client("ws://" +ip + ":61614");
 		d3.select("#connect").html("Status: Disconnected");
-		server.on("connect", function() {
-			server.send("550e8400-e29b-41d4-a716-446655440000/temperature");
-			d3.select("#connect").html("Status: Connected");
-		});
 		
-		server.on("disconnect", function() {
-			d3.select("#connect").html("Status: Disconnected");
-		});		
-	
-		server.on("error", function() {
-			d3.select("#connect").html("Status: Error");
-		});	
-		
-		// server read the message
-		server.on("message", function(message) {
-			
+		client.connect("guest", "password", 
+		    function(frame) {
+		      d3.select("#connect").html("Status: Connected");
+		      client.subscribe("/topic/output.sandbox.*", function(message) {
 			// Inserted at field "message" the json received from the client. Used only for debug
 			// d3.select("#message").html(message);
 			// create a json from messagge received
-			var json = message;
+			var json = message.body;
 			obj = JSON.parse(json);
 			
 			// parser the json for print the value and time
@@ -111,9 +100,15 @@
 				var date = new Date(dateS[0]);				
 				arrayTime.push(date.toString());
 				printArray();
-			  }
-			  }
-		});
+			    }
+			  }		    
+		       });
+		    },
+		    function() {
+			    //Error callback
+			    d3.select("#connect").html("Status: Error");
+		    }
+		 );
 	};		
 	
 	// print the array in the pre
