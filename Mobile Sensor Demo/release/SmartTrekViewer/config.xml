@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget 
+xmlns = "http://www.w3.org/ns/widgets"
+xmlns:gap = "http://phonegap.com/ns/1.0"
+id = "com.nsbasic.SMHost1"
+version = "1.0.0">
+
+<name>Smart Trek Visualizer</name>
+<description></description>
+<preference name="phonegap-version" value="3.4.0" />
+
+<!--
+<preference name="SplashScreenDelay" value="2000" />
+<gap:splash src="nsb/images/SplashScreen.png"/>
+<gap:splash src='splash/ios/Default.png' gap:platform='ios' width='320' height='480' />
+<gap:splash src='splash/ios/Default@2x.png' gap:platform='ios' width='640' height='960' />
+<gap:splash src='splash/ios/Default-568h@2x.png' gap:platform='ios' width='640' height='1136'
+<gap:splash src='splash/ios/Default-Portrait.png' gap:platform='ios' width='768' height='1024' />
+<gap:splash src='splash/ios/Default-Landscape.png' gap:platform='ios' width='1024' height='768' />
+<gap:splash src='splash/ios/Default-Portrait@2x.png' gap:platform='ios' width='1536' height='2048' />
+<gap:splash src='splash/ios/Default-Landscape@2x.png' gap:platform='ios' width='2048' height='1536' />
+-->
+<!-- Icons: Expand this section with sizes required for platforms you are targeting.-->
+<icon src="nsb/images/LauncherIcon57.png" />
+<!--
+<icon src="icons/ios/icon.png" gap:platform="ios" width="57" height="57" />
+<icon src="icons/ios/icon-72.png" gap:platform="ios" width="72" height="72" />
+<icon src="icons/ios/icon_at_2x.png" gap:platform="ios" width="114" height="114" />
+<icon src="icons/ios/icon-72_at_2x.png" gap:platform="ios" width="144" height="144" />
+<icon src="icons/android/ldpi.png" gap:platform="android" gap:density="ldpi" />
+<icon src="icons/android/mdpi.png" gap:platform="android" gap:density="mdpi" />
+<icon src="icons/android/hdpi.png" gap:platform="android" gap:density="hdpi" />
+<icon src="icons/android/xhdpi.png" gap:platform="android" gap:density="xhdpi" />
+-->
+
+<!-- sample feature specification -->
+<!-- <feature name="http://api.phonegap.com/1.0/network"/> -->
+
+<preference name="permissions" value="none"/>
+<!-- sample preference specifications -->
+<!-- <preference name="autorotate" value="false" readonly="true"/> -->
+<!-- <preference name="orientation" value="default" /> -->
+<!-- <preference name="fullscreen" value="true" /> -->
+
+<!-- Platforms: Customize as needed. -->
+<gap:platforms>
+   <gap:platform name="android" minVersion="2.3" />
+   <gap:platform name="ios" />
+   <gap:platform name="winphone" />
+</gap:platforms>
+</widget>
