@@ -12,6 +12,12 @@ The demo was written using the AppStudio IDE [link](https://www.nsbasic.com) whi
 
 AppStudio generates an application based on JQuery Mobile. The generated application is purely HTML5 and JavaScript and can be used and changed freely.
 
+Both the demo (sensor and viewer) are located in the **release** folder.
+The demo can be performed:
+* locally (double click on the index.html file)
+* published on a web server (Smart Data Platform supports cross-domain ajax call according to the CORS specific)
+* embedded on mobile application using phone gap (cordova)
+
 
 
 
