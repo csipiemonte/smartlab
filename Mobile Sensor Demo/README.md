@@ -18,6 +18,23 @@ The demo can be performed:
 * published on a web server (Smart Data Platform supports cross-domain ajax call according to the CORS specific)
 * embedded on mobile application using phone gap (cordova)
 
+The application works on mobile device and desktop that are compatible with jQuery.
+
+On desktop the application was tested (work well) with:
+
+* Apple Safari
+* Google Chrome
+* Microsoft Internet Explorer 11 
+
+**Firefox is not supported**
+
+On mobile device was testing on iPhone and iPad running IOS 6.0 and above... it works. The viewer not work on iPhone.
+
+On Android devices the application only works on the newer device with a browser that conforms to HTML5 specification. 
+
+On windows phone 8.0 and 8.1 emulator the application work well (has not been tested on a real device). 
+
+If your browser does not fully support JQuery Mobile, you may see an error dialog during the start of the application. in most cases it is sufficient to close the error window to properly use the application. 
 
 
 
