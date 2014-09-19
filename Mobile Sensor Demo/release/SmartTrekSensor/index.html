@@ -1,0 +1,518 @@
+﻿<!DOCTYPE HTML>
+<html manifest="OfflineApp.manifest">
+<head>
+<meta charset="utf-8">
+<title>SmartTrek</title>
+<meta name="generator" content="NSB/AppStudio 4.1.5.0$zkdb" />
+<meta name='date' content='2014-09-17 14:56:13.415418' />
+<meta name='version' content='1.0.0' />
+<meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no, minimal-ui' />
+<meta name='apple-mobile-web-app-capable' content='YES' />
+<meta name='mobile-web-app-capable' content='yes' />
+<meta name='apple-mobile-web-app-status-bar-style' content='default' />
+<meta name='apple-mobile-web-app-title' content='' />
+<meta name='copyright' content='Copyright 2014 ABC Company' />
+<noscript><h1>JavaScript must be enabled!</h1></noscript>
+<link rel='apple-touch-icon' href='nsb/images/LauncherIcon57.png' />
+<!-- Startup images -->
+<!-- iOS 6 & 7 iPad (retina, portrait) -->
+<link href='splash/ios/1536x2008.png'
+      media='(device-width: 768px) and (device-height: 1024px)
+         and (orientation: portrait)
+         and (-webkit-device-pixel-ratio: 2)'
+      rel='apple-touch-startup-image'>
+<!-- iOS 6 & 7 iPad (retina, landscape) -->
+<link href='splash/ios/1496x2048.png'
+      media='(device-width: 768px) and (device-height: 1024px)
+         and (orientation: landscape)
+         and (-webkit-device-pixel-ratio: 2)'
+      rel='apple-touch-startup-image'>
+<!-- iOS 6 iPad (portrait) -->
+<link href='splash/ios/768x1004.png'
+      media='(device-width: 768px) and (device-height: 1024px)
+         and (orientation: portrait)
+         and (-webkit-device-pixel-ratio: 1)'
+      rel='apple-touch-startup-image'>
+<!-- iOS 6 iPad (landscape) -->
+<link href='splash/ios/748x1024.png'
+      media='(device-width: 768px) and (device-height: 1024px)
+         and (orientation: landscape)
+         and (-webkit-device-pixel-ratio: 1)'
+      rel='apple-touch-startup-image'>
+<!-- iOS 6 & 7 iPhone 5 -->
+<link href='splash/ios/640x1096.png'
+      media='(device-width: 320px) and (device-height: 568px)
+         and (-webkit-device-pixel-ratio: 2)'
+      rel='apple-touch-startup-image'>
+<!-- iOS 6 & 7 iPhone (retina) -->
+<link href='splash/ios/640x920.png'
+      media='(device-width: 320px) and (device-height: 480px)
+         and (-webkit-device-pixel-ratio: 2)'
+      rel='apple-touch-startup-image'>
+<!-- iOS 6 iPhone -->
+<link href='splash/ios/320x460.png'
+      media='(device-width: 320px) and (device-height: 480px)
+         and (-webkit-device-pixel-ratio: 1)'
+      rel='apple-touch-startup-image'>
+<link rel='shortcut icon' sizes='196x196' href='nsb/images/196.png' />
+<script src="nsb/jquery.js"></script>
+<script src="nsb/hfunc.js"></script>
+<link href="nsb/nsbstyle.css" rel="stylesheet">
+<script src="nsb/fastclick.js"></script>
+<script src="nsb/jquery.mobile.js"></script>
+<link href="nsb/jquery.mobile.css" rel="stylesheet">
+<script src="nsb/complexfunctions.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+
+
+
+<style type="text/css">
+#imgLogoSDP {position:absolute; left:10px; right:px; top:425px; bottom:auto; height:28px; width:167px}
+#imgLogoCSI {position:absolute; left:258px; right:auto; top:430px; bottom:auto; height:24px; width:54px}
+#lblTitolo {position:absolute; left:38px; right:auto; top:64px; bottom:auto; height:auto; width:248px}
+#lblSottotitolo {position:absolute; left:51px; right:auto; top:134px; bottom:auto; height:19px; width:208px}
+#btnSensor {position:absolute; left:75px; right:auto; top:200px; bottom:auto; height:74px; width:130px}
+#Line1 {position:absolute; left:10px; right:10px; top:122px; bottom:auto; height:3px; width:auto; margin:0px;}
+#btnSettings {position:absolute; left:75px; right:auto; top:339px; bottom:auto; height:auto; width:130px}
+#ttipSensor {position:absolute; left:221px; right:auto; top:226px; bottom:auto; height:24px; width:24px}
+#ttipSettings {position:absolute; left:221px; right:auto; top:343px; bottom:auto; height:24px; width:24px}
+#HeaderBar {position: absolute; width:100%; height:40px; left:0px; top:0px;}
+#HeaderBar1 {position: absolute; width:100%; height:40px; left:0px; top:0px;}
+#btnStart {position:absolute; left:13px; right:auto; top:387px; bottom:auto; height:auto; width:100px}
+#btnJSON {position:absolute; left:146px; right:auto; top:387px; bottom:auto; height:auto; width:166px}
+#TextArea1 {position:absolute; left:11px; right:auto; top:256px; bottom:auto; height:124px; width:303px}
+#imgLogoCSI2 {position:absolute; left:255px; right:auto; top:431px; bottom:auto; height:24px; width:54px}
+#imgLogoSDP2 {position:absolute; left:7px; right:px; top:427px; bottom:auto; height:28px; width:167px}
+#GoogleMap1 {position:absolute; left:10px; right:auto; top:49px; bottom:auto; height:200px; width:300px}
+#HeaderBarSettings {position: absolute; width:100%; height:40px; left:0px; top:0px;}
+#imgLogoSDP3 {position:absolute; left:10px; right:px; top:427px; bottom:auto; height:28px; width:167px}
+#imgLogoCSI3 {position:absolute; left:258px; right:auto; top:431px; bottom:auto; height:24px; width:54px}
+#lblGPS {position:absolute; left:52px; right:auto; top:64px; bottom:auto; height:auto; width:220px}
+#lblMapRefreshCopy {position:absolute; left:125px; right:auto; top:168px; bottom:auto; height:auto; width:66px}
+#sldRefresh {position: absolute; width:288px; height:auto; left:16px; top:94px;}
+#cmbSensor {position:absolute; left:16px; right:auto; top:191px; bottom:auto; height:auto; width:284px}
+#Label1 {position:absolute; left:15px; right:auto; top:251px; bottom:auto; height:auto; width:43px}
+#lblUUID {position:absolute; left:62px; right:auto; top:253px; bottom:auto; height:auto; width:243px}
+body * {font-family:helvetica}
+</style>
+</head>
+<body style="margin:0px;-ms-touch-action:none;">
+<script>window.addEventListener('load', function() {new FastClick(document.body)}, false)</script>
+<div data-role="page" id="Page_jqm" data-theme="a" style="">
+
+<form id="frmHome" action="" method="GET" onsubmit="return false;" style="display:none; height:100%; position:absolute; top:0px; left:0px; width:100%; ">
+<script>
+frmHome.innerHTML=[  "<div id='imgLogoSDP' data-nsb-type=image><img src='img/logosdp.jpg'  height=100% width=100% name='imgLogoSDP_img' style='' usemap='imgLogoSDP_map'></div>",
+  "<div id='imgLogoCSI' data-nsb-type=image><img src='img/logoCSI.png'  height=100% width=100% name='imgLogoCSI_img' style='' usemap='imgLogoCSI_map'></div>",
+  "<div id='lblTitolo' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:50px; font-family:arial; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >SmartTrek</div>",
+  "<div id='lblSottotitolo' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:arial; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Smart Localizer Prototype</div>",
+  "<button id='btnSensor' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Show Sensor</button>",
+  "<hr id='Line1' class='' style='background-color:black;border-style:solid;border-color:black;border-width:1px;' >",
+  "<button id='btnSettings' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Settings</button>",
+  NSB.ToolTip_jqm('ttipSensor','Activate <b>sensor mode</b> that allows you to record the movement of the device.','slide', 'b','','max-width:200px;','info'),
+  NSB.ToolTip_jqm('ttipSettings','set the application\'s parameters','slide', 'b','','max-width:200px;','info'),
+  NSB.HeaderBar_jqm14('HeaderBar', 'Sensor Demo', '', 'arrow-l', 'none', '', 'arrow-r', 'none', ' style="" class=" "', '', ''),
+  ].join('');
+</script>
+</form>
+
+
+<form id="frmSensor" action="" method="GET" onsubmit="return false;" style="display:none; height:100%; position:absolute; top:0px; left:0px; width:100%; ">
+<script>
+frmSensor.innerHTML=[  NSB.HeaderBar_jqm14('HeaderBar1', 'Sensor Mode', 'Home', 'home', 'left', '', 'false', 'right', ' style="" class=" "', '', ''),
+  "<button id='btnStart' class='ui-btn ui-mini  ui-btn-inline ui-icon-false ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Start</button>",
+  "<button id='btnJSON' class='ui-btn ui-mini  ui-btn-inline ui-icon-false ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Show JSON</button>",
+  "<textarea id='TextArea1' class='ui-mini  ' name='' style='display:block; margin-top:0px; text-align:left; ; font-family:; font-style:; font-weight:; color:; background-color:white;-webkit-overflow-scrolling:touch; max-height:auto; '  autocorrect='on'  autocomplete='on'  autocapitalize='on' data-autogrow=false  placeholder=''></textarea>",
+  "<div id='imgLogoCSI2' data-nsb-type=image><img src='img/logoCSI.png'  height=100% width=100% name='imgLogoCSI2_img' style='' usemap='imgLogoCSI2_map'></div>",
+  "<div id='imgLogoSDP2' data-nsb-type=image><img src='img/logosdp.jpg'  height=100% width=100% name='imgLogoSDP2_img' style='' usemap='imgLogoSDP2_map'></div>",
+  "<div id=GoogleMap1 style='background:#F0FFFF;'></div>",
+  ].join('');
+</script>
+</form>
+
+
+<form id="frmSettings" action="" method="GET" onsubmit="return false;" style="display:none; height:100%; position:absolute; top:0px; left:0px; width:100%; ">
+<script>
+frmSettings.innerHTML=[  NSB.HeaderBar_jqm14('HeaderBarSettings', 'Settings', '', 'home', 'none', 'Save', 'check', 'right', ' style="" class=" "', '', ''),
+  "<div id='imgLogoSDP3' data-nsb-type=image><img src='img/logosdp.jpg'  height=100% width=100% name='imgLogoSDP3_img' style='' usemap='imgLogoSDP3_map'></div>",
+  "<div id='imgLogoCSI3' data-nsb-type=image><img src='img/logoCSI.png'  height=100% width=100% name='imgLogoCSI3_img' style='' usemap='imgLogoCSI3_map'></div>",
+  "<div id='lblGPS' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Refresh interval (1 - 60 sec)</div>",
+  "<div id='lblMapRefreshCopy' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Sensor</div>",
+  "<div  id='sldRefresh' style=''><input type='range' id='sldRefresh_inner' data-mini=true  style='color:color; background-color:white; ' name=''   value='5' min='1' max='60' step='1' data-track-theme='a' class=' '></div>",
+  NSB.Select_jqm('cmbSensor', '', '1,2', 0, 1, '', '','', 'arrow-d', 'right', 'false', 'true', 'a', '', '', '', '','', ''),
+  "<div id='Label1' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:14px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >UUID:</div>",
+  "<div id='lblUUID' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:12px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >UUID</div>",
+  ].join('');
+</script>
+</form>
+
+</div>
+<script>
+if(!navigator.cookieEnabled) NSB.MsgBox('Please turn cookies on.');
+(function(){var all=document.getElementsByTagName('*');for(var i=0;i<all.length;i++)if(typeof all[i].id!='undefined'&&typeof window[all[i].id]=='undefined')window[all[i].id]=all[i];})()
+
+window.addEventListener('load', function() {
+  frmHome.style.display = 'block';
+
+  NSB.addProperties(imgLogoSDP);
+  NSB.addProperties(imgLogoCSI);
+
+
+  NSB.addProperties(lblTitolo);
+
+
+  NSB.addProperties(lblSottotitolo);
+  NSB.addDisableProperty(btnSensor);
+  NSB.addProperties(btnSensor);
+  btnSensor.onclick=function(){ChangeForm(frmSensor)};
+  NSB.addProperties(Line1);
+  NSB.addDisableProperty(btnSettings);
+  NSB.addProperties(btnSettings);
+  btnSettings.onclick=function(){ChangeForm(frmSettings)};
+  NSB.addProperties(ttipSensor);
+  NSB.addProperties(ttipSettings);
+  NSB.addProperties(HeaderBar);
+  NSB.addDisableProperty(HeaderBar);
+
+
+  if(typeof(HeaderBar.onclick)=='function'){
+    if(typeof(HeaderBar_left)!='undefined') HeaderBar_left.onclick=function() {HeaderBar.onclick(HeaderBar_left.getAttribute('nsbvalue'))};
+    if(typeof(HeaderBar_right)!='undefined') HeaderBar_right.onclick=function() {HeaderBar.onclick(HeaderBar_right.getAttribute('nsbvalue'))}};
+  frmHome.style.display = 'none';
+  
+}, false);
+frmHome.onsubmit=function(event){window.event.stopPropagation();window.event.preventDefault()};
+NSB.addProperties(frmHome);
+ //this form show the main manù
+
+window.addEventListener('load', function() {
+  frmSensor.style.display = 'block';
+
+  NSB.addProperties(HeaderBar1);
+  NSB.addDisableProperty(HeaderBar1);
+  HeaderBar1_left.onclick=function(){ChangeForm(frmHome)};
+
+  if(typeof(HeaderBar1.onclick)=='function'){
+    if(typeof(HeaderBar1_left)!='undefined') HeaderBar1_left.onclick=function() {HeaderBar1.onclick(HeaderBar1_left.getAttribute('nsbvalue'))};
+    if(typeof(HeaderBar1_right)!='undefined') HeaderBar1_right.onclick=function() {HeaderBar1.onclick(HeaderBar1_right.getAttribute('nsbvalue'))}};
+  NSB.addDisableProperty(btnStart);
+  NSB.addProperties(btnStart);
+
+  NSB.addDisableProperty(btnJSON);
+  NSB.addProperties(btnJSON);
+
+  TextArea1.ontouchmove=function(e){e.stopPropagation()};
+  NSB.addProperties(TextArea1);
+  NSB.addProperties(imgLogoCSI2);
+  NSB.addProperties(imgLogoSDP2);
+  NSB.addProperties(GoogleMap1);
+  GoogleMap1.mapOptions={
+    disableDefaultUI: False,
+    disableDoubleClickZoom: False,
+    draggable: False,
+    draggableCursor: '',
+    draggingCursor: '',
+    heading: 0,
+    keyboardShortcuts: True,
+    latitude: '40.948262',
+    longitude: '-72.898428',
+    mapMaker: True,
+    mapTypeId: 'roadmap',
+    maxZoom: 20,
+    noClear: False,
+    scrollwheel: False,
+    streetViewControl: False,
+    tilt: 0,
+    zoom: 16,
+    zoomControl: False,
+    };
+  GoogleMap1.setMarker = NSB.GoogleMapSetMarker;
+  GoogleMap1.refresh = NSB.GoogleMapRefresh;
+  GoogleMap1.refresh();
+  frmSensor.style.display = 'none';
+  
+}, false);
+frmSensor.onsubmit=function(event){window.event.stopPropagation();window.event.preventDefault()};
+NSB.addProperties(frmSensor);
+ //Geolocation - this form gets the current location
+ //and displays a map of it. It also shows the current
+ //speed and altitude.
+
+ //Set up global variables
+var gps;
+var flgJSON;
+longitude = 0;
+latitude = 0;
+lastRefresh = 0;
+flgJSON = False;
+
+btnStart.onclick = function() { savethefunction_rvar="";
+
+  if(btnStart.text == "Start") {
+ //This starts scanning the current location. It checks it every x seconds.
+ //If it gets the data successfully, the handler function is called.
+ //If not, errorCallBack is called.
+
+ //NOTE: the timer not work properly in phonegap/cordova
+
+    options={timeout: 1000, maximumAge: 1000, enableHighAccuracy: True}
+    gps=navigator.geolocation.watchPosition(onGeolocation, errorCallBack, options);
+
+ //disable the stop button, enable the start button
+    btnStart.text = "Stop";
+ } else {
+ //Stop checking the current location
+    navigator.geolocation.clearWatch(gps);
+    btnStart.text = "Start";
+  }
+return savethefunction_rvar; }
+
+
+function onGeolocation(location) { savethefunction_rvar="";
+ var s;
+ var jt;
+ var t;
+ var fDate;
+
+ // set the timestamp value
+  t = dateadd("s",0,new Date());
+
+ // get the location coordinate
+
+  if(location.coords.longitude == null) {
+     longitudine = 0;
+ } else {
+     longitudine = location.coords.longitude;
+  }
+
+  if(location.coords.latitude == null) {
+     latitudine = 0;
+ } else {
+     latitudine = location.coords.latitude;
+  }
+
+  if(location.coords.speed == null) {
+     vel = 0;
+ } else {
+     vel = location.coords.speed;
+  }
+
+  if(location.coords.altitude == null) {
+     altitudine = 0;
+ } else {
+     altitudine = location.coords.altitude;
+  }
+
+ // build the text for the info text area
+  s = "Longitude: " + longitudine  +  '\n';
+  s = s  +  "Latitude: " + latitudine  +  '\n';
+  s = s  +  "Speed: " + vel  +  '\n';
+  s = s  +  "Altitude: " + altitudine  +  '\n';
+
+ // build a timestamp in ISO format
+  fDate = "";
+  fDate = fDate  +  Year(t)  +  "-";
+  if(Month(t) < 10) {
+    fDate = fDate  +  "0"  +  Month(t);
+ } else {
+    fDate = fDate  +  Month(t);
+  }
+
+  fDate = fDate  +  "-";
+
+  if(Day(t) < 10) {
+    fDate = fDate  +  "0"  +  Day(t);
+ } else {
+    fDate = fDate  +  Day(t);
+  }
+
+  fDate = fDate  +  "T";
+
+   if(Hour(t) < 10) {
+    fDate = fDate  +  "0"  +  Hour(t);
+ } else {
+    fDate = fDate  +  Hour(t);
+  }
+
+  fDate = fDate  +  ":";
+
+  if(Minute(t) < 10) {
+    fDate = fDate  +  "0"  +  Minute(t);
+ } else {
+    fDate = fDate  +  Minute(t);
+  }
+
+  fDate = fDate  +  ":";
+
+  if(Second(t) < 10) {
+    fDate = fDate  +  "0"  +  Second(t);
+ } else {
+    fDate = fDate  +  Second(t);
+  }
+
+  fDate = fDate  +  "+0200";
+
+  s = s  +   "Timestamp: " + fDate;
+
+ // build a JSON message
+  jt = "{" + '"' + "stream" + '"' + ": " + '"' + "" + NomeStream + "" + '"' + ", ";
+  jt = jt + "" + '"' + "sensor" + '"' + ": " + '"' + "" + SensorID + "" + '"' + ", ";
+  jt = jt + "" + '"' + "values" + '"' + ": [{";
+  jt = jt + "" + '"' + "time" + '"' + ": " + '"' + "" +  fDate + "" + '"' + ", ";
+  jt = jt + "" + '"' + "components" + '"' + ": {";
+  jt = jt + "" + '"' + "longitude" + '"' + ": " + '"' + "" + longitudine + "" + '"' + ", ";
+  jt = jt + "" + '"' + "latitude" + '"' + ": " + '"' + "" + latitudine + "" + '"' + ", ";
+  jt = jt + "" + '"' + "altitude" + '"' + ": " + '"' + "" + altitudine + "" + '"' + ", ";
+  jt = jt + "" + '"' + "speed" + '"' + ": " + '"' + "" + vel + "" + '"' + "}}]} ";
+
+ // this fix the phonegap/cordova timer problem
+  if(SysInfo(10)-lastRefresh > intervalRefresh) {
+
+ //send JSON data to SDP.
+var xmlHttp = new XMLHttpRequest();
+      xmlHttp.open( "POST", "http://stream.smartdatanet.it/api/input/smartlab", True);
+      xmlHttp.setRequestHeader("Authorization", "Basic c21hcnRsYWI6VXgwbXU1aXQ="); 
+      xmlHttp.setRequestHeader("Content-Type", "application/json "); 
+      xmlHttp.send( jt );
+//show the map
+    GoogleMap1.mapOptions.latitude = latitudine;
+    GoogleMap1.mapOptions.longitude = longitudine;
+    GoogleMap1.refresh();
+    marker = GoogleMap1.setMarker(null);
+
+    lastRefresh=SysInfo(10);
+      if(flgJSON == True) {
+        TextArea1.value = jt;
+ } else {
+        TextArea1.value = s;
+      }
+  }
+return savethefunction_rvar; }
+
+function errorCallBack(Error) { savethefunction_rvar="";
+ // in case of geolocation error show the previous data
+    GoogleMap1.mapOptions.latitude = latitudine;
+    GoogleMap1.mapOptions.longitude = longitudine;
+    GoogleMap1.refresh();
+return savethefunction_rvar; }
+
+
+
+btnJSON.onclick = function() { savethefunction_rvar="";
+  if(btnJSON.text == "Show JSON") {
+      flgJSON = True;
+      btnJSON.text = "Show Data";
+ } else {
+      flgJSON = False;
+      btnJSON.text = "Show JSON";
+  }
+return savethefunction_rvar; }
+
+frmSensor.onshow = function() { savethefunction_rvar="";
+    GoogleMap1.mapOptions.latitude = 0;
+    GoogleMap1.mapOptions.longitude = 0;
+    GoogleMap1.refresh();
+    TextArea1.text = "";
+return savethefunction_rvar; }
+
+window.addEventListener('load', function() {
+  frmSettings.style.display = 'block';
+
+  NSB.addProperties(HeaderBarSettings);
+  NSB.addDisableProperty(HeaderBarSettings);
+
+
+  if(typeof(HeaderBarSettings.onclick)=='function'){
+    if(typeof(HeaderBarSettings_left)!='undefined') HeaderBarSettings_left.onclick=function() {HeaderBarSettings.onclick(HeaderBarSettings_left.getAttribute('nsbvalue'))};
+    if(typeof(HeaderBarSettings_right)!='undefined') HeaderBarSettings_right.onclick=function() {HeaderBarSettings.onclick(HeaderBarSettings_right.getAttribute('nsbvalue'))}};
+  NSB.addProperties(imgLogoSDP3);
+  NSB.addProperties(imgLogoCSI3);
+
+
+  NSB.addProperties(lblGPS);
+
+
+  NSB.addProperties(lblMapRefreshCopy);
+  $('#sldRefresh .ui-slider').css('margin','0px');
+  sldRefresh.__defineGetter__('value', function(){return sldRefresh_inner.value});
+  sldRefresh.__defineSetter__('value', function(n){ sldRefresh_inner.value=n});
+  sldRefresh.__defineGetter__('min', function(){return sldRefresh_inner.min});
+  sldRefresh.__defineSetter__('min', function(n){ sldRefresh_inner.min=n});
+  sldRefresh.__defineGetter__('max', function(){return sldRefresh_inner.max});
+  sldRefresh.__defineSetter__('max', function(n){ sldRefresh_inner.max=n});
+  sldRefresh.__defineGetter__('step', function(){return sldRefresh_inner.step});
+  sldRefresh.__defineSetter__('step', function(n){ sldRefresh_inner.step=n});
+  sldRefresh.setValue=function(n){$('#sldRefresh_inner').val(n).slider('refresh')};
+  NSB.addProperties(sldRefresh);
+  if(typeof(cmbSensor)=='undefined') cmbSensor={id:'cmbSensor'};
+  NSB.Select_jqm_init(cmbSensor,'','');
+
+
+  NSB.addProperties(Label1);
+
+
+  NSB.addProperties(lblUUID);
+  frmSettings.style.display = 'none';
+  
+}, false);
+frmSettings.onsubmit=function(event){window.event.stopPropagation();window.event.preventDefault()};
+NSB.addProperties(frmSettings);
+ // set the deafault value of combobox
+frmSettings.onshow = function() { savethefunction_rvar="";
+  cmbSensor.addItem("phonegps01" , "cc1bfe50-491c-560d-a235-0e4134bbdc23");
+  cmbSensor.addItem("phonegps02" , "5391c45d-7350-5f9b-b971-f711e2766123");
+  lblUUID.Caption = cmbSensor.selectedValue();
+return savethefunction_rvar; }
+
+ // when the combobox xchange, set the UUID label
+cmbSensor.onchange = function() { savethefunction_rvar="";
+  lblUUID.Caption = cmbSensor.selectedValue();
+return savethefunction_rvar; }
+
+
+ // manage the header bar
+HeaderBarSettings.onclick = function(button) { savethefunction_rvar="";
+
+  if(TypeName(button)=="object" )  { return savethefunction_rvar; }
+
+ // manage the "save" button click
+  if(button == "Save") {
+      sensorID = cmbSensor.selectedValue();
+      intervalRefresh = sldRefresh.value * 1000;
+      SensorID = cmbSensor.selectedValue();
+      ChangeForm(frmHome);
+  }
+
+return savethefunction_rvar; }
+
+
+window.addEventListener('orientationchange', function(){window.scrollTo(0,0)});
+window.addEventListener('load', function() {
+  browserWarningMessage('Please use Google Chrome, Apple Safari or another supported browser.');
+  frmHome.style.display = 'block';
+  Main();
+  if (typeof(frmHome.onshow)=='function') frmHome.onshow();
+  
+}, false);
+
+var NSBCurrentForm = frmHome;
+
+var intervalRefresh;
+var SensorID;
+var NomeStream;
+ var latitudine;
+ var longitudine;
+ var vel;
+ var altitudine;
+
+
+
+function Main() {
+  SensorID = "cc1bfe50-491c-560d-a235-0e4134bbdc23";
+  intervalRefresh = 5000;
+  NomeStream = "position";
+}
+</script>
+
+</body>
+</html>

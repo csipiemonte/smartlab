@@ -1,0 +1,10 @@
+{
+  "max": 90,
+  "min": 20,
+  "fps": 1,
+  "dt_stats": 10,
+  "dt_speed": 5,
+  "n": 3,
+  "min_speed": 1,
+  "max_speed": 5
+}
