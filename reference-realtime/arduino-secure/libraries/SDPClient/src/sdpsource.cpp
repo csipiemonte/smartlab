@@ -219,11 +219,16 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
   if(m_hmacKeylength > 0)
   {
     sdp::message::SecureJSON secjson;
+    /*
+     uint8_t hmacKey2[]={
+     0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,0x13,0x14,
+     0x15,0x16,0x17,0x18,0x19
+     };
+     */
+    secjson.setKey(m_hmacKey, m_hmacKeylength);
+    secjson.create(json);
 
-    secjson.setKey( m_hmacKey, m_hmacKeylength);
-    secjson.create( json );
-
-  // Publish _JSON
+    // Publish _JSON
     m_message = aJson.print(secjson.getJson());
   }
   else
@@ -265,7 +270,6 @@ uint8_t SDPSource::subscribe(const char* tenant, SDPStream& stream, GenericSenso
   size_t lenStreamId = strlen(stream.id());
   size_t lenSensorId = strlen(sensor.id());
 
-
   if ((lenType + lenTenant + lenStreamId + lenSensorId + 5) > TOPIC_SIZE)
   {
     return 0;
@@ -302,7 +306,6 @@ void SDPSource::callback(char* topic, byte* payload, unsigned int length)
   // In order to republish this payload, a copy must be made
   // as the orignal payload buffer will be overwritten whilst
   // constructing the PUBLISH packet.
-
 
   // Free the memory old buffer
   if (configuration != 0)

@@ -27,10 +27,11 @@ namespace sdp
 {
   namespace message
   {
-    size_t CSVLine::LINE_SIZE = 128;
+    const size_t CSVLine::LINE_SIZE = 128;
+    const char CSVLine::FS = ';';
 
     CSVLine::CSVLine() :
-    m_nf(0), m_fields(0), m_isCopy(false), m_line(0), m_length(0)
+        m_nf(0), m_fields(0), m_isCopy(false), m_line(0), m_length(0)
     {
     }
 
@@ -56,7 +57,7 @@ namespace sdp
       if (m_line != 0 && !m_isCopy)
       {
         delete[] m_line;
-        m_line  = 0;
+        m_line = 0;
       }
     }
 
@@ -90,10 +91,47 @@ namespace sdp
       memset(m_line, 0, m_length);
       memcpy(m_line, line, m_length - 1);
 
-      Serial.print("line: ");
-      Serial.println(m_line);
-      Serial.println(m_length);
+      m_nf = 0;
 
+      for (size_t i = 0; i < m_length; i++)
+      {
+        if (m_line[i] == FS)
+        {
+          m_nf++;
+        }
+      }
+
+      if (m_length > 2 && m_line[m_length - 2] != FS && m_line[m_length] == 0)
+      {
+        m_nf++;
+      }
+
+      m_fields = new size_t[m_nf];
+      memset(m_fields, 0, sizeof(size_t) + m_nf);
+
+      size_t j = 0;
+      for (size_t i = 0; i < m_length; i++)
+      {
+        if (m_line[i -1] == FS || i == 0)
+        {
+          m_line[i -1] = 0;
+          m_fields[j++] = i;
+        }
+      }
     }
+
+    bool CSVLine::getItemAsInt(size_t index, int &n)
+    {
+      char* field = getItem(index);
+      return StringParser::toInt(field, n);
+    }
+
+
+    bool CSVLine::getItemAsLong(size_t index, long &n)
+    {
+      char* field = getItem(index);
+      return StringParser::toLong(field, n, strlen(field));
+    }
+
   } /* namespace message */
 } /* namespace sdp */

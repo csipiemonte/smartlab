@@ -76,10 +76,10 @@ A standard for the format of the configuration message sent to the Arduino in no
 The Arduino subscribes itself to this topic on the MQTT broker:
 
 ```
-config/<tenant>/<sensor_name>
+config/<tenant>/<sensor_id>
 ```
 
-When a new configuration is published on this topic, arduino node received the new one and process it. To save memory and make simple the process of this message on Arduino board, on this family the new configuration is sent ad CSV (Comma Separated Values). For example the configuration has this parameter:
+When a new configuration is published on this topic, arduino node received the new one and process it. To save memory and make simple the process of this message on Arduino board, on this family the new configuration is sent ad CSV (Comma-Separated Values). For example the configuration has this parameter:
 - Polling time
 - Analog pin
 

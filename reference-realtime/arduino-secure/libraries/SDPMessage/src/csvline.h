@@ -8,11 +8,13 @@
 #ifndef CSVLINE_H_
 #define CSVLINE_H_
 
+#include "Arduino.h"
+#include "stringparser.h"
+
 namespace sdp
 {
   namespace message
   {
-
     /**
      * The CSVLine class describes a generic line of a CSV file.
      *
@@ -24,7 +26,10 @@ namespace sdp
       public:
 
         //! Max size for a CSV line
-        static size_t LINE_SIZE;
+        static const size_t LINE_SIZE;
+
+        //! Field Separator
+        static const char FS;
 
         /**
          * Default Constructor.
@@ -44,7 +49,60 @@ namespace sdp
          */
         virtual ~CSVLine();
 
+        /**
+         * Initializes object from a CSV line.
+         *
+         * \param[in] line buffer where CSV line is stored
+         * \param[in] length size of the buffer
+         *
+         */
         void set(const char* line, size_t length);
+
+        /**
+         * Gets a fields of the CSV line as a string.
+         *
+         * \param[in] index field position
+         *
+         * \return pointer to the field (char array) or 0 if invalid index
+         */
+        char* getItem(size_t index) { return (index < m_nf)?&m_line[m_fields[index]]:0; }
+
+        /**
+         * Gets a fields of the CSV line as an integer.
+         *
+         * \param[in] index field position
+         * \param[out] n field
+         *
+         * \return false if invalid index or wrong format (not integer), true otherwise
+         */
+        bool getItemAsInt(size_t index, int &n);
+
+        /**
+         * Gets a fields of the CSV line as an long integer.
+         *
+         * \param[in] index field position
+         * \param[out] n field
+         *
+         * \return false if invalid index or wrong format (not long integer), true otherwise
+         */
+        bool getItemAsLong(size_t index, long &n);
+
+        /**
+         * Gets a fields of the CSV line as an float.
+         *
+         * \param[in] index field position
+         * \param[out] n field
+         *
+         * \return false if invalid index or wrong format (not float), true otherwise
+         */
+        bool getItemAsFloat(size_t index, long &n);
+
+        /**
+         * Gets the fields number of CSV line.
+         *
+         * \return number of fields
+         */
+        size_t NF() { return m_nf; };
 
       private:
         //! Internal buffer for storage the CSV line
@@ -57,7 +115,7 @@ namespace sdp
         size_t *m_fields;
 
         //! Number of fields
-        byte m_nf;
+        size_t m_nf;
 
         //! Flag  to check if it is a copy
         bool m_isCopy;

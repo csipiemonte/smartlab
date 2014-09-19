@@ -263,6 +263,31 @@ namespace sdp
         /// Default component label
         static const char* DEFAULT_COMPONENT_LABEL;
 
+      public:
+        /**
+         * Gets configuration buffer.
+         *
+         * \return configuration buffer
+         */
+        static sdp::message::CSVLine *getConfiguration()
+        {
+          return configuration;
+        }
+
+        /**
+         * Deletes configuration buffer.
+         *
+         * \return configuration buffer
+         */
+        static void deleteConfiguration()
+        {
+          if (configuration != 0)
+          {
+            delete configuration;
+            configuration = 0;
+          }
+        }
+
       private:
 
         //! Configuration buffer (received from server)
