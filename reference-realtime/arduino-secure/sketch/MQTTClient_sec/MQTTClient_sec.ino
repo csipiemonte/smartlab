@@ -48,6 +48,9 @@
 #include <aJSON.h>
 #include <sdppublishmsg.h>
 
+#include <stringparser.h>
+#include <csvline.h>
+
 #include <avr/pgmspace.h>
 
 
@@ -60,6 +63,8 @@
 #ifdef DEBUG_MEMORY
 #include <MemoryFree.h>
 #endif
+
+#define CFG_FILENAME "config.csv"
 
 
 /******************************************************************************************
@@ -85,6 +90,7 @@
  *                     to use standard SDP JSON. 
  *                      to use standard SDP JSON. 
  * CONFIGURATION      : change configuration runtime receiving the new one from the broker
+ *                      MQTT (work in progress)
  ******************************************************************************************/
 //! Global macro value to define if network connection is cable or Wi-Fi
 #define WIFI 1
@@ -420,7 +426,6 @@ NetworkConfig netConfig;
 #ifdef WIFI
 
 //! Wireless network SSID (name)
-//! Wireless network SSID (name)
 const char w_ssid[] PROGMEM = WIRELESS_SSID;
 
 //! Wireless network password
@@ -557,6 +562,12 @@ Interval tNtpUpdateTime;
 //! Read sensor period
 Interval tReadTime; //(READ_SENSOR_PERIOD + 1);
 
+// Read interval (in ms)
+unsigned long tRead = 0;
+
+// NTP update  interval (in ms)
+unsigned long tNtpUpdate = 0;
+
 
 /*------------------------------------------------------------------------------------
 /* FUNCTION PROTOTYPEs
@@ -686,8 +697,41 @@ char* getFlashString(PROGMEM const char *string_table[], byte index);
  *
  * \param[in] board type of board (Mega, Uno, ...)
  * \param[in] shield type of shield (Ethernet, Wifi,...)
+ *
+ * \return true: opened, false: error while opening SD
  */
 bool openSD(uint8_t board, uint8_t shield);
+
+/**
+ * checkNewConfig
+ * Checks if there isa new node configuration (received from the broker MQTT).
+ *
+ * \return true: it is received a new configuration, false: no new configuration
+ */
+bool checkNewConfig();
+
+/**
+ * updateConfig
+ * Loads the new configuration and save it on SD card.
+ *
+ * \return true: if no errors, false: othewise
+ */
+bool updateConfig();
+
+/**
+ * updateConfig
+ * Loads the new configuration and save it on SD card.
+ *
+ * \return true: if no errors, false: othewise
+ */
+bool updateConfig();
+
+/**
+ * loadConfig
+ * Loads configuration from SD card, if #CFG_FILENAME file is not present, it will be use the default values.
+ *
+ */
+void loadConfig();
 
 
 
@@ -712,6 +756,15 @@ void setup()
   {
     Serial.println( F(" done.") );    
   }
+
+#ifdef CONFIGURATION
+  Serial.println( );
+  Serial.println( F("Load Configuration...") );
+  loadConfig();
+#else
+  tRead = READ_SENSOR_PERIOD;
+  tNtpUpdate = UPDATE_TIME_PERIOD;
+#endif
 
   Serial.println( );
   Serial.println( F("Configure smart object...") );
@@ -883,16 +936,23 @@ Serial.println(freeMemory());
     case IDLE :
     {
       // Do nothing and check the following state
-      if (tReadTime.residualTime(READ_SENSOR_PERIOD) == 0)
+      if (tReadTime.residualTime(tRead /*READ_SENSOR_PERIOD*/) == 0)
       {
         state = READ_SENSORS;
       }
-      else if (tNtpUpdateTime.residualTime(UPDATE_TIME_PERIOD) == 0)
+      else if (tNtpUpdateTime.residualTime(tNtpUpdate/*UPDATE_TIME_PERIOD*/) == 0)
       {
         state = NTPUPDATE;
       }
       MTTQClient.loop();
-      
+#ifdef CONFIGURATION      
+      if ( checkNewConfig() )
+      {
+        updateConfig();
+        loadConfig();
+      }
+#endif
+
     } break;
     
     default : 
@@ -1052,13 +1112,13 @@ void printNetworkConfiguration()
   Serial.println(F("Network configuration: "));
 #ifdef STATIC_NETWORK_CFG
   Serial.print( F("\tIP Address: ") );
-  Serial.println(IPAddress(ip));  
+  Serial.println(IPAddress( netConfig.ip() ));  
   Serial.print( F("\tNetmask   : ") );
-  Serial.println(IPAddress(subnet));  
+  Serial.println(IPAddress( netConfig.netmask() ));  
   Serial.print( F("\tGateway   : ") );
-  Serial.println(IPAddress(gateway));  
+  Serial.println(IPAddress( netConfig.gateway() ));  
   Serial.print( F("\tDNS       : ") );
-  Serial.println(IPAddress(mydns));
+  Serial.println(IPAddress( netConfig.dns() ));
 #else
   Serial.print( F("\tIP Address: ") );
   
@@ -1226,3 +1286,141 @@ bool openSD(uint8_t board, uint8_t shield)
   return true;
 }
 
+#ifdef CONFIGURATION
+bool checkNewConfig()
+{
+  return (sdp::client::SDPSource::getConfiguration() != 0);
+}
+
+bool updateConfig()
+{
+  if ( checkNewConfig() )
+  {
+    Serial.println( F("New configuration") );
+
+    // Save new configuration
+//    Serial.println( F("Save on SD") );
+    if (SD.exists(CFG_FILENAME))
+    {
+      // Delete old configuration
+      SD.remove(CFG_FILENAME);
+    }
+    
+    File myFile = SD.open(CFG_FILENAME, FILE_WRITE);
+    // if the file opened okay, write to it:
+    if (myFile) 
+    {
+      for (size_t i = 0; i < sdp::client::SDPSource::getConfiguration()->NF(); i++)
+      {
+        myFile.print(sdp::client::SDPSource::getConfiguration()->getItem(i));
+        myFile.print(";");
+      }
+      // close the file:
+      myFile.close();
+//      Serial.println();
+    } 
+    else 
+    {
+      // if the file didn't open, print an error:
+      Serial.println( F("Error opening") );
+    }
+    sdp::client::SDPSource::deleteConfiguration();
+  }
+  
+  return true;
+}
+
+
+
+#define RBUF_SIZE 128
+const uint8_t cfgNF = 2;
+
+void loadConfig()
+{
+  if (SD.exists(CFG_FILENAME))
+  {
+//    Serial.println( F("Load from SD") );
+
+    File myFile = SD.open(CFG_FILENAME, FILE_READ);
+    // if the file opened okay, write to it:
+    if (myFile) 
+    {
+      char rBuffer[RBUF_SIZE] = {0};
+      size_t i = 0;
+      bool endline = false;
+      while ( myFile.available() && ! endline) 
+      {
+        rBuffer[i] = myFile.read();
+        if ( rBuffer[i] =='\n' || i == RBUF_SIZE )
+        {
+          endline = true;
+        }
+        i++;
+      }
+      myFile.close();
+
+      sdp::message::CSVLine conf;
+      conf.set(rBuffer, RBUF_SIZE);
+      
+      
+      //check number of fields
+      if ( conf.NF() == cfgNF)
+      {
+        for (i = 0; i < cfgNF; i++)
+        {
+          switch (i)
+          {
+            case 0 : {
+              int n = 0;
+              
+              if ( conf.getItemAsInt(i, n) )
+              {
+                tRead = ( (unsigned long) n) * 1000;
+              }
+              else
+              {
+                tRead = READ_SENSOR_PERIOD;
+              }
+              
+              Serial.print( F("\ttRead: ") );
+              Serial.println(tRead);
+              
+            } break;
+            
+            case 1 : {
+              int n = 0;
+              
+              if ( conf.getItemAsInt(i, n) )
+              {
+                tNtpUpdate = ( (unsigned long) n) * 1000;
+              }
+              else
+              {
+                tNtpUpdate = UPDATE_TIME_PERIOD;
+              }
+              
+              Serial.print( F("\ttNtpUpdate: ") );
+              Serial.println(tNtpUpdate);
+            } break;
+            default : {} break;
+            
+          }
+        }
+        
+        return ;
+      }
+      else
+      {
+        Serial.println( F("Invalid config file!") ); 
+      }
+      // close the file:
+    }
+    // if the file didn't open, print an error:
+      Serial.println( F("error opening") );
+  }
+  else
+  {
+    Serial.println( F("Default values") );
+  }
+}
+#endif
