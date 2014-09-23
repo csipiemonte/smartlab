@@ -2376,7 +2376,7 @@ NSB.Print=function(s){
      if(NSB_text.innerHTML.slice(-4)!="<br>") s="<br>" + s;
      NSB_text.innerHTML=NSB_text.innerHTML + s;
      NSB.Printobj.style.display="block";
-     if(typeof(iScroll)!="undefined") {setTimeout(function(){NSB.Printref.refresh()}, 100)}
+     if(typeof(IScroll)!="undefined") {setTimeout(function(){NSB.Printref.refresh()}, 100)}
   }
   else {
     var height=window.innerHeight-50
@@ -2395,8 +2395,8 @@ NSB.Print=function(s){
       "<div id='NSB_ProgressClose' class='NSB_ProgressClose'>\u00D7</div>";
     document.body.appendChild(NSB.Printobj);
     NSB_ProgressClose.onclick = function(){NSB_Progress.style.display='none'};
-    if(typeof(iScroll)!="undefined") {
-       NSB.Printref=new iScroll('NSB_scroller',{bounce:true, zoom:false})
+    if(typeof(IScroll)!="undefined") {
+       NSB.Printref=new IScroll(NSB_scroller,{bounce:true, zoom:false, mouseWheel:true, scrollbars:true})
        setTimeout(function(){NSB.Printref.refresh()}, 200)
     }
   }

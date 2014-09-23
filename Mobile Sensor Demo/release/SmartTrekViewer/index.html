@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <title>Smart Trek Visualizer</title>
-<meta name="generator" content="NSB/AppStudio 4.1.5.0$zkdb" />
-<meta name='date' content='2014-09-17 14:54:52.304470' />
+<meta name="generator" content="NSB/AppStudio 4.2.0.0$zkdb" />
+<meta name='date' content='2014-09-23 13:54:08.608281' />
 <meta name='version' content='1.0.0' />
 <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no, minimal-ui' />
 <meta name='apple-mobile-web-app-capable' content='YES' />
@@ -54,7 +54,7 @@
       media='(device-width: 320px) and (device-height: 480px)
          and (-webkit-device-pixel-ratio: 1)'
       rel='apple-touch-startup-image'>
-<link rel='shortcut icon' sizes='196x196' href='nsb/images/196.png' />
+<link rel='icon' sizes='192x192' href='nsb/images/196.png' />
 <script src="nsb/jquery.js"></script>
 <script src="nsb/hfunc.js"></script>
 <link href="nsb/nsbstyle.css" rel="stylesheet">
@@ -63,31 +63,23 @@
 <link href="nsb/jquery.mobile.css" rel="stylesheet">
 <script src="nsb/complexfunctions.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+<script src="nsb/iscroll.js"></script>
 
 
 
 <style type="text/css">
-#Line1 {position:absolute; left:9px; right:10px; top:5px; bottom:auto; height:652px; width:965px; margin:0px;}
 #btnConnetti {position:absolute; left:31px; right:auto; top:73px; bottom:auto; height:auto; width:100px}
-#txtResult {position:absolute; left:22px; right:auto; top:200px; bottom:auto; height:447px; width:422px}
 #btnDisconnetti {position:absolute; left:140px; right:auto; top:73px; bottom:auto; height:auto; width:100px}
-#GoogleMap1 {position:absolute; left:473px; right:auto; top:75px; bottom:auto; height:450px; width:480px}
-#Label1 {position:absolute; left:62px; right:auto; top:127px; bottom:auto; height:auto; width:70px}
-#cmbSensore {position:absolute; left:139px; right:auto; top:125px; bottom:auto; height:auto; width:308px}
-#lblSensore {position:absolute; left:139px; right:auto; top:166px; bottom:auto; height:auto; width:306px}
+#GoogleMap1 {position:absolute; left:45px; right:auto; top:128px; bottom:auto; height:450px; width:900px}
+#Label1 {position:absolute; left:263px; right:auto; top:72px; bottom:auto; height:auto; width:70px}
+#cmbSensore {position:absolute; left:338px; right:auto; top:71px; bottom:auto; height:auto; width:308px}
+#lblSensore {position:absolute; left:661px; right:auto; top:71px; bottom:auto; height:auto; width:306px}
 #Label2 {position:absolute; left:362px; right:auto; top:15px; bottom:auto; height:auto; width:312px}
 #Image1 {position:absolute; left:24px; right:auto; top:10px; bottom:auto; height:44px; width:203px}
-#Label3 {position:absolute; left:473px; right:auto; top:539px; bottom:auto; height:auto; width:70px}
 #Image2 {position:absolute; left:879px; right:auto; top:14px; bottom:auto; height:39px; width:83px}
-#Label4 {position:absolute; left:603px; right:auto; top:539px; bottom:auto; height:auto; width:70px}
-#Label5 {position:absolute; left:753px; right:auto; top:539px; bottom:auto; height:auto; width:70px}
-#Label6 {position:absolute; left:884px; right:auto; top:539px; bottom:auto; height:auto; width:70px}
-#lblLat {position:absolute; left:474px; right:auto; top:569px; bottom:auto; height:auto; width:124px}
-#lblLon {position:absolute; left:603px; right:auto; top:569px; bottom:auto; height:22px; width:144px}
-#lblAlt {position:absolute; left:753px; right:auto; top:569px; bottom:auto; height:22px; width:118px}
-#lblSpeed {position:absolute; left:885px; right:auto; top:569px; bottom:auto; height:22px; width:77px}
-#Label7 {position:absolute; left:470px; right:auto; top:613px; bottom:auto; height:auto; width:97px}
-#lblTimestamp {position:absolute; left:581px; right:auto; top:613px; bottom:auto; height:auto; width:283px}
+#tblSensor_scroller {position: absolute; overflow:hidden; width:898px; height:149px; left:45px; top:590px; right:auto; bottom:auto;}
+#tblSensor {position:absolute; left:0px; top:0px; width:100%; height:auto }
+#Line1 {position:absolute; left:10px; right:10px; top:5px; bottom:auto; height:733px; width:945px; margin:0px;}
 body * {font-family:helvetica}
 </style>
 </head>
@@ -97,9 +89,7 @@ body * {font-family:helvetica}
 
 <form id="Form1" action="" method="GET" onsubmit="return false;" style="display:none; height:100%; position:absolute; top:0px; left:0px; width:100%; ">
 <script>
-Form1.innerHTML=[  "<hr id='Line1' class='' style='background-color:grigio;border-style:solid;border-color:gray;border-width:1px;' >",
-  "<button id='btnConnetti' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Connect</button>",
-  "<textarea id='txtResult' class='ui-mini  ' name='' style='display:block; margin-top:0px; text-align:left; font-size:12px;; font-family:helvetica; font-style:; font-weight:; color:; background-color:;-webkit-overflow-scrolling:touch; max-height:auto; '  autocorrect='on'  autocomplete='on'  autocapitalize='on' data-autogrow=false  placeholder='Inserisci il testo qui'></textarea>",
+Form1.innerHTML=[  "<button id='btnConnetti' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Connect</button>",
   "<button id='btnDisconnetti' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Logout</button>",
   "<div id=GoogleMap1 style='background:#F0FFFF;'></div>",
   "<div id='Label1' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Sensor:</div>",
@@ -107,17 +97,9 @@ Form1.innerHTML=[  "<hr id='Line1' class='' style='background-color:grigio;borde
   "<div id='lblSensore' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:14px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Label</div>",
   "<div id='Label2' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:30px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Smart Trek Visualizer</div>",
   "<div id='Image1' data-nsb-type=image><img src='img/logosdp.jpg'  height=100% width=100% name='Image1_img' style='' usemap='Image1_map'></div>",
-  "<div id='Label3' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Latitude:</div>",
   "<div id='Image2' data-nsb-type=image><img src='img/logoCSI.png'  height=100% width=100% name='Image2_img' style='' usemap='Image2_map'></div>",
-  "<div id='Label4' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Longitude:</div>",
-  "<div id='Label5' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Altitude:</div>",
-  "<div id='Label6' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Speed:</div>",
-  "<div id='lblLat' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:green; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >xxx</div>",
-  "<div id='lblLon' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:green; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >xxx</div>",
-  "<div id='lblAlt' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:green; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >xxx</div>",
-  "<div id='lblSpeed' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:green; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >xxx</div>",
-  "<div id='Label7' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Timestamp:</div>",
-  "<div id='lblTimestamp' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:green; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >xxx</div>",
+  NSB.Grid("tblSensor", "6", "6", "", "", "Sensor, TS, Latitude, Longitude, Altitude [m], Speed [m/s]", "", "style=", "", ""),
+  "<hr id='Line1' class='' style='background-color:grigio;border-style:solid;border-color:gray;border-width:1px;' >",
   ].join('');
 </script>
 </form>
@@ -130,12 +112,9 @@ if(!navigator.cookieEnabled) NSB.MsgBox('Please turn cookies on.');
 window.addEventListener('load', function() {
   Form1.style.display = 'block';
 
-  NSB.addProperties(Line1);
   NSB.addDisableProperty(btnConnetti);
   NSB.addProperties(btnConnetti);
 
-  txtResult.ontouchmove=function(e){e.stopPropagation()};
-  NSB.addProperties(txtResult);
   NSB.addDisableProperty(btnDisconnetti);
   NSB.addProperties(btnDisconnetti);
 
@@ -153,12 +132,12 @@ window.addEventListener('load', function() {
     mapMaker: True,
     mapTypeId: 'roadmap',
     maxZoom: 20,
-    noClear: False,
+    noClear: True,
     scrollwheel: False,
     streetViewControl: False,
     tilt: 0,
     zoom: 16,
-    zoomControl: False,
+    zoomControl: True,
     };
   GoogleMap1.setMarker = NSB.GoogleMapSetMarker;
   GoogleMap1.refresh = NSB.GoogleMapRefresh;
@@ -175,42 +154,29 @@ window.addEventListener('load', function() {
 
   NSB.addProperties(Label2);
   NSB.addProperties(Image1);
-
-
-  NSB.addProperties(Label3);
   NSB.addProperties(Image2);
-
-
-  NSB.addProperties(Label4);
-
-
-  NSB.addProperties(Label5);
-
-
-  NSB.addProperties(Label6);
-
-
-  NSB.addProperties(lblLat);
-
-
-  NSB.addProperties(lblLon);
-
-
-  NSB.addProperties(lblAlt);
-
-
-  NSB.addProperties(lblSpeed);
-
-
-  NSB.addProperties(Label7);
-
-
-  NSB.addProperties(lblTimestamp);
+  tblSensor_ref = new IScroll(tblSensor_scroller,{ mouseWheel:true, scrollbars:true, bounce:true, zoom:false,click:iScrollClick()});
+  tblSensor.refresh=function(){setTimeout(NSB.refresh,100,tblSensor_ref)};
+  tblSensor.GridRefreshWidth=function(){setTimeout(NSB.GridRefreshWidth,10,tblSensor)};
+  NSB.Grid_init('tblSensor');
+  NSB.addProperties(tblSensor,tblSensor_scroller)
+  NSB.addProperties(Line1);
   Form1.style.display = 'none';
   
 }, false);
 Form1.onsubmit=function(event){window.event.stopPropagation();window.event.preventDefault()};
 NSB.addProperties(Form1);
+var NUMSENSOR = 5;
+var sensor=createMultiDimArray(NUMSENSOR);
+var marker=createMultiDimArray(NUMSENSOR);
+var client;
+var topics;
+var topics2;
+var idSensore;
+var tipoOp;
+var map;
+
+
  // manage the click on "Connect" button
 btnConnetti.onclick = function() { savethefunction_rvar="";
    var urlClient;
@@ -218,6 +184,7 @@ btnConnetti.onclick = function() { savethefunction_rvar="";
     urlClient = "ws://stream.smartdatanet.it/ws";
     client = Stomp.client(urlClient);
     client.connect("guest" , "Aekieh6F" , connectCallBack, errorCallback);
+
 return savethefunction_rvar; }
 
 btnDisconnetti.onclick = function() { savethefunction_rvar="";
@@ -226,48 +193,77 @@ btnDisconnetti.onclick = function() { savethefunction_rvar="";
     btnConnetti.disabled = False;
     btnDisconnetti.disabled = True;
     cmbSensore.disabled = False;
-    lblLat.Caption = "0.0";
-    lblLon.Caption = "0.0";
-    lblAlt.Caption = "0.0";
-    lblSpeed.Caption = "0.0";
-    lblTimestamp.Caption = "";
     GoogleMap1.mapOptions.longitude = 0;
     GoogleMap1.mapOptions.latitude = 0;
     GoogleMap1.refresh();
-    txtResult.text = "";
 return savethefunction_rvar; }
 
  // init the screen view
 Form1.onshow = function() { savethefunction_rvar="";
+ // define sensor metadata
+    sensor[0] = {name: "phonegps01" , id: "cc1bfe50-491c-560d-a235-0e4134bbdc23" , topic: "/topic/output.smartlab.cc1bfe50-491c-560d-a235-0e4134bbdc23_position" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
+    sensor[1] = {name: "phonegps02" , id: "5391c45d-7350-5f9b-b971-f711e2766123" , topic: "/topic/output.smartlab.5391c45d-7350-5f9b-b971-f711e2766123_position" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
+    sensor[2] = {name: "n.d." , id: "null" , topic: "null" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
+    sensor[3] = {name: "n.d." , id: "null" , topic: "null" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
+    sensor[4] = {name: "n.d." , id: "null" , topic: "null" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
+
+ // GUI Init
+ //button
     btnConnetti.disabled = False;
     btnDisconnetti.disabled = True;
     cmbSensore.disabled = False;
-    cmbSensore.addItem("phonegps01" , "cc1bfe50-491c-560d-a235-0e4134bbdc23");
-    cmbSensore.addItem("phonegps02" , "5391c45d-7350-5f9b-b971-f711e2766123");
+
+ // combo box
+    cmbSensore.addItem(sensor[0].name, sensor[0].topic);
+    cmbSensore.addItem(sensor[1].name, sensor[1].topic);
+    cmbSensore.addItem("all phone" , "all sensor ID");
+
+ // label
     lblSensore.Caption = cmbSensore.selectedValue();
     idSensore = cmbSensore.selectedItem();
-    topics = "/topic/output.smartlab.cc1bfe50-491c-560d-a235-0e4134bbdc23_position";
-    txtResult.text = "";
+
+ // default topics
+    topics = sensor[0].topic;
+
+ // maps
     GoogleMap1.mapOptions.longitude = 0;
     GoogleMap1.mapOptions.latitude = 0;
     GoogleMap1.refresh();
-    lblLat.Caption = "0.0";
-    lblLon.Caption = "0.0";
-    lblAlt.Caption = "0.0";
-    lblSpeed.Caption = "0.0";
-    lblTimestamp.Caption = "";
+
+
+ // get map identification
+    point = new google.maps.LatLng(0, 0);
+    mapOptions = {zoom: 10, center: point}
+    map = new google.maps.Map(document.getElementById("GoogleMap1"), mapOptions);
+
+ // define marker
+
+    for   (i = 0; i  <= (NUMSENSOR-1); i ++) {
+        marker[i] = new google.maps.Marker({position: point, map: map});
+        icon = new google.maps.MarkerImage(""  +  (i+1)  +  ".png");
+        marker[i].setIcon(icon);
+        marker[i].setVisible(False);
+    }
+
+
+
 
 return savethefunction_rvar; }
 
  // manage the topic selection 
 cmbSensore.onchange = function() { savethefunction_rvar="";
-    if(cmbSensore.selectedItem() == "phonegps01") {
+
+    switch (True) {
+    case ((cmbSensore.selectedItem()) == "phonegps01"):
         topics = "/topic/output.smartlab.cc1bfe50-491c-560d-a235-0e4134bbdc23_position";
+	break;
+    case ((cmbSensore.selectedItem()) == "phonegps02"):
+        topics = "/topic/output.smartlab.5391c45d-7350-5f9b-b971-f711e2766123_position";
+	break;
+    case ((cmbSensore.selectedItem()) == "all phone"):
+      topics = "/topic/output.smartlab.internal_allgps";
     }
 
-    if(cmbSensore.selectedItem() == "phonegps02") {
-        topics = "/topic/output.smartlab.5391c45d-7350-5f9b-b971-f711e2766123_position";
-    }
     lblSensore.Caption = cmbSensore.selectedValue();
     idSensore = cmbSensore.selectedItem();
 return savethefunction_rvar; }
@@ -277,8 +273,13 @@ function connectCallBack(x) {
     btnConnetti.disabled = True;
     btnDisconnetti.disabled = False;
     cmbSensore.disabled = True;
-    client.subscribe(topics, messageCallback);
-    _msgbox_confirm("You are connected and subscribed to topics: " + topics);
+    switch (True) {
+    case ((cmbSensore.selectedItem()) == "phonegps01" ): case ((cmbSensore.selectedItem()) ==  "phonegps02" ): case ((cmbSensore.selectedItem()) ==  "all phone"):
+        client.subscribe(topics, messageCallback);
+        _msgbox_confirm("You are connected and subscribed to topics: " + topics);
+
+    }
+
 }
 
  // connection error
@@ -288,39 +289,87 @@ function errorCallback(x) {
 
  // manage the stop message
 function messageCallback(x) {
-  var jsText;
-  var obJSON;
-  var latitude;
-  var longitude;
+ var jsText;
+ var obJSON;
+ var latitude;
+ var longitude;
+ var altezza;
+ var vel;
+ var tstamp;
+ var indice;
+ var markerBounds;
 
  // remove the stomp header
   jsText =""  +  x;
   p =  InStr(jsText, "{");
   jsText = Mid(jsText, p);
 
-  txtResult.text = x;
  // convert the JSON to an object
   obJSON = JSON.parse(jsText);
 
  // show the info on the screen
+
+  ids = obJSON.sensor;
+  indice = 0;
+  for   (indice = 0; indice  <= (NUMSENSOR - 1); indice ++) {
+    if(sensor[indice].id == ids) {
+         break;
+    }
+  }
+
+  if(indice >= NUMSENSOR) {
+     return;
+  }
+
   latitude = obJSON.values[0].components.latitude;
   longitude = obJSON.values[0].components.longitude;
-  GoogleMap1.mapOptions.longitude = longitude;
-  GoogleMap1.mapOptions.latitude = latitude;
-  lblLat.Caption = latitude;
-  lblLon.Caption = longitude;
-  lblAlt.Caption = longitude = obJSON.values[0].components.altitude;
-  lblSpeed.Caption = longitude = obJSON.values[0].components.speed;
-  lblTimestamp.Caption = obJSON.values[0].time;
-  GoogleMap1.refresh();
-  marker = GoogleMap1.setMarker(null);
+  altezza =obJSON.values[0].components.altitude;
+  vel = obJSON.values[0].components.speed;
+  tstamp = obJSON.values[0].time;
+
+  sensor[indice].marked = 1;
+  sensor[indice].lat = latitude;
+  sensor[indice].lon = longitude;
+  sensor[indice].alt = altezza;
+  sensor[indice].ts = tstamp;
+
+  point = new google.maps.LatLng(latitude, longitude);
+  marker[indice].setPosition(point);
+  marker[indice].setVisible(True);
+
+ // refresh screen
+  markerBounds = new google.maps.LatLngBounds();
+
+  for   (i = 0; i  <= (NUMSENSOR - 1); i ++) {
+    tblSensor.setValue(i+1,0,sensor[i].name);
+    if(sensor[i].marked == 1) {
+      pnt = new google.maps.LatLng(sensor[i].lat, sensor[i].lon);
+      markerBounds.extend(pnt);
+      tblSensor.setValue(i+1, 1, sensor[indice].ts);
+      tblSensor.setValue(i+1, 2, sensor[indice].lat);
+      tblSensor.setValue(i+1, 3, sensor[indice].lon);
+      tblSensor.setValue(i+1, 4, sensor[indice].alt);
+      tblSensor.setValue(i+1, 5, sensor[indice].speed);
+ } else {
+      tblSensor.setValue(i+1, 1, "-");
+      tblSensor.setValue(i+1, 2, "-");
+      tblSensor.setValue(i+1, 3, "-");
+      tblSensor.setValue(i+1, 4, "-");
+      tblSensor.setValue(i+1, 5, "-");
+    }
+  }
+  map.fitBounds(markerBounds);
+
 
 
 }
+
 
 function disconnectCallback(x) {
-  _msgbox_confirm("You are disconnected and logged out");
+  location = ".";
+
 }
+
 
 
 
@@ -716,9 +765,6 @@ window.addEventListener('load', function() {
 
 var NSBCurrentForm = Form1;
 
-var client;
-var topics;
-var idSensore;
 
 
 

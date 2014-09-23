@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <title>SmartTrek</title>
-<meta name="generator" content="NSB/AppStudio 4.1.5.0$zkdb" />
-<meta name='date' content='2014-09-17 14:56:13.415418' />
+<meta name="generator" content="NSB/AppStudio 4.2.0.0$zkdb" />
+<meta name='date' content='2014-09-23 13:26:51.004566' />
 <meta name='version' content='1.0.0' />
 <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no, minimal-ui' />
 <meta name='apple-mobile-web-app-capable' content='YES' />
@@ -54,7 +54,7 @@
       media='(device-width: 320px) and (device-height: 480px)
          and (-webkit-device-pixel-ratio: 1)'
       rel='apple-touch-startup-image'>
-<link rel='shortcut icon' sizes='196x196' href='nsb/images/196.png' />
+<link rel='icon' sizes='192x192' href='nsb/images/196.png' />
 <script src="nsb/jquery.js"></script>
 <script src="nsb/hfunc.js"></script>
 <link href="nsb/nsbstyle.css" rel="stylesheet">
@@ -62,7 +62,6 @@
 <script src="nsb/jquery.mobile.js"></script>
 <link href="nsb/jquery.mobile.css" rel="stylesheet">
 <script src="nsb/complexfunctions.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
 
 
@@ -78,16 +77,30 @@
 #ttipSettings {position:absolute; left:221px; right:auto; top:343px; bottom:auto; height:24px; width:24px}
 #HeaderBar {position: absolute; width:100%; height:40px; left:0px; top:0px;}
 #HeaderBar1 {position: absolute; width:100%; height:40px; left:0px; top:0px;}
-#btnStart {position:absolute; left:13px; right:auto; top:387px; bottom:auto; height:auto; width:100px}
-#btnJSON {position:absolute; left:146px; right:auto; top:387px; bottom:auto; height:auto; width:166px}
-#TextArea1 {position:absolute; left:11px; right:auto; top:256px; bottom:auto; height:124px; width:303px}
+#btnStart {position:absolute; left:14px; right:auto; top:270px; bottom:auto; height:52px; width:209px}
+#TextArea1 {position:absolute; left:12px; right:auto; top:332px; bottom:auto; height:90px; width:303px}
 #imgLogoCSI2 {position:absolute; left:255px; right:auto; top:431px; bottom:auto; height:24px; width:54px}
 #imgLogoSDP2 {position:absolute; left:7px; right:px; top:427px; bottom:auto; height:28px; width:167px}
-#GoogleMap1 {position:absolute; left:10px; right:auto; top:49px; bottom:auto; height:200px; width:300px}
+#lblCStream {position:absolute; left:10px; right:auto; top:55px; bottom:auto; height:auto; width:125px}
+#lblCSensor {position:absolute; left:10px; right:auto; top:85px; bottom:auto; height:auto; width:125px}
+#lblCTime {position:absolute; left:10px; right:auto; top:115px; bottom:auto; height:auto; width:125px}
+#lblCLat {position:absolute; left:10px; right:auto; top:145px; bottom:auto; height:auto; width:125px}
+#lblCLon {position:absolute; left:10px; right:auto; top:175px; bottom:auto; height:auto; width:125px}
+#lblCAlt {position:absolute; left:10px; right:auto; top:205px; bottom:auto; height:auto; width:125px}
+#lblCSpeed {position:absolute; left:10px; right:auto; top:235px; bottom:auto; height:auto; width:125px}
+#lblStream {position:absolute; left:148px; right:auto; top:55px; bottom:auto; height:auto; width:170px}
+#lblSensor {position:absolute; left:148px; right:auto; top:85px; bottom:auto; height:auto; width:170px}
+#lblTime {position:absolute; left:148px; right:auto; top:118px; bottom:auto; height:auto; width:170px}
+#lblLat {position:absolute; left:148px; right:auto; top:145px; bottom:auto; height:auto; width:170px}
+#lblLon {position:absolute; left:148px; right:auto; top:175px; bottom:auto; height:auto; width:170px}
+#lblAlt {position:absolute; left:148px; right:auto; top:205px; bottom:auto; height:auto; width:710px}
+#lblSpeed {position:absolute; left:148px; right:auto; top:235px; bottom:auto; height:auto; width:170px}
+#lblSend {position:absolute; left:247px; right:auto; top:273px; bottom:auto; height:auto; width:56px}
+#lblNumber {position:absolute; left:236px; right:auto; top:297px; bottom:auto; height:auto; width:70px}
 #HeaderBarSettings {position: absolute; width:100%; height:40px; left:0px; top:0px;}
 #imgLogoSDP3 {position:absolute; left:10px; right:px; top:427px; bottom:auto; height:28px; width:167px}
 #imgLogoCSI3 {position:absolute; left:258px; right:auto; top:431px; bottom:auto; height:24px; width:54px}
-#lblGPS {position:absolute; left:52px; right:auto; top:64px; bottom:auto; height:auto; width:220px}
+#lblGPS {position:absolute; left:14px; right:auto; top:64px; bottom:auto; height:auto; width:281px}
 #lblMapRefreshCopy {position:absolute; left:125px; right:auto; top:168px; bottom:auto; height:auto; width:66px}
 #sldRefresh {position: absolute; width:288px; height:auto; left:16px; top:94px;}
 #cmbSensor {position:absolute; left:16px; right:auto; top:191px; bottom:auto; height:auto; width:284px}
@@ -120,12 +133,26 @@ frmHome.innerHTML=[  "<div id='imgLogoSDP' data-nsb-type=image><img src='img/log
 <form id="frmSensor" action="" method="GET" onsubmit="return false;" style="display:none; height:100%; position:absolute; top:0px; left:0px; width:100%; ">
 <script>
 frmSensor.innerHTML=[  NSB.HeaderBar_jqm14('HeaderBar1', 'Sensor Mode', 'Home', 'home', 'left', '', 'false', 'right', ' style="" class=" "', '', ''),
-  "<button id='btnStart' class='ui-btn ui-mini  ui-btn-inline ui-icon-false ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Start</button>",
-  "<button id='btnJSON' class='ui-btn ui-mini  ui-btn-inline ui-icon-false ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Show JSON</button>",
-  "<textarea id='TextArea1' class='ui-mini  ' name='' style='display:block; margin-top:0px; text-align:left; ; font-family:; font-style:; font-weight:; color:; background-color:white;-webkit-overflow-scrolling:touch; max-height:auto; '  autocorrect='on'  autocomplete='on'  autocapitalize='on' data-autogrow=false  placeholder=''></textarea>",
+  "<button id='btnStart' class='ui-btn ui-mini  ui-btn-inline ui-icon-false ui-btn-icon-none  ' style='margin:0px; overflow:visible; font-size:20px; font-family:; font-style:; font-weight:; color:yellow; background-color:red; ;  ' data-nsb-type=Button_jqm>Start</button>",
+  "<textarea id='TextArea1' class='ui-mini  ' name='' style='display:block; margin-top:0px; text-align:left; font-size:12px;; font-family:; font-style:; font-weight:; color:; background-color:white;-webkit-overflow-scrolling:touch; max-height:auto; '  autocorrect='on'  autocomplete='on'  autocapitalize='on' data-autogrow=false  placeholder=''></textarea>",
   "<div id='imgLogoCSI2' data-nsb-type=image><img src='img/logoCSI.png'  height=100% width=100% name='imgLogoCSI2_img' style='' usemap='imgLogoCSI2_map'></div>",
   "<div id='imgLogoSDP2' data-nsb-type=image><img src='img/logosdp.jpg'  height=100% width=100% name='imgLogoSDP2_img' style='' usemap='imgLogoSDP2_map'></div>",
-  "<div id=GoogleMap1 style='background:#F0FFFF;'></div>",
+  "<div id='lblCStream' class='' data-nsb-type=Label style='text-align:right; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Stream:</div>",
+  "<div id='lblCSensor' class='' data-nsb-type=Label style='text-align:right; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Sensor ID:</div>",
+  "<div id='lblCTime' class='' data-nsb-type=Label style='text-align:right; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >TimeStamp:</div>",
+  "<div id='lblCLat' class='' data-nsb-type=Label style='text-align:right; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Latitude:</div>",
+  "<div id='lblCLon' class='' data-nsb-type=Label style='text-align:right; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Longitude:</div>",
+  "<div id='lblCAlt' class='' data-nsb-type=Label style='text-align:right; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Altitude [m]:</div>",
+  "<div id='lblCSpeed' class='' data-nsb-type=Label style='text-align:right; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Speed [m/s]:</div>",
+  "<div id='lblStream' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >0.0</div>",
+  "<div id='lblSensor' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:12px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >0.0</div>",
+  "<div id='lblTime' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:12px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >0.0</div>",
+  "<div id='lblLat' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >0.0</div>",
+  "<div id='lblLon' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >0.0</div>",
+  "<div id='lblAlt' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >0.0</div>",
+  "<div id='lblSpeed' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >0.0</div>",
+  "<div id='lblSend' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >n. msg</div>",
+  "<div id='lblNumber' class='' data-nsb-type=Label style='text-align:center; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >0</div>",
   ].join('');
 </script>
 </form>
@@ -136,9 +163,9 @@ frmSensor.innerHTML=[  NSB.HeaderBar_jqm14('HeaderBar1', 'Sensor Mode', 'Home', 
 frmSettings.innerHTML=[  NSB.HeaderBar_jqm14('HeaderBarSettings', 'Settings', '', 'home', 'none', 'Save', 'check', 'right', ' style="" class=" "', '', ''),
   "<div id='imgLogoSDP3' data-nsb-type=image><img src='img/logosdp.jpg'  height=100% width=100% name='imgLogoSDP3_img' style='' usemap='imgLogoSDP3_map'></div>",
   "<div id='imgLogoCSI3' data-nsb-type=image><img src='img/logoCSI.png'  height=100% width=100% name='imgLogoCSI3_img' style='' usemap='imgLogoCSI3_map'></div>",
-  "<div id='lblGPS' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Refresh interval (1 - 60 sec)</div>",
+  "<div id='lblGPS' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Refresh interval (100 - 10000 msec)</div>",
   "<div id='lblMapRefreshCopy' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Sensor</div>",
-  "<div  id='sldRefresh' style=''><input type='range' id='sldRefresh_inner' data-mini=true  style='color:color; background-color:white; ' name=''   value='5' min='1' max='60' step='1' data-track-theme='a' class=' '></div>",
+  "<div  id='sldRefresh' style=''><input type='range' id='sldRefresh_inner' data-mini=true  style='color:color; background-color:white; ' name=''   value='500' min='100' max='10000' step='100' data-track-theme='a' class=' '></div>",
   NSB.Select_jqm('cmbSensor', '', '1,2', 0, 1, '', '','', 'arrow-d', 'right', 'false', 'true', 'a', '', '', '', '','', ''),
   "<div id='Label1' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:14px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >UUID:</div>",
   "<div id='lblUUID' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:12px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >UUID</div>",
@@ -198,37 +225,58 @@ window.addEventListener('load', function() {
   NSB.addDisableProperty(btnStart);
   NSB.addProperties(btnStart);
 
-  NSB.addDisableProperty(btnJSON);
-  NSB.addProperties(btnJSON);
-
   TextArea1.ontouchmove=function(e){e.stopPropagation()};
   NSB.addProperties(TextArea1);
   NSB.addProperties(imgLogoCSI2);
   NSB.addProperties(imgLogoSDP2);
-  NSB.addProperties(GoogleMap1);
-  GoogleMap1.mapOptions={
-    disableDefaultUI: False,
-    disableDoubleClickZoom: False,
-    draggable: False,
-    draggableCursor: '',
-    draggingCursor: '',
-    heading: 0,
-    keyboardShortcuts: True,
-    latitude: '40.948262',
-    longitude: '-72.898428',
-    mapMaker: True,
-    mapTypeId: 'roadmap',
-    maxZoom: 20,
-    noClear: False,
-    scrollwheel: False,
-    streetViewControl: False,
-    tilt: 0,
-    zoom: 16,
-    zoomControl: False,
-    };
-  GoogleMap1.setMarker = NSB.GoogleMapSetMarker;
-  GoogleMap1.refresh = NSB.GoogleMapRefresh;
-  GoogleMap1.refresh();
+
+
+  NSB.addProperties(lblCStream);
+
+
+  NSB.addProperties(lblCSensor);
+
+
+  NSB.addProperties(lblCTime);
+
+
+  NSB.addProperties(lblCLat);
+
+
+  NSB.addProperties(lblCLon);
+
+
+  NSB.addProperties(lblCAlt);
+
+
+  NSB.addProperties(lblCSpeed);
+
+
+  NSB.addProperties(lblStream);
+
+
+  NSB.addProperties(lblSensor);
+
+
+  NSB.addProperties(lblTime);
+
+
+  NSB.addProperties(lblLat);
+
+
+  NSB.addProperties(lblLon);
+
+
+  NSB.addProperties(lblAlt);
+
+
+  NSB.addProperties(lblSpeed);
+
+
+  NSB.addProperties(lblSend);
+
+
+  NSB.addProperties(lblNumber);
   frmSensor.style.display = 'none';
   
 }, false);
@@ -241,6 +289,10 @@ NSB.addProperties(frmSensor);
  //Set up global variables
 var gps;
 var flgJSON;
+var timerRef;
+var jt;
+var nmsg;
+
 longitude = 0;
 latitude = 0;
 lastRefresh = 0;
@@ -252,25 +304,26 @@ btnStart.onclick = function() { savethefunction_rvar="";
  //This starts scanning the current location. It checks it every x seconds.
  //If it gets the data successfully, the handler function is called.
  //If not, errorCallBack is called.
-
  //NOTE: the timer not work properly in phonegap/cordova
 
+    nmsg = 0;
     options={timeout: 1000, maximumAge: 1000, enableHighAccuracy: True}
-    gps=navigator.geolocation.watchPosition(onGeolocation, errorCallBack, options);
+    options={enableHighAccuracy: False}
+    gps = navigator.geolocation.watchPosition(onGeolocation, errorCallBack, options);
 
+    timerRef = setInterval (onTimer, intervalRefresh);
  //disable the stop button, enable the start button
     btnStart.text = "Stop";
  } else {
  //Stop checking the current location
     navigator.geolocation.clearWatch(gps);
+    clearInterval(timerRef);
     btnStart.text = "Start";
   }
 return savethefunction_rvar; }
 
 
 function onGeolocation(location) { savethefunction_rvar="";
- var s;
- var jt;
  var t;
  var fDate;
 
@@ -303,11 +356,6 @@ function onGeolocation(location) { savethefunction_rvar="";
      altitudine = location.coords.altitude;
   }
 
- // build the text for the info text area
-  s = "Longitude: " + longitudine  +  '\n';
-  s = s  +  "Latitude: " + latitudine  +  '\n';
-  s = s  +  "Speed: " + vel  +  '\n';
-  s = s  +  "Altitude: " + altitudine  +  '\n';
 
  // build a timestamp in ISO format
   fDate = "";
@@ -352,8 +400,6 @@ function onGeolocation(location) { savethefunction_rvar="";
 
   fDate = fDate  +  "+0200";
 
-  s = s  +   "Timestamp: " + fDate;
-
  // build a JSON message
   jt = "{" + '"' + "stream" + '"' + ": " + '"' + "" + NomeStream + "" + '"' + ", ";
   jt = jt + "" + '"' + "sensor" + '"' + ": " + '"' + "" + SensorID + "" + '"' + ", ";
@@ -365,53 +411,35 @@ function onGeolocation(location) { savethefunction_rvar="";
   jt = jt + "" + '"' + "altitude" + '"' + ": " + '"' + "" + altitudine + "" + '"' + ", ";
   jt = jt + "" + '"' + "speed" + '"' + ": " + '"' + "" + vel + "" + '"' + "}}]} ";
 
- // this fix the phonegap/cordova timer problem
-  if(SysInfo(10)-lastRefresh > intervalRefresh) {
+ // displey data on screen
+  lblStream.Caption = NomeStream;
+  lblSensor.Caption = SensorID;
+  lblTime.Caption = fDate;
+  lblLat.Caption = latitudine;
+  lblLon.Caption = longitudine;
+  lblAlt.Caption = altitudine;
+  lblSpeed.Caption = vel;
+  TextArea1.text = jt;
 
- //send JSON data to SDP.
+
+return savethefunction_rvar; }
+
+function onTimer() { savethefunction_rvar="";
+    nmsg = nmsg + 1;
+    lblNumber.Caption = nmsg;
 var xmlHttp = new XMLHttpRequest();
       xmlHttp.open( "POST", "http://stream.smartdatanet.it/api/input/smartlab", True);
       xmlHttp.setRequestHeader("Authorization", "Basic c21hcnRsYWI6VXgwbXU1aXQ="); 
       xmlHttp.setRequestHeader("Content-Type", "application/json "); 
       xmlHttp.send( jt );
-//show the map
-    GoogleMap1.mapOptions.latitude = latitudine;
-    GoogleMap1.mapOptions.longitude = longitudine;
-    GoogleMap1.refresh();
-    marker = GoogleMap1.setMarker(null);
-
-    lastRefresh=SysInfo(10);
-      if(flgJSON == True) {
-        TextArea1.value = jt;
- } else {
-        TextArea1.value = s;
-      }
-  }
 return savethefunction_rvar; }
 
 function errorCallBack(Error) { savethefunction_rvar="";
- // in case of geolocation error show the previous data
-    GoogleMap1.mapOptions.latitude = latitudine;
-    GoogleMap1.mapOptions.longitude = longitudine;
-    GoogleMap1.refresh();
+ //do nothing
 return savethefunction_rvar; }
 
-
-
-btnJSON.onclick = function() { savethefunction_rvar="";
-  if(btnJSON.text == "Show JSON") {
-      flgJSON = True;
-      btnJSON.text = "Show Data";
- } else {
-      flgJSON = False;
-      btnJSON.text = "Show JSON";
-  }
-return savethefunction_rvar; }
 
 frmSensor.onshow = function() { savethefunction_rvar="";
-    GoogleMap1.mapOptions.latitude = 0;
-    GoogleMap1.mapOptions.longitude = 0;
-    GoogleMap1.refresh();
     TextArea1.text = "";
 return savethefunction_rvar; }
 
@@ -478,7 +506,7 @@ HeaderBarSettings.onclick = function(button) { savethefunction_rvar="";
  // manage the "save" button click
   if(button == "Save") {
       sensorID = cmbSensor.selectedValue();
-      intervalRefresh = sldRefresh.value * 1000;
+      intervalRefresh = sldRefresh.value;
       SensorID = cmbSensor.selectedValue();
       ChangeForm(frmHome);
   }
@@ -509,7 +537,7 @@ var NomeStream;
 
 function Main() {
   SensorID = "cc1bfe50-491c-560d-a235-0e4134bbdc23";
-  intervalRefresh = 5000;
+  intervalRefresh = 500;
   NomeStream = "position";
 }
 </script>
