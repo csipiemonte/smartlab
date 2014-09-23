@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Smart Trek Visualizer</title>
 <meta name="generator" content="NSB/AppStudio 4.2.0.0$zkdb" />
-<meta name='date' content='2014-09-23 13:54:08.608281' />
+<meta name='date' content='2014-09-23 14:22:55.818734' />
 <meta name='version' content='1.0.0' />
 <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no, minimal-ui' />
 <meta name='apple-mobile-web-app-capable' content='YES' />
@@ -68,6 +68,7 @@
 
 
 <style type="text/css">
+#Line1 {position:absolute; left:10px; right:10px; top:5px; bottom:auto; height:733px; width:945px; margin:0px;}
 #btnConnetti {position:absolute; left:31px; right:auto; top:73px; bottom:auto; height:auto; width:100px}
 #btnDisconnetti {position:absolute; left:140px; right:auto; top:73px; bottom:auto; height:auto; width:100px}
 #GoogleMap1 {position:absolute; left:45px; right:auto; top:128px; bottom:auto; height:450px; width:900px}
@@ -79,7 +80,6 @@
 #Image2 {position:absolute; left:879px; right:auto; top:14px; bottom:auto; height:39px; width:83px}
 #tblSensor_scroller {position: absolute; overflow:hidden; width:898px; height:149px; left:45px; top:590px; right:auto; bottom:auto;}
 #tblSensor {position:absolute; left:0px; top:0px; width:100%; height:auto }
-#Line1 {position:absolute; left:10px; right:10px; top:5px; bottom:auto; height:733px; width:945px; margin:0px;}
 body * {font-family:helvetica}
 </style>
 </head>
@@ -89,7 +89,8 @@ body * {font-family:helvetica}
 
 <form id="Form1" action="" method="GET" onsubmit="return false;" style="display:none; height:100%; position:absolute; top:0px; left:0px; width:100%; ">
 <script>
-Form1.innerHTML=[  "<button id='btnConnetti' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Connect</button>",
+Form1.innerHTML=[  "<hr id='Line1' class='' style='background-color:grigio;border-style:solid;border-color:gray;border-width:1px;' >",
+  "<button id='btnConnetti' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Connect</button>",
   "<button id='btnDisconnetti' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Logout</button>",
   "<div id=GoogleMap1 style='background:#F0FFFF;'></div>",
   "<div id='Label1' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Sensor:</div>",
@@ -99,7 +100,6 @@ Form1.innerHTML=[  "<button id='btnConnetti' class='ui-btn ui-mini  ui-btn-inlin
   "<div id='Image1' data-nsb-type=image><img src='img/logosdp.jpg'  height=100% width=100% name='Image1_img' style='' usemap='Image1_map'></div>",
   "<div id='Image2' data-nsb-type=image><img src='img/logoCSI.png'  height=100% width=100% name='Image2_img' style='' usemap='Image2_map'></div>",
   NSB.Grid("tblSensor", "6", "6", "", "", "Sensor, TS, Latitude, Longitude, Altitude [m], Speed [m/s]", "", "style=", "", ""),
-  "<hr id='Line1' class='' style='background-color:grigio;border-style:solid;border-color:gray;border-width:1px;' >",
   ].join('');
 </script>
 </form>
@@ -112,6 +112,7 @@ if(!navigator.cookieEnabled) NSB.MsgBox('Please turn cookies on.');
 window.addEventListener('load', function() {
   Form1.style.display = 'block';
 
+  NSB.addProperties(Line1);
   NSB.addDisableProperty(btnConnetti);
   NSB.addProperties(btnConnetti);
 
@@ -160,7 +161,6 @@ window.addEventListener('load', function() {
   tblSensor.GridRefreshWidth=function(){setTimeout(NSB.GridRefreshWidth,10,tblSensor)};
   NSB.Grid_init('tblSensor');
   NSB.addProperties(tblSensor,tblSensor_scroller)
-  NSB.addProperties(Line1);
   Form1.style.display = 'none';
   
 }, false);
