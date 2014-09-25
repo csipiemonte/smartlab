@@ -81,17 +81,19 @@ config/<tenant>/<sensor_id>
 
 When a new configuration is published on this topic, arduino node received the new one and process it. To save memory and make simple the process of this message on Arduino board, on this family the new configuration is sent ad CSV (Comma-Separated Values). For example the configuration has this parameter:
 - Polling time
-- Analog pin
+- NTP polling time
 
 The CSV will be:
 
 ```
-10000;0;
+10000;600000;
 ```
 
-**Note:**
-This features is work in progress. The idea is get the fields from the CSV line, change parameters and save new configuration on the local SD. 
+The  Arduino board receives the new configuration as CSV line, saves it on the SD card and then loads the  changed parameters.
 At every boot of the Arduino the new configuration will be loaded from the SD card.
+
+**Note:**
+This features is work in progress. 
 
 
 Documentation
