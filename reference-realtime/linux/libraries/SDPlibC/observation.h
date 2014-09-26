@@ -14,7 +14,7 @@
 /**
  * @brief Struct for the object Stream
  *
- * Struct for the object Stream
+ * 
  */
 typedef struct 
 {
@@ -24,7 +24,7 @@ typedef struct
 /**
  * @brief Struct for the object Sensor
  *
- * Struct for the object Sensor
+ * 
  */
 typedef struct 
 {
@@ -34,7 +34,7 @@ typedef struct
 /**
  * @brief Struct for the object Component
  *
- * Struct for the object Component
+ * 
  */
 typedef struct 
 {
@@ -45,7 +45,7 @@ typedef struct
 /**
  * @brief Struct for the object Value
  *
- * Struct for the object Value
+ * 
  */
 typedef struct 
 {
@@ -60,7 +60,7 @@ typedef struct
 /**
  * @brief Struct for the object Observation
  *
- * Struct for the object Observation
+ * 
  */
 typedef struct 
 {
