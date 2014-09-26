@@ -9,6 +9,9 @@
 #define SDPSOURCE_H_
 
 #include <Arduino.h>
+#include <SPI.h>
+#include <SD.h>
+
 #include "Client.h"
 #include "Stream.h"
 #include "sdpserver.h"
@@ -267,7 +270,7 @@ namespace sdp
         /**
          * Gets configuration buffer.
          *
-         * \return configuration buffer
+         * \return configuration buffer, 0 otherwise
          */
         static sdp::message::CSVLine *getConfiguration()
         {
@@ -286,6 +289,70 @@ namespace sdp
             delete configuration;
             configuration = 0;
           }
+        }
+
+        static bool saveConfiguration(char* filename)
+        {
+          // Save new configuration
+          //    Serial.println( F("Save on SD") );
+          if (SD.exists(filename))
+          {
+            // Delete old configuration
+            SD.remove(filename);
+          }
+
+          File myFile = SD.open(filename, FILE_WRITE);
+          // if the file opened okay, write to it:
+          if (myFile)
+          {
+            for (size_t i = 0;
+                i < sdp::client::SDPSource::getConfiguration()->NF(); i++)
+            {
+              myFile.print(
+                  sdp::client::SDPSource::getConfiguration()->getItem(i));
+              myFile.print(sdp::message::CSVLine::FS);
+            }
+            // close the file:
+            myFile.close();
+            //      Serial.println();
+          } else
+          {
+            // if the file didn't open, print an error:
+            return false;
+          }
+          return true;
+
+        }
+
+        static bool loadConfiguration(char* filename, sdp::message::CSVLine &conf)
+        {
+#define RBUF_SIZE 128
+          char rBuffer[RBUF_SIZE] = {0};
+          File myFile = SD.open(filename, FILE_READ);
+          // if the file opened okay, read it and get only the first line
+          if (myFile)
+          {
+            size_t i = 0;
+            bool endline = false;
+            while (myFile.available() && !endline)
+            {
+              rBuffer[i] = myFile.read();
+              if (rBuffer[i] == '\n' || i == RBUF_SIZE)
+              {
+                endline = true;
+              }
+              i++;
+            }
+            myFile.close();
+          }
+          else
+          {
+            return false;
+          }
+
+          conf.set(rBuffer, RBUF_SIZE);
+
+          return true;
         }
 
       private:

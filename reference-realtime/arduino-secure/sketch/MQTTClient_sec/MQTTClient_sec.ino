@@ -87,7 +87,6 @@
  *                      Comment it to use a domain definition
  *
  * SECURE_JSON        : use secure json. Default value is 0 (not). Comment it if you want 
- *                     to use standard SDP JSON. 
  *                      to use standard SDP JSON. 
  * CONFIGURATION      : change configuration runtime receiving the new one from the broker
  *                      MQTT (work in progress)
@@ -102,7 +101,7 @@
 //#define SDP_SERVER_AS_IP 1
 
 //! Global macro value to define if use secure JSON or standard SDP JSON
-#define SECURE_JSON 1
+//#define SECURE_JSON 1
 
 //! Global macro value to define if handle changing configuration form remote using the broker MQTT
 //#define CONFIGURATION 1
@@ -505,17 +504,27 @@ uint16_t serverPort = 1883;
 
 #ifdef SDP_SERVER_AS_IP
 //! IP address of MQTT broker
-byte serverIP[] = MQTT_SERVER_IP;
+
+byte serverIP[4] = MQTT_SERVER_IP;
 
 //! domain of MQTT broker
+#ifdef CONFIGURATION
+sdp::client::SDPServer *MQTTserver = NULL;
+#else
 sdp::client::SDPServer MQTTserver(serverIP, serverPort);
+#endif
 
 #else
 //! domain of MQTT broker
 char *serverDomain = MQTT_SERVER_DOMAIN;
 
 //! domain of MQTT broker
+#ifdef CONFIGURATION
+sdp::client::SDPServer *MQTTserver = NULL;
+#else
 sdp::client::SDPServer MQTTserver(serverDomain, serverPort);
+#endif
+
 #endif
 
 
@@ -531,7 +540,11 @@ sdp::sensor::AnalogSensor sensor(SENSOR_ANALOG_INPUT_PIN);
 sdp::client::SDPStream stream;
 
 //! SDP source
+#ifdef CONFIGURATION
+sdp::client::SDPSource *MTTQClient= NULL;
+#else
 sdp::client::SDPSource MTTQClient(MQTTserver, client, MQTT_CLIENTID);
+#endif
 
 //! Smart object state
 uint8_t state = IDLE;
@@ -805,11 +818,30 @@ void setup()
 
   
   // Create connection with the SPD server
+#ifdef CONFIGURATION
+
+#ifdef SDP_SERVER_AS_IP  
+  MQTTserver = new sdp::client::SDPServer(serverIP, serverPort);
+#else
+  MQTTserver = new sdp::client::SDPServer(serverDomain, serverPort);
+#endif
+
+  MTTQClient = new sdp::client::SDPSource(*MQTTserver, client, MQTT_CLIENTID);
+  
+  MTTQClient->setUsername(getFlashString((const char**) mqtt_table, MQTT_USER));
+  MTTQClient->setPassword(getFlashString((const char**) mqtt_table, MQTT_PASS));
+#else
   MTTQClient.setUsername(getFlashString((const char**) mqtt_table, MQTT_USER));
   MTTQClient.setPassword(getFlashString((const char**) mqtt_table, MQTT_PASS));
+#endif
+  
  
 #ifdef SECURE_JSON
+#ifndef CONFIGURATION
   MTTQClient.setHMACKey(hmacKey, HMAC_KEYWORD_LENGTH);
+#else
+  MTTQClient->setHMACKey(hmacKey, HMAC_KEYWORD_LENGTH);
+#endif
 #endif
  //MTTQClient.connect();
 
@@ -881,20 +913,32 @@ void loop()
       Serial.println( m.value() );
 
       // Check if client is connected with the server
+#ifdef CONFIGURATION
+      if (MTTQClient->isConnected())
+#else
       if (MTTQClient.isConnected())
+#endif
       {
         Serial.print ( F("Sending measurement... ") );
 
         // Publish measurement
         int n = 0;
+#ifdef CONFIGURATION
+        if ( n = (MTTQClient->publish(stream, m, getFlashString((const char**) node_table, NODE_TENANT))) )
+#else
         if ( n = (MTTQClient.publish(stream, m, getFlashString((const char**) node_table, NODE_TENANT))) )
+#endif
         {
          Serial.println( F("done") );
         }
         else
         {
           Serial.println( F("Failed") );
+#ifdef CONFIGURATION
+          MTTQClient->disconnect();
+#else
           MTTQClient.disconnect();
+#endif
           Serial.println( F("SDP broker disconnected!") );
         }
 
@@ -911,10 +955,14 @@ void loop()
       else
       {
         Serial.println( F("SDP no connection") );
+#ifdef CONFIGURATION
+        if ( MTTQClient->connect() )
+#else
         if ( MTTQClient.connect() )
+#endif
         {
 #ifdef CONFIGURATION      
-          if ( (MTTQClient.subscribe(getFlashString((const char**) node_table, NODE_TENANT), stream, sensor)) )
+          if ( (MTTQClient->subscribe(getFlashString((const char**) node_table, NODE_TENANT), stream, sensor)) )
           {}
 #endif
           Serial.println( F("SDP connected") );
@@ -944,7 +992,11 @@ Serial.println(freeMemory());
       {
         state = NTPUPDATE;
       }
+#ifdef CONFIGURATION
+      MTTQClient->loop();
+#else
       MTTQClient.loop();
+#endif
 #ifdef CONFIGURATION      
       if ( checkNewConfig() )
       {
@@ -1297,32 +1349,10 @@ bool updateConfig()
   if ( checkNewConfig() )
   {
     Serial.println( F("New configuration") );
-
-    // Save new configuration
-//    Serial.println( F("Save on SD") );
-    if (SD.exists(CFG_FILENAME))
-    {
-      // Delete old configuration
-      SD.remove(CFG_FILENAME);
-    }
     
-    File myFile = SD.open(CFG_FILENAME, FILE_WRITE);
-    // if the file opened okay, write to it:
-    if (myFile) 
+    if ( !sdp::client::SDPSource::saveConfiguration(CFG_FILENAME) )
     {
-      for (size_t i = 0; i < sdp::client::SDPSource::getConfiguration()->NF(); i++)
-      {
-        myFile.print(sdp::client::SDPSource::getConfiguration()->getItem(i));
-        myFile.print(";");
-      }
-      // close the file:
-      myFile.close();
-//      Serial.println();
-    } 
-    else 
-    {
-      // if the file didn't open, print an error:
-      Serial.println( F("Error opening") );
+      Serial.println( F("Error while saving configurazion") );
     }
     sdp::client::SDPSource::deleteConfiguration();
   }
@@ -1341,28 +1371,12 @@ void loadConfig()
   {
 //    Serial.println( F("Load from SD") );
 
-    File myFile = SD.open(CFG_FILENAME, FILE_READ);
-    // if the file opened okay, write to it:
-    if (myFile) 
-    {
-      char rBuffer[RBUF_SIZE] = {0};
-      size_t i = 0;
-      bool endline = false;
-      while ( myFile.available() && ! endline) 
-      {
-        rBuffer[i] = myFile.read();
-        if ( rBuffer[i] =='\n' || i == RBUF_SIZE )
-        {
-          endline = true;
-        }
-        i++;
-      }
-      myFile.close();
+    char rBuffer[RBUF_SIZE] = {0};
+    size_t i = 0;
 
-      sdp::message::CSVLine conf;
-      conf.set(rBuffer, RBUF_SIZE);
-      
-      
+    sdp::message::CSVLine conf;
+    if (sdp::client::SDPSource::loadConfiguration( CFG_FILENAME, conf))
+    {
       //check number of fields
       if ( conf.NF() == cfgNF)
       {
