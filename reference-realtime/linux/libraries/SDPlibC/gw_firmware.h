@@ -89,8 +89,8 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream);
  * @brief Download a file
  * 
  * This function does the download from the network following a GET request
- * @param out the link of file
- * @param hash the value of hash
+ * @param url the link of file
+ * @param pathFile the path where to save the file 
  * 
  * @return Return 1 if dowload is correct, -1 for error
  */
@@ -111,6 +111,8 @@ int checkHash(char* filename, char* hash);
  * @brief Load the firmware for Arduino
  * 
  * Load the firmware for Arduino. At moment this function works for Arduino MEGA 2560
+ * @param filename the name of file
+ * @param device the serial port where is attached the Arduino
  * 
  * 
  */
