@@ -32,3 +32,12 @@ Usage
 ```
 gcc test.c -o test -lsdpC
 ```
+
+Documentation
+--------------
+SDPlibC libraries use [*doxygen*](http://www.stack.nl/~dimitri/doxygen/) tool to create the source code documentation.
+To create documentation for SDPlibC libraries use the command:
+
+```
+doxygen sdp.doxygen
+```
