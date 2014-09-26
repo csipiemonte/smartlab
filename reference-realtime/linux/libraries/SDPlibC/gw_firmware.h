@@ -114,4 +114,4 @@ int checkHash(char* filename, char* hash);
  * 
  * 
  */
-void loadFirmware(char *filename);
+void loadFirmware(char *filename, char *device);
