@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <title>Smart Trek Visualizer</title>
-<meta name="generator" content="NSB/AppStudio 4.2.0.0$zkdb" />
-<meta name='date' content='2014-09-23 14:22:55.818734' />
+<meta name="generator" content="NSB/AppStudio 4.2.1.0$zkdb" />
+<meta name='date' content='2014-09-30 10:41:39.458238' />
 <meta name='version' content='1.0.0' />
 <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no, minimal-ui' />
 <meta name='apple-mobile-web-app-capable' content='YES' />
@@ -121,7 +121,7 @@ window.addEventListener('load', function() {
 
   NSB.addProperties(GoogleMap1);
   GoogleMap1.mapOptions={
-    disableDefaultUI: True,
+    disableDefaultUI: False,
     disableDoubleClickZoom: True,
     draggable: False,
     draggableCursor: '',
@@ -138,7 +138,7 @@ window.addEventListener('load', function() {
     streetViewControl: False,
     tilt: 0,
     zoom: 16,
-    zoomControl: True,
+    zoomControl: False,
     };
   GoogleMap1.setMarker = NSB.GoogleMapSetMarker;
   GoogleMap1.refresh = NSB.GoogleMapRefresh;
@@ -214,9 +214,13 @@ Form1.onshow = function() { savethefunction_rvar="";
     cmbSensore.disabled = False;
 
  // combo box
-    cmbSensore.addItem(sensor[0].name, sensor[0].topic);
-    cmbSensore.addItem(sensor[1].name, sensor[1].topic);
+    for   (i = 0; i  <= (NUMSENSOR-1); i ++) {
+      if(sensor[i].name != "n.d.") {
+        cmbSensore.addItem(sensor[i].name, sensor[i].topic);
+      }
+    }
     cmbSensore.addItem("all phone" , "all sensor ID");
+    cmbSensore.addItem("all phone filtered" , "all sensor ID filtered");
 
  // label
     lblSensore.Caption = cmbSensore.selectedValue();
@@ -245,7 +249,7 @@ Form1.onshow = function() { savethefunction_rvar="";
         marker[i].setVisible(False);
     }
 
-
+    tblSensor.rows = NUMSENSOR + 1;
 
 
 return savethefunction_rvar; }
@@ -255,13 +259,25 @@ cmbSensore.onchange = function() { savethefunction_rvar="";
 
     switch (True) {
     case ((cmbSensore.selectedItem()) == "phonegps01"):
-        topics = "/topic/output.smartlab.cc1bfe50-491c-560d-a235-0e4134bbdc23_position";
+        topics = sensor[0].topic;
 	break;
     case ((cmbSensore.selectedItem()) == "phonegps02"):
-        topics = "/topic/output.smartlab.5391c45d-7350-5f9b-b971-f711e2766123_position";
+        topics = sensor[1].topic;
+	break;
+    case ((cmbSensore.selectedItem()) == "phonegps03"):
+        topics = sensor[2].topic;
+	break;
+    case ((cmbSensore.selectedItem()) == "phonegps04"):
+        topics = sensor[3].topic;
+	break;
+    case ((cmbSensore.selectedItem()) == "phonegps05"):
+        topics = sensor[3].topic;
 	break;
     case ((cmbSensore.selectedItem()) == "all phone"):
       topics = "/topic/output.smartlab.internal_allgps";
+	break;
+    case ((cmbSensore.selectedItem()) == "all phone filtered"):
+      topics = "/topic/output.smartlab.internal_allgpsfilterlong";
     }
 
     lblSensore.Caption = cmbSensore.selectedValue();
@@ -274,7 +290,7 @@ function connectCallBack(x) {
     btnDisconnetti.disabled = False;
     cmbSensore.disabled = True;
     switch (True) {
-    case ((cmbSensore.selectedItem()) == "phonegps01" ): case ((cmbSensore.selectedItem()) ==  "phonegps02" ): case ((cmbSensore.selectedItem()) ==  "all phone"):
+    case ((cmbSensore.selectedItem()) == "phonegps01" ): case ((cmbSensore.selectedItem()) ==  "phonegps02" ): case ((cmbSensore.selectedItem()) ==  "all phone" ): case ((cmbSensore.selectedItem()) ==  "all phone filtered"):
         client.subscribe(topics, messageCallback);
         _msgbox_confirm("You are connected and subscribed to topics: " + topics);
 
@@ -345,11 +361,11 @@ function messageCallback(x) {
     if(sensor[i].marked == 1) {
       pnt = new google.maps.LatLng(sensor[i].lat, sensor[i].lon);
       markerBounds.extend(pnt);
-      tblSensor.setValue(i+1, 1, sensor[indice].ts);
-      tblSensor.setValue(i+1, 2, sensor[indice].lat);
-      tblSensor.setValue(i+1, 3, sensor[indice].lon);
-      tblSensor.setValue(i+1, 4, sensor[indice].alt);
-      tblSensor.setValue(i+1, 5, sensor[indice].speed);
+      tblSensor.setValue(i+1, 1, sensor[i].ts);
+      tblSensor.setValue(i+1, 2, sensor[i].lat);
+      tblSensor.setValue(i+1, 3, sensor[i].lon);
+      tblSensor.setValue(i+1, 4, sensor[i].alt);
+      tblSensor.setValue(i+1, 5, sensor[i].speed);
  } else {
       tblSensor.setValue(i+1, 1, "-");
       tblSensor.setValue(i+1, 2, "-");

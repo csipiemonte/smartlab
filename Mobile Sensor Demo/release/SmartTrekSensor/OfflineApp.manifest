@@ -2,6 +2,7 @@ CACHE MANIFEST
 
 CACHE:
 nsb/fastclick.js
+nsb/library/jquery.xml2json.js
 nsb/jquery.mobile.js
 img/logosdp.jpg
 img/logoCSI.png
@@ -17,4 +18,4 @@ nsb/hfunc.js
 NETWORK:
 *
 
-# buildtime: 1411471610.43
+# buildtime: 1412066112.63
