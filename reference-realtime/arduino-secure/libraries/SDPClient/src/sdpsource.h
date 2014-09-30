@@ -40,6 +40,10 @@ namespace sdp
      */
     class SDPSource
     {
+      private:
+        //! Configuration buffer (received from server)
+        static sdp::message::CSVLine *configuration;
+
       public:
         /**
          * \enum    _sdpsource_error
@@ -112,6 +116,13 @@ namespace sdp
          */
         virtual ~SDPSource();
 
+        /**
+         * Sets the HMAC keyword.
+         *
+         * \param[in] key HMAC keyword.
+         * \param[in] length length of HMAC keyword.
+         *
+         */
         void setHMACKey(uint8_t * key, size_t length);
 
         /**
@@ -127,9 +138,9 @@ namespace sdp
         ;
 
         /**
-         * Sets the MQTT username.
+         * Sets the MQTT password.
          *
-         * \param[in] user MQTT username.
+         * \param[in] pass MQTT password.
          *
          */
         void setPassword(char * pass)
@@ -210,9 +221,11 @@ namespace sdp
         /**
          * This function subscribes client to a specific topic.
          *
-         * \param[in] topic output topic
+         * \param[in] tenant first component of the topic (tenant)
+         * \param[in] stream output stream
+         * \param[in] sensor sensor
          *
-         * \return
+         * \return 1 if no error, 0 oterwise
          */
         uint8_t subscribe(const char* tenant, SDPStream& stream, GenericSensor& sensor);
 
@@ -280,7 +293,6 @@ namespace sdp
         /**
          * Deletes configuration buffer.
          *
-         * \return configuration buffer
          */
         static void deleteConfiguration()
         {
@@ -291,6 +303,13 @@ namespace sdp
           }
         }
 
+        /**
+         * Gets configuration buffer.
+         *
+         * \param[in] filename name of the configuration file
+         *
+         * \return true if no error, false otherwise
+         */
         static bool saveConfiguration(char* filename)
         {
           // Save new configuration
@@ -324,9 +343,21 @@ namespace sdp
 
         }
 
+
+        //! Size of an internal input buffer
+        static  uint16_t RBUF_SIZE = 128
+
+
+        /**
+         * Loads configuration from the configuration file (it reads only the first line).
+         *
+         * \param[in] filename name of the configuration file
+         * \param[out] conf node configuration
+         *
+         * \return true if no error, false otherwise
+         */
         static bool loadConfiguration(char* filename, sdp::message::CSVLine &conf)
         {
-#define RBUF_SIZE 128
           char rBuffer[RBUF_SIZE] = {0};
           File myFile = SD.open(filename, FILE_READ);
           // if the file opened okay, read it and get only the first line
@@ -355,11 +386,7 @@ namespace sdp
           return true;
         }
 
-      private:
-
-        //! Configuration buffer (received from server)
-        static sdp::message::CSVLine *configuration;
-
+      protected:
         /**
          * This routine is called automatically when something comes in from the broker.
          * Also use this to prepare a response.
@@ -371,6 +398,7 @@ namespace sdp
          */
         static void callback(char* topic, byte* payload, unsigned int length);
 
+      private:
         //! Smart Data server
         SDPServer* m_server;
 

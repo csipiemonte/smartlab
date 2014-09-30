@@ -1,5 +1,5 @@
 /**
- * \file avgmeasure.h
+ * \file average.h
  * \brief Arduino library for calculating a cumulative moving average for a measurement.
  *
  * \author Marco Boeris Frusca

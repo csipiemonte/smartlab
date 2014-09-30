@@ -1,5 +1,5 @@
 /*
- * avgmeasure.cpp
+ * average.cpp
  *         Arduino library for calculating a cumulative moving average for a measurement.
  *
  * Authors:

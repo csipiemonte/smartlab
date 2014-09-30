@@ -79,7 +79,7 @@ namespace sdp
          * \param[in] pos GPS location
          * \param[out] coord invalid coordinate index  (0 if no errors)
          *
-         * \return 1 if no errors, #GPSPosition._gps_error error code otherwise
+         * \return 1 if no errors, #sdp::sensor::GPSPosition._gps_error error code otherwise
          */
         int setPosition(GPSPosition &pos, byte &coord);
 
@@ -91,7 +91,7 @@ namespace sdp
          * \param[in] altitude altitude coordinate in meters
          * \param[out] coord invalid coordinate index  (0 if no errors)
          *
-         * \return 1 if no errors, #GPSPosition._gps_error error code otherwise
+         * \return 1 if no errors, #sdp::sensor::GPSPosition._gps_error error code otherwise
          */
         int setPosition(char* latitude, char* longitude, char* altitude,
             byte &coord);
