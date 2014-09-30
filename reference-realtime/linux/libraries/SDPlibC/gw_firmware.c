@@ -20,7 +20,6 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 }
 
 FirmwareComponent getFirmwareComponent(char *bufferJson){
-        //char *url,*hash;
 	FirmwareComponent firmwareGet;
         cJSON *json;
         cJSON *jsonObj,*jsonObjCheck;
@@ -45,32 +44,11 @@ FirmwareComponent getFirmwareComponent(char *bufferJson){
                 return;
             }	    
         }
-   /*     int okCheck=0;
-        int cont=0;
-        while(okCheck!=1){
-            if(cont<5){
-                okCheck=getFile(url, hash);
-                cont++;
-            }else{
-                okCheck=1;
-                printf("impossibile scaricare un file non corrotto\n");
-                break;
-            }
-
-            if(okCheck==1){
-                printf("il file scaricato è corretto ed è stato caricato\n");
-            }else{
-                printf("il file scaricato è scorretto riscarico\n");
-            }
-        } */
 	  
 	return firmwareGet;
-//         free(firmwareGet.url);
-//         free(firmwareGet.hash);
 }
 
 int getFile(char *url,char *pathFile){
-        printf("sono in getFile con out=%s e hash=%s\n", url, pathFile);
         CURL *curl;
         FILE *fp;
         CURLcode res;
@@ -91,21 +69,11 @@ int getFile(char *url,char *pathFile){
             curl_easy_cleanup(curl);
             fclose(fp);
         }
-        printf("sono in getFile con out=%s e hash=%s\n", url, pathFile);
-        return 1;
-       /* if(checkHash(outfilename,hashTemp)==1){
-            loadFirmware();
-            return 1;
-        }else{
-            printf("checksum errato riscarico il file\n"); 
-            return -1;
-        }*/
-       
+        return 1;      
 }
 
 int checkHash(char* filename, char* hash)
 {
-        printf("sono in checkhash con hash=%s\n",hash);
         FILE *inFile = fopen (filename, "rb");	
         unsigned char c[MD5_DIGEST_LENGTH];
         int i=0;
@@ -133,24 +101,23 @@ int checkHash(char* filename, char* hash)
             sprintf(&md5string[i*2], "%02x", (unsigned int)c[i]);	      
 
         for(i = 0; i < 32; i++){ 
-
-            //printf("[%d] %c %c\n", i, md5string[i], hash[i]);
             if(md5string[i]!=hashTemp[i]){
-                printf("\ntest checksum fallito\n");
+                printf("\ntest checksum failed\n");
                 fclose (inFile);
                 return -1;
             }
         }
-        printf (" checksum riuscito\n");	
+        printf ("test checksum ok\n");	
         fclose (inFile);
         return 1;
 }
 
-void loadFirmware(char *filename){
+void loadFirmware(char *filename, char *device){
         char command[500];
         memset(command,0,500);
-        printf("carico il firmware segnalato dal messaggio\n");
-        snprintf(command, 500,"avrdude -p m2560 -P /dev/ttyACM0 -c stk500v2 -b 115200 -U flash:w:%s &",filename);
-        printf("valore del comando:\n%s \n",command);
+        printf("load the firmware\n");
+        snprintf(command, 500,"avrdude -p m2560 -P %s -c stk500v2 -b 115200 -U flash:w:%s &", device, filename);
+	system(command);	
         memset(command,0,500);  
+
 }
