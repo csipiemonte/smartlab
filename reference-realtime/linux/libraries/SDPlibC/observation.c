@@ -11,7 +11,7 @@ char* getTime(){
         char *buffer=malloc(30*sizeof(char));
         time(&curtime);
         timeTF = localtime( &curtime );
-        strftime(buffer,30,"%Y/%m/%dT%XZ",timeTF);
+        strftime(buffer,30,"%Y-%m-%dT%XZ",timeTF);
         return buffer;
 }
 
