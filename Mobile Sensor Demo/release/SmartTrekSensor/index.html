@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <title>SmartTrek</title>
-<meta name="generator" content="NSB/AppStudio 4.2.0.0$zkdb" />
-<meta name='date' content='2014-09-23 13:26:51.004566' />
+<meta name="generator" content="NSB/AppStudio 4.2.1.0$zkdb" />
+<meta name='date' content='2014-09-30 10:35:13.469841' />
 <meta name='version' content='1.0.0' />
 <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no, minimal-ui' />
 <meta name='apple-mobile-web-app-capable' content='YES' />
@@ -63,6 +63,7 @@
 <link href="nsb/jquery.mobile.css" rel="stylesheet">
 <script src="nsb/complexfunctions.js"></script>
 
+<script src="nsb/library/jquery.xml2json.js"></script>
 
 
 <style type="text/css">
@@ -70,12 +71,14 @@
 #imgLogoCSI {position:absolute; left:258px; right:auto; top:430px; bottom:auto; height:24px; width:54px}
 #lblTitolo {position:absolute; left:38px; right:auto; top:64px; bottom:auto; height:auto; width:248px}
 #lblSottotitolo {position:absolute; left:51px; right:auto; top:134px; bottom:auto; height:19px; width:208px}
-#btnSensor {position:absolute; left:75px; right:auto; top:200px; bottom:auto; height:74px; width:130px}
+#btnSensor {position:absolute; left:75px; right:auto; top:175px; bottom:auto; height:74px; width:130px}
 #Line1 {position:absolute; left:10px; right:10px; top:122px; bottom:auto; height:3px; width:auto; margin:0px;}
-#btnSettings {position:absolute; left:75px; right:auto; top:339px; bottom:auto; height:auto; width:130px}
-#ttipSensor {position:absolute; left:221px; right:auto; top:226px; bottom:auto; height:24px; width:24px}
-#ttipSettings {position:absolute; left:221px; right:auto; top:343px; bottom:auto; height:24px; width:24px}
+#btnSettings {position:absolute; left:75px; right:auto; top:362px; bottom:auto; height:auto; width:130px}
+#ttipSensor {position:absolute; left:221px; right:auto; top:198px; bottom:auto; height:24px; width:24px}
+#ttipSettings {position:absolute; left:221px; right:auto; top:366px; bottom:auto; height:24px; width:24px}
 #HeaderBar {position: absolute; width:100%; height:40px; left:0px; top:0px;}
+#btnTrack {position:absolute; left:76px; right:auto; top:278px; bottom:auto; height:59px; width:128px}
+#ttipTrack {position:absolute; left:222px; right:auto; top:293px; bottom:auto; height:24px; width:24px}
 #HeaderBar1 {position: absolute; width:100%; height:40px; left:0px; top:0px;}
 #btnStart {position:absolute; left:14px; right:auto; top:270px; bottom:auto; height:52px; width:209px}
 #TextArea1 {position:absolute; left:12px; right:auto; top:332px; bottom:auto; height:90px; width:303px}
@@ -106,6 +109,19 @@
 #cmbSensor {position:absolute; left:16px; right:auto; top:191px; bottom:auto; height:auto; width:284px}
 #Label1 {position:absolute; left:15px; right:auto; top:251px; bottom:auto; height:auto; width:43px}
 #lblUUID {position:absolute; left:62px; right:auto; top:253px; bottom:auto; height:auto; width:243px}
+#imgLogoSDP3Copy {position:absolute; left:10px; right:px; top:427px; bottom:auto; height:28px; width:167px}
+#imgLogoCSI3Copy {position:absolute; left:258px; right:auto; top:431px; bottom:auto; height:24px; width:54px}
+#hdrTrack {position: absolute; width:100%; height:40px; left:0px; top:0px;}
+#cmbRoute {position:absolute; left:23px; right:auto; top:91px; bottom:auto; height:auto; width:276px}
+#Label2 {position:absolute; left:23px; right:auto; top:65px; bottom:auto; height:auto; width:187px}
+#btnPlay {position:absolute; left:100px; right:auto; top:295px; bottom:auto; height:74px; width:125px}
+#Label3 {position:absolute; left:23px; right:auto; top:138px; bottom:auto; height:auto; width:70px}
+#lblPoint {position:absolute; left:108px; right:auto; top:138px; bottom:auto; height:auto; width:81px}
+#lblGPSCopy {position:absolute; left:21px; right:auto; top:170px; bottom:auto; height:auto; width:281px}
+#sldSend {position: absolute; width:288px; height:auto; left:23px; top:200px;}
+#lblSendN {position:absolute; left:19px; right:auto; top:382px; bottom:auto; height:auto; width:285px}
+#ftLoop {position:absolute; left:194px; right:auto; top:243px; bottom:auto; height:auto; width:auto}
+#Label5 {position:absolute; left:66px; right:auto; top:245px; bottom:auto; height:auto; width:106px}
 body * {font-family:helvetica}
 </style>
 </head>
@@ -125,6 +141,8 @@ frmHome.innerHTML=[  "<div id='imgLogoSDP' data-nsb-type=image><img src='img/log
   NSB.ToolTip_jqm('ttipSensor','Activate <b>sensor mode</b> that allows you to record the movement of the device.','slide', 'b','','max-width:200px;','info'),
   NSB.ToolTip_jqm('ttipSettings','set the application\'s parameters','slide', 'b','','max-width:200px;','info'),
   NSB.HeaderBar_jqm14('HeaderBar', 'Sensor Demo', '', 'arrow-l', 'none', '', 'arrow-r', 'none', ' style="" class=" "', '', ''),
+  "<button id='btnTrack' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Route simulator</button>",
+  NSB.ToolTip_jqm('ttipTrack','simulated a pre-recorded route','slide', 'b','','max-width:200px;','info'),
   ].join('');
 </script>
 </form>
@@ -173,6 +191,26 @@ frmSettings.innerHTML=[  NSB.HeaderBar_jqm14('HeaderBarSettings', 'Settings', ''
 </script>
 </form>
 
+
+<form id="frmTrack" action="" method="GET" onsubmit="return false;" style="display:none; height:100%; position:absolute; top:0px; left:0px; width:100%; ">
+<script>
+frmTrack.innerHTML=[  "<div id='imgLogoSDP3Copy' data-nsb-type=image><img src='img/logosdp.jpg'  height=100% width=100% name='imgLogoSDP3Copy_img' style='' usemap='imgLogoSDP3Copy_map'></div>",
+  "<div id='imgLogoCSI3Copy' data-nsb-type=image><img src='img/logoCSI.png'  height=100% width=100% name='imgLogoCSI3Copy_img' style='' usemap='imgLogoCSI3Copy_map'></div>",
+  NSB.HeaderBar_jqm14('hdrTrack', 'Track Simulator', 'Home', 'home', 'left', '', 'arrow-r', 'none', ' style="" class=" "', '', ''),
+  NSB.Select_jqm('cmbRoute', '', '1,2', 0, 1, '', '','', 'arrow-d', 'right', 'false', 'true', 'a', '', 'data-mini=true', '', '','', ''),
+  "<div id='Label2' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Select a route to play:</div>",
+  "<button id='btnPlay' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible; font-size:30px; font-family:; font-style:; font-weight:; color:yellow; background-color:red; ;  ' data-nsb-type=Button_jqm>Play</button>",
+  "<div id='Label3' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Point n.:</div>",
+  "<div id='lblPoint' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >0</div>",
+  "<div id='lblGPSCopy' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Send interval (100 - 10000 msec)</div>",
+  "<div  id='sldSend' style=''><input type='range' id='sldSend_inner' data-mini=true  style='color:color; background-color:white; ' name=''   value='1000' min='100' max='10000' step='100' data-track-theme='a' class=' '></div>",
+  "<div id='lblSendN' class='' data-nsb-type=Label style='text-align:center; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Sent 0 / 0 GPS points</div>",
+  "<div id='ftLoop' style=''><select id='ftLoop_inner' name='ftLoop' data-role=flipswitch data-mini=true data-corners='false' style='' class=' '><option>Off</option><option>On</option></select></div>",
+  "<div id='Label5' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Loop IN/OUT:</div>",
+  ].join('');
+</script>
+</form>
+
 </div>
 <script>
 if(!navigator.cookieEnabled) NSB.MsgBox('Please turn cookies on.');
@@ -205,6 +243,10 @@ window.addEventListener('load', function() {
   if(typeof(HeaderBar.onclick)=='function'){
     if(typeof(HeaderBar_left)!='undefined') HeaderBar_left.onclick=function() {HeaderBar.onclick(HeaderBar_left.getAttribute('nsbvalue'))};
     if(typeof(HeaderBar_right)!='undefined') HeaderBar_right.onclick=function() {HeaderBar.onclick(HeaderBar_right.getAttribute('nsbvalue'))}};
+  NSB.addDisableProperty(btnTrack);
+  NSB.addProperties(btnTrack);
+  btnTrack.onclick=function(){ChangeForm(frmTrack)};
+  NSB.addProperties(ttipTrack);
   frmHome.style.display = 'none';
   
 }, false);
@@ -217,7 +259,7 @@ window.addEventListener('load', function() {
 
   NSB.addProperties(HeaderBar1);
   NSB.addDisableProperty(HeaderBar1);
-  HeaderBar1_left.onclick=function(){ChangeForm(frmHome)};
+
 
   if(typeof(HeaderBar1.onclick)=='function'){
     if(typeof(HeaderBar1_left)!='undefined') HeaderBar1_left.onclick=function() {HeaderBar1.onclick(HeaderBar1_left.getAttribute('nsbvalue'))};
@@ -307,7 +349,7 @@ btnStart.onclick = function() { savethefunction_rvar="";
  //NOTE: the timer not work properly in phonegap/cordova
 
     nmsg = 0;
-    options={timeout: 1000, maximumAge: 1000, enableHighAccuracy: True}
+    options={timeout: 100, maximumAge: 100, enableHighAccuracy: True}
     options={enableHighAccuracy: False}
     gps = navigator.geolocation.watchPosition(onGeolocation, errorCallBack, options);
 
@@ -324,12 +366,8 @@ return savethefunction_rvar; }
 
 
 function onGeolocation(location) { savethefunction_rvar="";
- var t;
- var fDate;
-
- // set the timestamp value
-  t = dateadd("s",0,new Date());
-
+ var fdate;
+  fdate = TimeStamp();
  // get the location coordinate
 
   if(location.coords.longitude == null) {
@@ -357,54 +395,11 @@ function onGeolocation(location) { savethefunction_rvar="";
   }
 
 
- // build a timestamp in ISO format
-  fDate = "";
-  fDate = fDate  +  Year(t)  +  "-";
-  if(Month(t) < 10) {
-    fDate = fDate  +  "0"  +  Month(t);
- } else {
-    fDate = fDate  +  Month(t);
-  }
-
-  fDate = fDate  +  "-";
-
-  if(Day(t) < 10) {
-    fDate = fDate  +  "0"  +  Day(t);
- } else {
-    fDate = fDate  +  Day(t);
-  }
-
-  fDate = fDate  +  "T";
-
-   if(Hour(t) < 10) {
-    fDate = fDate  +  "0"  +  Hour(t);
- } else {
-    fDate = fDate  +  Hour(t);
-  }
-
-  fDate = fDate  +  ":";
-
-  if(Minute(t) < 10) {
-    fDate = fDate  +  "0"  +  Minute(t);
- } else {
-    fDate = fDate  +  Minute(t);
-  }
-
-  fDate = fDate  +  ":";
-
-  if(Second(t) < 10) {
-    fDate = fDate  +  "0"  +  Second(t);
- } else {
-    fDate = fDate  +  Second(t);
-  }
-
-  fDate = fDate  +  "+0200";
-
  // build a JSON message
   jt = "{" + '"' + "stream" + '"' + ": " + '"' + "" + NomeStream + "" + '"' + ", ";
   jt = jt + "" + '"' + "sensor" + '"' + ": " + '"' + "" + SensorID + "" + '"' + ", ";
   jt = jt + "" + '"' + "values" + '"' + ": [{";
-  jt = jt + "" + '"' + "time" + '"' + ": " + '"' + "" +  fDate + "" + '"' + ", ";
+  jt = jt + "" + '"' + "time" + '"' + ": " + '"' + "" +  fdate + "" + '"' + ", ";
   jt = jt + "" + '"' + "components" + '"' + ": {";
   jt = jt + "" + '"' + "longitude" + '"' + ": " + '"' + "" + longitudine + "" + '"' + ", ";
   jt = jt + "" + '"' + "latitude" + '"' + ": " + '"' + "" + latitudine + "" + '"' + ", ";
@@ -414,7 +409,7 @@ function onGeolocation(location) { savethefunction_rvar="";
  // displey data on screen
   lblStream.Caption = NomeStream;
   lblSensor.Caption = SensorID;
-  lblTime.Caption = fDate;
+  lblTime.Caption = fdate;
   lblLat.Caption = latitudine;
   lblLon.Caption = longitudine;
   lblAlt.Caption = altitudine;
@@ -428,7 +423,7 @@ function onTimer() { savethefunction_rvar="";
     nmsg = nmsg + 1;
     lblNumber.Caption = nmsg;
 var xmlHttp = new XMLHttpRequest();
-      xmlHttp.open( "POST", "http://stream.smartdatanet.it/api/input/smartlab", True);
+      xmlHttp.open( "POST", urlSend, True);
       xmlHttp.setRequestHeader("Authorization", "Basic c21hcnRsYWI6VXgwbXU1aXQ="); 
       xmlHttp.setRequestHeader("Content-Type", "application/json "); 
       xmlHttp.send( jt );
@@ -441,6 +436,21 @@ return savethefunction_rvar; }
 
 frmSensor.onshow = function() { savethefunction_rvar="";
     TextArea1.text = "";
+    nmsg = 0;
+return savethefunction_rvar; }
+
+HeaderBar1.onclick = function(button) { savethefunction_rvar="";
+    if(TypeName(button)=="object" )  { return savethefunction_rvar; }
+
+ // manage the "save" button click
+  if(button == "Home") {
+      if(btnStart.text == "Play") {
+          ChangeForm(frmHome);
+ } else {
+          btnStart.onclick();
+          ChangeForm(frmHome);
+      }
+  }
 return savethefunction_rvar; }
 
 window.addEventListener('load', function() {
@@ -513,6 +523,177 @@ HeaderBarSettings.onclick = function(button) { savethefunction_rvar="";
 
 return savethefunction_rvar; }
 
+window.addEventListener('load', function() {
+  frmTrack.style.display = 'block';
+
+  NSB.addProperties(imgLogoSDP3Copy);
+  NSB.addProperties(imgLogoCSI3Copy);
+  NSB.addProperties(hdrTrack);
+  NSB.addDisableProperty(hdrTrack);
+
+
+  if(typeof(hdrTrack.onclick)=='function'){
+    if(typeof(hdrTrack_left)!='undefined') hdrTrack_left.onclick=function() {hdrTrack.onclick(hdrTrack_left.getAttribute('nsbvalue'))};
+    if(typeof(hdrTrack_right)!='undefined') hdrTrack_right.onclick=function() {hdrTrack.onclick(hdrTrack_right.getAttribute('nsbvalue'))}};
+  if(typeof(cmbRoute)=='undefined') cmbRoute={id:'cmbRoute'};
+  NSB.Select_jqm_init(cmbRoute,'','');
+
+
+  NSB.addProperties(Label2);
+  NSB.addDisableProperty(btnPlay);
+  NSB.addProperties(btnPlay);
+
+
+
+  NSB.addProperties(Label3);
+
+
+  NSB.addProperties(lblPoint);
+
+
+  NSB.addProperties(lblGPSCopy);
+  $('#sldSend .ui-slider').css('margin','0px');
+  sldSend.__defineGetter__('value', function(){return sldSend_inner.value});
+  sldSend.__defineSetter__('value', function(n){ sldSend_inner.value=n});
+  sldSend.__defineGetter__('min', function(){return sldSend_inner.min});
+  sldSend.__defineSetter__('min', function(n){ sldSend_inner.min=n});
+  sldSend.__defineGetter__('max', function(){return sldSend_inner.max});
+  sldSend.__defineSetter__('max', function(n){ sldSend_inner.max=n});
+  sldSend.__defineGetter__('step', function(){return sldSend_inner.step});
+  sldSend.__defineSetter__('step', function(n){ sldSend_inner.step=n});
+  sldSend.setValue=function(n){$('#sldSend_inner').val(n).slider('refresh')};
+  NSB.addProperties(sldSend);
+
+
+  NSB.addProperties(lblSendN);
+  $('#ftLoop .ui-flipswitch').css('margin','0px');
+  ftLoop.value=function() {return ftLoop_inner.options[ftLoop_inner.selectedIndex].innerHTML;}
+  ftLoop.setting=function() {return ftLoop_inner.options[ftLoop_inner.selectedIndex].innerHTML!='Off';}
+  ftLoop.setValue=function(n) {$('#ftLoop_inner').val(n).flipswitch('refresh'); }
+  NSB.addDisableProperty(ftLoop);NSB.addProperties(ftLoop);
+
+
+  NSB.addProperties(Label5);
+  frmTrack.style.display = 'none';
+  
+}, false);
+frmTrack.onsubmit=function(event){window.event.stopPropagation();window.event.preventDefault()};
+NSB.addProperties(frmTrack);
+var nmsg;
+var timerRefSend;
+var intervalSend;
+var maxmsg;
+var req;
+var data;
+var increment;
+
+frmTrack.onshow = function() { savethefunction_rvar="";
+  cmbRoute.addItem("Torino - via Filadelfia" , "torino1.xml");
+  cmbRoute.addItem("Torino - corso Agnelli - Beinasco" , "torino2.xml");
+  cmbRoute.addItem("Torino - tangenziale" , "torino3.xml");
+  cmbRoute.addItem("Canavese Tour" , "canavese.xml");
+
+  intervalSend = 1000;
+
+  cmbRoute.onchange();
+  nmsg = 0;
+  increment = 1;
+
+return savethefunction_rvar; }
+
+btnPlay.onclick = function() { savethefunction_rvar="";
+  if(btnPlay.text == "Play") {
+    nmsg = 0;
+    timerRefSend = setInterval (onTimerSend, intervalSend);
+    btnPlay.text = "Stop";
+    sldSend.disabled = True;
+    cmbRoute.disabled = True;
+    ftLoop.disabled = True;
+ } else {
+ //Stop checking the current location
+    clearInterval(timerRefSend);
+    btnPlay.text = "Play";
+    sldSend.disabled = False;
+    cmbRoute.disabled = False;
+    ftLoop.disabled = False;
+  }
+return savethefunction_rvar; }
+
+sldSend.onchange = function() { savethefunction_rvar="";
+  intervalSend = sldSend.value;
+return savethefunction_rvar; }
+
+function onTimerSend() { savethefunction_rvar="";
+ var jt;
+
+    lblSendN.Caption = "Sent "  +  (nmsg + 1)  +  " / "  +   maxmsg  +  " GPS points";
+
+    nmsg = nmsg + increment;
+
+    if(nmsg >= maxmsg || nmsg < 0) {
+      if(ftLoop.value() == "On") {
+          increment = - increment;
+           return;
+ } else {
+        btnPlay.onclick();
+      }
+
+ } else {
+      jt = "{" + '"' + "stream" + '"' + ": " + '"' + "" + NomeStream + "" + '"' + ", ";
+      jt = jt + "" + '"' + "sensor" + '"' + ": " + '"' + "" + SensorID + "" + '"' + ", ";
+      jt = jt + "" + '"' + "values" + '"' + ": [{";
+      jt = jt + "" + '"' + "time" + '"' + ": " + '"' + "" +  TimeStamp() + "" + '"' + ", ";
+      jt = jt + "" + '"' + "components" + '"' + ": {";
+      jt = jt + "" + '"' + "longitude" + '"' + ": " + '"' + "" + data.trkpt[nmsg].lon + "" + '"' + ", ";
+      jt = jt + "" + '"' + "latitude" + '"' + ": " + '"' + "" + data.trkpt[nmsg].lat + "" + '"' + ", ";
+      jt = jt + "" + '"' + "altitude" + '"' + ": " + '"' + "" + data.trkpt[nmsg].ele + "" + '"' + ", ";
+      jt = jt + "" + '"' + "speed" + '"' + ": 0.0}}]} ";
+
+      console.log(jt);
+var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "POST", urlSend, True);
+        xmlHttp.setRequestHeader("Authorization", "Basic c21hcnRsYWI6VXgwbXU1aXQ="); 
+        xmlHttp.setRequestHeader("Content-Type", "application/json "); 
+        xmlHttp.send( jt );
+}
+return savethefunction_rvar; }
+
+cmbRoute.onchange = function() { savethefunction_rvar="";
+   req = Ajax(urlRoute  +  cmbRoute.selectedValue());
+   if(!req )  { return savethefunction_rvar; }
+  if(req.readyState != 4 )  { return savethefunction_rvar; } //ignore progress reports
+
+  if(req.status != 200) { //failure
+    _msgbox_confirm("Error: "  +  req.err);
+     return savethefunction_rvar;
+  }
+
+  if(Left(req.responseText,5)!="<?xml") {
+    _msgbox_confirm("XML not received"  +  req.responseText);
+     return savethefunction_rvar;
+  }
+  data = $.xml2json(req.responseText);
+  maxmsg = data.trkpt.length;
+  lblPoint.Caption = maxmsg;
+return savethefunction_rvar; }
+
+
+
+
+hdrTrack.onclick = function(button) { savethefunction_rvar="";
+  if(TypeName(button)=="object" )  { return savethefunction_rvar; }
+
+ // manage the "save" button click
+  if(button == "Home") {
+      if(btnPlay.text == "Play") {
+          ChangeForm(frmHome);
+ } else {
+          btnPlay.onclick();
+          ChangeForm(frmHome);
+      }
+  }
+return savethefunction_rvar; }
+
 
 window.addEventListener('orientationchange', function(){window.scrollTo(0,0)});
 window.addEventListener('load', function() {
@@ -528,10 +709,12 @@ var NSBCurrentForm = frmHome;
 var intervalRefresh;
 var SensorID;
 var NomeStream;
- var latitudine;
- var longitudine;
- var vel;
- var altitudine;
+var latitudine;
+var longitudine;
+var vel;
+var altitudine;
+var urlSend;
+var urlRoute;
 
 
 
@@ -539,7 +722,59 @@ function Main() {
   SensorID = "cc1bfe50-491c-560d-a235-0e4134bbdc23";
   intervalRefresh = 500;
   NomeStream = "position";
+  urlSend = "http://stream.smartdatanet.it/api/input/smartlab";
+  urlRoute = "http://esperimenti.gabriele-pellegrinetti.it/sensor/route/";
 }
+
+function TimeStamp() { savethefunction_rvar="";
+ var t;
+ var fDate;
+  t = dateadd("s",0,new Date());
+    fDate = "";
+  fDate = fDate  +  Year(t)  +  "-";
+  if(Month(t) < 10) {
+    fDate = fDate  +  "0"  +  Month(t);
+ } else {
+    fDate = fDate  +  Month(t);
+  }
+
+  fDate = fDate  +  "-";
+
+  if(Day(t) < 10) {
+    fDate = fDate  +  "0"  +  Day(t);
+ } else {
+    fDate = fDate  +  Day(t);
+  }
+
+  fDate = fDate  +  "T";
+
+   if(Hour(t) < 10) {
+    fDate = fDate  +  "0"  +  Hour(t);
+ } else {
+    fDate = fDate  +  Hour(t);
+  }
+
+  fDate = fDate  +  ":";
+
+  if(Minute(t) < 10) {
+    fDate = fDate  +  "0"  +  Minute(t);
+ } else {
+    fDate = fDate  +  Minute(t);
+  }
+
+  fDate = fDate  +  ":";
+
+  if(Second(t) < 10) {
+    fDate = fDate  +  "0"  +  Second(t);
+ } else {
+    fDate = fDate  +  Second(t);
+  }
+
+  fDate = fDate  +  "+0200";
+
+   savethefunction_rvar  = fDate;
+
+return savethefunction_rvar; }
 </script>
 
 </body>
