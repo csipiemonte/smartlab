@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>SmartTrek</title>
 <meta name="generator" content="NSB/AppStudio 4.2.1.0$zkdb" />
-<meta name='date' content='2014-09-30 10:35:13.469841' />
+<meta name='date' content='2014-10-01 16:05:38.814000' />
 <meta name='version' content='1.0.0' />
 <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no, minimal-ui' />
 <meta name='apple-mobile-web-app-capable' content='YES' />
@@ -114,14 +114,16 @@
 #hdrTrack {position: absolute; width:100%; height:40px; left:0px; top:0px;}
 #cmbRoute {position:absolute; left:23px; right:auto; top:91px; bottom:auto; height:auto; width:276px}
 #Label2 {position:absolute; left:23px; right:auto; top:65px; bottom:auto; height:auto; width:187px}
-#btnPlay {position:absolute; left:100px; right:auto; top:295px; bottom:auto; height:74px; width:125px}
+#btnPlay {position:absolute; left:98px; right:auto; top:284px; bottom:auto; height:71px; width:125px}
 #Label3 {position:absolute; left:23px; right:auto; top:138px; bottom:auto; height:auto; width:70px}
 #lblPoint {position:absolute; left:108px; right:auto; top:138px; bottom:auto; height:auto; width:81px}
 #lblGPSCopy {position:absolute; left:21px; right:auto; top:170px; bottom:auto; height:auto; width:281px}
 #sldSend {position: absolute; width:288px; height:auto; left:23px; top:200px;}
-#lblSendN {position:absolute; left:19px; right:auto; top:382px; bottom:auto; height:auto; width:285px}
+#lblSendN {position:absolute; left:15px; right:auto; top:365px; bottom:auto; height:auto; width:285px}
 #ftLoop {position:absolute; left:194px; right:auto; top:243px; bottom:auto; height:auto; width:auto}
 #Label5 {position:absolute; left:66px; right:auto; top:245px; bottom:auto; height:auto; width:106px}
+#lblLat2 {position:absolute; left:17px; right:auto; top:394px; bottom:auto; height:auto; width:140px}
+#lblLon2 {position:absolute; left:174px; right:auto; top:394px; bottom:auto; height:auto; width:132px}
 body * {font-family:helvetica}
 </style>
 </head>
@@ -199,7 +201,7 @@ frmTrack.innerHTML=[  "<div id='imgLogoSDP3Copy' data-nsb-type=image><img src='i
   NSB.HeaderBar_jqm14('hdrTrack', 'Track Simulator', 'Home', 'home', 'left', '', 'arrow-r', 'none', ' style="" class=" "', '', ''),
   NSB.Select_jqm('cmbRoute', '', '1,2', 0, 1, '', '','', 'arrow-d', 'right', 'false', 'true', 'a', '', 'data-mini=true', '', '','', ''),
   "<div id='Label2' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Select a route to play:</div>",
-  "<button id='btnPlay' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible; font-size:30px; font-family:; font-style:; font-weight:; color:yellow; background-color:red; ;  ' data-nsb-type=Button_jqm>Play</button>",
+  "<button id='btnPlay' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible; font-size:20px; font-family:; font-style:; font-weight:; color:yellow; background-color:red; ;  ' data-nsb-type=Button_jqm>Play</button>",
   "<div id='Label3' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Point n.:</div>",
   "<div id='lblPoint' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >0</div>",
   "<div id='lblGPSCopy' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Send interval (100 - 10000 msec)</div>",
@@ -207,6 +209,8 @@ frmTrack.innerHTML=[  "<div id='imgLogoSDP3Copy' data-nsb-type=image><img src='i
   "<div id='lblSendN' class='' data-nsb-type=Label style='text-align:center; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Sent 0 / 0 GPS points</div>",
   "<div id='ftLoop' style=''><select id='ftLoop_inner' name='ftLoop' data-role=flipswitch data-mini=true data-corners='false' style='' class=' '><option>Off</option><option>On</option></select></div>",
   "<div id='Label5' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Loop IN/OUT:</div>",
+  "<div id='lblLat2' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:12px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Lat: 0.00000</div>",
+  "<div id='lblLon2' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:12px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Lon: 0.00000</div>",
   ].join('');
 </script>
 </form>
@@ -574,6 +578,12 @@ window.addEventListener('load', function() {
 
 
   NSB.addProperties(Label5);
+
+
+  NSB.addProperties(lblLat2);
+
+
+  NSB.addProperties(lblLon2);
   frmTrack.style.display = 'none';
   
 }, false);
@@ -591,6 +601,7 @@ frmTrack.onshow = function() { savethefunction_rvar="";
   cmbRoute.addItem("Torino - via Filadelfia" , "torino1.xml");
   cmbRoute.addItem("Torino - corso Agnelli - Beinasco" , "torino2.xml");
   cmbRoute.addItem("Torino - tangenziale" , "torino3.xml");
+  cmbRoute.addItem("Torino - corso grosseto - corso agnelli" , "torino4.xml");
   cmbRoute.addItem("Canavese Tour" , "canavese.xml");
 
   intervalSend = 1000;
@@ -649,7 +660,8 @@ function onTimerSend() { savethefunction_rvar="";
       jt = jt + "" + '"' + "altitude" + '"' + ": " + '"' + "" + data.trkpt[nmsg].ele + "" + '"' + ", ";
       jt = jt + "" + '"' + "speed" + '"' + ": 0.0}}]} ";
 
-      console.log(jt);
+      lblLat2.Caption = data.trkpt[nmsg].lat;
+      lblLon2.Caption = data.trkpt[nmsg].lon;
 var xmlHttp = new XMLHttpRequest();
         xmlHttp.open( "POST", urlSend, True);
         xmlHttp.setRequestHeader("Authorization", "Basic c21hcnRsYWI6VXgwbXU1aXQ="); 
@@ -723,7 +735,8 @@ function Main() {
   intervalRefresh = 500;
   NomeStream = "position";
   urlSend = "http://stream.smartdatanet.it/api/input/smartlab";
-  urlRoute = "http://esperimenti.gabriele-pellegrinetti.it/sensor/route/";
+ //urlRoute = "http://esperimenti.gabriele-pellegrinetti.it/sensor/route/"
+  urlRoute = "route/";
 }
 
 function TimeStamp() { savethefunction_rvar="";

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Smart Trek Visualizer</title>
 <meta name="generator" content="NSB/AppStudio 4.2.1.0$zkdb" />
-<meta name='date' content='2014-09-30 10:41:39.458238' />
+<meta name='date' content='2014-10-01 16:05:30.538193' />
 <meta name='version' content='1.0.0' />
 <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no, minimal-ui' />
 <meta name='apple-mobile-web-app-capable' content='YES' />
@@ -71,15 +71,17 @@
 #Line1 {position:absolute; left:10px; right:10px; top:5px; bottom:auto; height:733px; width:945px; margin:0px;}
 #btnConnetti {position:absolute; left:31px; right:auto; top:73px; bottom:auto; height:auto; width:100px}
 #btnDisconnetti {position:absolute; left:140px; right:auto; top:73px; bottom:auto; height:auto; width:100px}
-#GoogleMap1 {position:absolute; left:45px; right:auto; top:128px; bottom:auto; height:450px; width:900px}
+#GoogleMap1 {position:absolute; left:45px; right:auto; top:146px; bottom:auto; height:440px; width:900px}
 #Label1 {position:absolute; left:263px; right:auto; top:72px; bottom:auto; height:auto; width:70px}
-#cmbSensore {position:absolute; left:338px; right:auto; top:71px; bottom:auto; height:auto; width:308px}
-#lblSensore {position:absolute; left:661px; right:auto; top:71px; bottom:auto; height:auto; width:306px}
+#cmbSensore {position:absolute; left:338px; right:auto; top:71px; bottom:auto; height:auto; width:254px}
+#lblSensore {position:absolute; left:600px; right:auto; top:71px; bottom:auto; height:34px; width:348px}
 #Label2 {position:absolute; left:362px; right:auto; top:15px; bottom:auto; height:auto; width:312px}
 #Image1 {position:absolute; left:24px; right:auto; top:10px; bottom:auto; height:44px; width:203px}
 #Image2 {position:absolute; left:879px; right:auto; top:14px; bottom:auto; height:39px; width:83px}
 #tblSensor_scroller {position: absolute; overflow:hidden; width:898px; height:149px; left:45px; top:590px; right:auto; bottom:auto;}
 #tblSensor {position:absolute; left:0px; top:0px; width:100%; height:auto }
+#Label3 {position:absolute; left:42px; right:auto; top:120px; bottom:auto; height:auto; width:135px}
+#fltBounds {position:absolute; left:178px; right:auto; top:116px; bottom:auto; height:auto; width:auto}
 body * {font-family:helvetica}
 </style>
 </head>
@@ -89,7 +91,7 @@ body * {font-family:helvetica}
 
 <form id="Form1" action="" method="GET" onsubmit="return false;" style="display:none; height:100%; position:absolute; top:0px; left:0px; width:100%; ">
 <script>
-Form1.innerHTML=[  "<hr id='Line1' class='' style='background-color:grigio;border-style:solid;border-color:gray;border-width:1px;' >",
+Form1.innerHTML=[  "<hr id='Line1' class='' style='background-color:grigio;border-style:solid;border-color:gray;border-width:1px;' hidden=\'true\'>",
   "<button id='btnConnetti' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Connect</button>",
   "<button id='btnDisconnetti' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible;  font-family:; font-style:; font-weight:; ;  ' data-nsb-type=Button_jqm>Logout</button>",
   "<div id=GoogleMap1 style='background:#F0FFFF;'></div>",
@@ -100,6 +102,8 @@ Form1.innerHTML=[  "<hr id='Line1' class='' style='background-color:grigio;borde
   "<div id='Image1' data-nsb-type=image><img src='img/logosdp.jpg'  height=100% width=100% name='Image1_img' style='' usemap='Image1_map'></div>",
   "<div id='Image2' data-nsb-type=image><img src='img/logoCSI.png'  height=100% width=100% name='Image2_img' style='' usemap='Image2_map'></div>",
   NSB.Grid("tblSensor", "6", "6", "", "", "Sensor, TS, Latitude, Longitude, Altitude [m], Speed [m/s]", "", "style=", "", ""),
+  "<div id='Label3' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Map auto resize:</div>",
+  "<div id='fltBounds' style=''><select id='fltBounds_inner' name='fltBounds' data-role=flipswitch data-mini=true data-corners='false' style='' class=' '><option>Off</option><option>On</option></select></div>",
   ].join('');
 </script>
 </form>
@@ -121,23 +125,23 @@ window.addEventListener('load', function() {
 
   NSB.addProperties(GoogleMap1);
   GoogleMap1.mapOptions={
-    disableDefaultUI: False,
+    disableDefaultUI: True,
     disableDoubleClickZoom: True,
     draggable: False,
     draggableCursor: '',
     draggingCursor: '',
     heading: 0,
     keyboardShortcuts: True,
-    latitude: '40.948262',
-    longitude: '-72.898428',
-    mapMaker: True,
+    latitude: '45.0781',
+    longitude: '7.6761',
+    mapMaker: False,
     mapTypeId: 'roadmap',
-    maxZoom: 20,
-    noClear: True,
+    maxZoom: 10,
+    noClear: False,
     scrollwheel: False,
     streetViewControl: False,
     tilt: 0,
-    zoom: 16,
+    zoom: 10,
     zoomControl: False,
     };
   GoogleMap1.setMarker = NSB.GoogleMapSetMarker;
@@ -161,6 +165,14 @@ window.addEventListener('load', function() {
   tblSensor.GridRefreshWidth=function(){setTimeout(NSB.GridRefreshWidth,10,tblSensor)};
   NSB.Grid_init('tblSensor');
   NSB.addProperties(tblSensor,tblSensor_scroller)
+
+
+  NSB.addProperties(Label3);
+  $('#fltBounds .ui-flipswitch').css('margin','0px');
+  fltBounds.value=function() {return fltBounds_inner.options[fltBounds_inner.selectedIndex].innerHTML;}
+  fltBounds.setting=function() {return fltBounds_inner.options[fltBounds_inner.selectedIndex].innerHTML!='Off';}
+  fltBounds.setValue=function(n) {$('#fltBounds_inner').val(n).flipswitch('refresh'); }
+  NSB.addDisableProperty(fltBounds);NSB.addProperties(fltBounds);
   Form1.style.display = 'none';
   
 }, false);
@@ -175,31 +187,47 @@ var topics2;
 var idSensore;
 var tipoOp;
 var map;
+var autobounds;
+var lineaConfineCoords;
+var lineaConfine;
 
 
  // manage the click on "Connect" button
 btnConnetti.onclick = function() { savethefunction_rvar="";
    var urlClient;
+   var markerBounds;
+   var pnt;
  // istantiate a STOMP client
     urlClient = "ws://stream.smartdatanet.it/ws";
     client = Stomp.client(urlClient);
     client.connect("guest" , "Aekieh6F" , connectCallBack, errorCallback);
-
+    markerBounds = new google.maps.LatLngBounds();
+    pnt = new google.maps.LatLng(45.020169, 7.527439);
+    markerBounds.extend(pnt);
+    pnt = new google.maps.LatLng(45.122730, 7.762615);
+    markerBounds.extend(pnt);
+    map.fitBounds(markerBounds);
 return savethefunction_rvar; }
 
 btnDisconnetti.onclick = function() { savethefunction_rvar="";
+   var markerBounds;
+   var pnt;
  // disconnect the server and reset the screen view
     client.disconnect(disconnectCallback);
     btnConnetti.disabled = False;
     btnDisconnetti.disabled = True;
     cmbSensore.disabled = False;
-    GoogleMap1.mapOptions.longitude = 0;
-    GoogleMap1.mapOptions.latitude = 0;
-    GoogleMap1.refresh();
+    markerBounds = new google.maps.LatLngBounds();
+    pnt = new google.maps.LatLng(45.020169, 7.527439);
+    markerBounds.extend(pnt);
+    pnt = new google.maps.LatLng(45.122730, 7.762615);
+    markerBounds.extend(pnt);
+    map.fitBounds(markerBounds);
 return savethefunction_rvar; }
 
  // init the screen view
 Form1.onshow = function() { savethefunction_rvar="";
+   var point;
  // define sensor metadata
     sensor[0] = {name: "phonegps01" , id: "cc1bfe50-491c-560d-a235-0e4134bbdc23" , topic: "/topic/output.smartlab.cc1bfe50-491c-560d-a235-0e4134bbdc23_position" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
     sensor[1] = {name: "phonegps02" , id: "5391c45d-7350-5f9b-b971-f711e2766123" , topic: "/topic/output.smartlab.5391c45d-7350-5f9b-b971-f711e2766123_position" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
@@ -230,14 +258,14 @@ Form1.onshow = function() { savethefunction_rvar="";
     topics = sensor[0].topic;
 
  // maps
-    GoogleMap1.mapOptions.longitude = 0;
-    GoogleMap1.mapOptions.latitude = 0;
+    GoogleMap1.mapOptions.longitude = 7.6761;
+    GoogleMap1.mapOptions.latitude = 45.0781;
     GoogleMap1.refresh();
 
 
  // get map identification
-    point = new google.maps.LatLng(0, 0);
-    mapOptions = {zoom: 10, center: point}
+    point = new google.maps.LatLng(45.0781, 7.6761);
+    mapOptions = {zoom: 10, center: point, zoomControl: False, disableDefaultUI: True}
     map = new google.maps.Map(document.getElementById("GoogleMap1"), mapOptions);
 
  // define marker
@@ -250,8 +278,21 @@ Form1.onshow = function() { savethefunction_rvar="";
     }
 
     tblSensor.rows = NUMSENSOR + 1;
+    autobounds = False;
 
+    lineaConfineCoords = [new google.maps.LatLng(0, 7.6), new google.maps.LatLng(360, 7.6)];
 
+    lineaConfine = new google.maps.Polyline({path: lineaConfineCoords, geodesic: True, strokeColor: "#FF0000" , strokeOpacity: 1.0, strokeWeight: 3});
+
+    lineaConfine.setMap(map);
+return savethefunction_rvar; }
+
+fltBounds.onchange = function() { savethefunction_rvar="";
+  if(fltBounds.value() == "On") {
+      autobounds = True;
+ } else {
+      autobounds = False;
+  }
 return savethefunction_rvar; }
 
  // manage the topic selection 
@@ -300,7 +341,7 @@ function connectCallBack(x) {
 
  // connection error
 function errorCallback(x) {
-  _msgbox_confirm("Connection Error");
+  btnConnetti.onclick();
 }
 
  // manage the stop message
@@ -359,8 +400,10 @@ function messageCallback(x) {
   for   (i = 0; i  <= (NUMSENSOR - 1); i ++) {
     tblSensor.setValue(i+1,0,sensor[i].name);
     if(sensor[i].marked == 1) {
-      pnt = new google.maps.LatLng(sensor[i].lat, sensor[i].lon);
-      markerBounds.extend(pnt);
+      if(autobounds == True) {
+        pnt = new google.maps.LatLng(sensor[i].lat, sensor[i].lon);
+        markerBounds.extend(pnt);
+      }
       tblSensor.setValue(i+1, 1, sensor[i].ts);
       tblSensor.setValue(i+1, 2, sensor[i].lat);
       tblSensor.setValue(i+1, 3, sensor[i].lon);
@@ -374,6 +417,14 @@ function messageCallback(x) {
       tblSensor.setValue(i+1, 5, "-");
     }
   }
+
+  if(autobounds == False) {
+      pnt = new google.maps.LatLng(45.020169, 7.527439);
+      markerBounds.extend(pnt);
+      pnt = new google.maps.LatLng(45.122730, 7.762615);
+      markerBounds.extend(pnt);
+  }
+
   map.fitBounds(markerBounds);
 
 
@@ -385,6 +436,8 @@ function disconnectCallback(x) {
   location = ".";
 
 }
+
+
 
 
 
