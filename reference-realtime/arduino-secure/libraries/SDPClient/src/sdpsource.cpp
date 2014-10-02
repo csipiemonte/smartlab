@@ -24,6 +24,7 @@ const char* SDPSource::CONNECTION_TYPE_1 = "config";
 const char* SDPSource::DEFAULT_COMPONENT_LABEL = "c0";
 const char SDPSource::CONC_CHAR = '/';
 sdp::message::CSVLine* SDPSource::configuration = 0;
+const uint16_t SDPSource::RBUF_SIZE = 128;
 
 SDPSource::SDPSource() :
     m_isCopy(false), m_subclient(NULL), m_message(NULL), m_hmacKeylength(0)

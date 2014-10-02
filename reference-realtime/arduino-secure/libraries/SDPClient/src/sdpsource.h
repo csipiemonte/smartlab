@@ -345,7 +345,7 @@ namespace sdp
 
 
         //! Size of an internal input buffer
-        static  uint16_t RBUF_SIZE = 128
+        static  const uint16_t RBUF_SIZE;
 
 
         /**
@@ -358,8 +358,10 @@ namespace sdp
          */
         static bool loadConfiguration(char* filename, sdp::message::CSVLine &conf)
         {
-          char rBuffer[RBUF_SIZE] = {0};
+          char rBuffer[RBUF_SIZE];
           File myFile = SD.open(filename, FILE_READ);
+          memset(rBuffer, 0, sizeof(char)*RBUF_SIZE);
+
           // if the file opened okay, read it and get only the first line
           if (myFile)
           {
