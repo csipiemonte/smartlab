@@ -287,7 +287,7 @@ public class RealTimeValidator implements MqttCallback {
 			}
 			String taggedJson = observation.toString();
 			try {
-				client.publish(topic + "_v", taggedJson.getBytes(), qos, false);
+				client.publish(topic + "/val", taggedJson.getBytes(), qos, false);
 			} catch (MqttException e) {
 			}
 		} catch (JSONException e) {
