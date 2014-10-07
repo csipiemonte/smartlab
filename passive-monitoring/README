@@ -35,6 +35,6 @@ will listen to the topic and will modify the "validity" field
 inside the received observations.
 
 The output is published to the following topic:
-output/<tenant>/<sensor>_<stream>_V
+output/<tenant>/<sensor>_<stream>/val
 
 
