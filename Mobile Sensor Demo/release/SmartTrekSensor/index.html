@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <title>SmartTrek</title>
-<meta name="generator" content="NSB/AppStudio 4.2.1.0$zkdb" />
-<meta name='date' content='2014-10-01 16:05:38.814000' />
+<meta name="generator" content="NSB/AppStudio 4.2.2.0$zkdb" />
+<meta name='date' content='2014-10-09 14:22:29.275259' />
 <meta name='version' content='1.0.0' />
 <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no, minimal-ui' />
 <meta name='apple-mobile-web-app-capable' content='YES' />
@@ -112,23 +112,26 @@
 #imgLogoSDP3Copy {position:absolute; left:10px; right:px; top:427px; bottom:auto; height:28px; width:167px}
 #imgLogoCSI3Copy {position:absolute; left:258px; right:auto; top:431px; bottom:auto; height:24px; width:54px}
 #hdrTrack {position: absolute; width:100%; height:40px; left:0px; top:0px;}
-#cmbRoute {position:absolute; left:23px; right:auto; top:91px; bottom:auto; height:auto; width:276px}
-#Label2 {position:absolute; left:23px; right:auto; top:65px; bottom:auto; height:auto; width:187px}
-#btnPlay {position:absolute; left:98px; right:auto; top:284px; bottom:auto; height:71px; width:125px}
-#Label3 {position:absolute; left:23px; right:auto; top:138px; bottom:auto; height:auto; width:70px}
-#lblPoint {position:absolute; left:108px; right:auto; top:138px; bottom:auto; height:auto; width:81px}
-#lblGPSCopy {position:absolute; left:21px; right:auto; top:170px; bottom:auto; height:auto; width:281px}
-#sldSend {position: absolute; width:288px; height:auto; left:23px; top:200px;}
+#cmbRoute {position:absolute; left:23px; right:auto; top:68px; bottom:auto; height:auto; width:276px}
+#Label2 {position:absolute; left:23px; right:auto; top:48px; bottom:auto; height:auto; width:187px}
+#btnPlay {position:absolute; left:33px; right:auto; top:285px; bottom:auto; height:71px; width:125px}
+#Label3 {position:absolute; left:23px; right:auto; top:110px; bottom:auto; height:auto; width:70px}
+#lblPoint {position:absolute; left:108px; right:auto; top:110px; bottom:auto; height:auto; width:81px}
+#lblGPSCopy {position:absolute; left:21px; right:auto; top:137px; bottom:auto; height:auto; width:281px}
+#sldSend {position: absolute; width:288px; height:auto; left:23px; top:158px;}
 #lblSendN {position:absolute; left:15px; right:auto; top:365px; bottom:auto; height:auto; width:285px}
 #ftLoop {position:absolute; left:194px; right:auto; top:243px; bottom:auto; height:auto; width:auto}
 #Label5 {position:absolute; left:66px; right:auto; top:245px; bottom:auto; height:auto; width:106px}
 #lblLat2 {position:absolute; left:17px; right:auto; top:394px; bottom:auto; height:auto; width:140px}
 #lblLon2 {position:absolute; left:174px; right:auto; top:394px; bottom:auto; height:auto; width:132px}
+#Label6 {position:absolute; left:22px; right:auto; top:206px; bottom:auto; height:auto; width:98px}
+#sldStep {position: absolute; width:188px; height:auto; left:123px; top:201px;}
+#btnStopSend {position:absolute; left:187px; right:auto; top:287px; bottom:auto; height:67px; width:100px}
 body * {font-family:helvetica}
 </style>
 </head>
 <body style="margin:0px;-ms-touch-action:none;">
-<script>window.addEventListener('load', function() {new FastClick(document.body)}, false)</script>
+<script>window.addEventListener('load', function() {new FastClick.attach(document.body)}, false)</script>
 <div data-role="page" id="Page_jqm" data-theme="a" style="">
 
 <form id="frmHome" action="" method="GET" onsubmit="return false;" style="display:none; height:100%; position:absolute; top:0px; left:0px; width:100%; ">
@@ -201,7 +204,7 @@ frmTrack.innerHTML=[  "<div id='imgLogoSDP3Copy' data-nsb-type=image><img src='i
   NSB.HeaderBar_jqm14('hdrTrack', 'Track Simulator', 'Home', 'home', 'left', '', 'arrow-r', 'none', ' style="" class=" "', '', ''),
   NSB.Select_jqm('cmbRoute', '', '1,2', 0, 1, '', '','', 'arrow-d', 'right', 'false', 'true', 'a', '', 'data-mini=true', '', '','', ''),
   "<div id='Label2' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Select a route to play:</div>",
-  "<button id='btnPlay' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible; font-size:20px; font-family:; font-style:; font-weight:; color:yellow; background-color:red; ;  ' data-nsb-type=Button_jqm>Play</button>",
+  "<button id='btnPlay' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible; font-size:20px; font-family:; font-style:; font-weight:; color:yellow; background-color:green; ;  ' data-nsb-type=Button_jqm>Play</button>",
   "<div id='Label3' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Point n.:</div>",
   "<div id='lblPoint' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >0</div>",
   "<div id='lblGPSCopy' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Send interval (100 - 10000 msec)</div>",
@@ -211,6 +214,9 @@ frmTrack.innerHTML=[  "<div id='imgLogoSDP3Copy' data-nsb-type=image><img src='i
   "<div id='Label5' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Loop IN/OUT:</div>",
   "<div id='lblLat2' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:12px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Lat: 0.00000</div>",
   "<div id='lblLon2' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:12px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Lon: 0.00000</div>",
+  "<div id='Label6' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Step (1-10):</div>",
+  "<div  id='sldStep' style=''><input type='range' id='sldStep_inner' data-mini=true  style='color:color; background-color:white; ' name=''   value='1' min='1' max='10' step='1' data-track-theme='a' class=' '></div>",
+  "<button id='btnStopSend' class='ui-btn ui-mini  ui-btn-inline ui-icon- ui-btn-icon-none  ' style='margin:0px; overflow:visible; font-size:20px; font-family:; font-style:; font-weight:; color:yellow; background-color:red; ;  ' data-nsb-type=Button_jqm>STOP</button>",
   ].join('');
 </script>
 </form>
@@ -338,6 +344,7 @@ var flgJSON;
 var timerRef;
 var jt;
 var nmsg;
+var intervalRefresh;
 
 longitude = 0;
 latitude = 0;
@@ -419,7 +426,6 @@ function onGeolocation(location) { savethefunction_rvar="";
   lblAlt.Caption = altitudine;
   lblSpeed.Caption = vel;
   TextArea1.text = jt;
-
 
 return savethefunction_rvar; }
 
@@ -503,6 +509,9 @@ NSB.addProperties(frmSettings);
 frmSettings.onshow = function() { savethefunction_rvar="";
   cmbSensor.addItem("phonegps01" , "cc1bfe50-491c-560d-a235-0e4134bbdc23");
   cmbSensor.addItem("phonegps02" , "5391c45d-7350-5f9b-b971-f711e2766123");
+  cmbSensor.addItem("phonegps03" , "a8b223bc-6aa8-5fa2-a217-32546bbd5b70");
+  cmbSensor.addItem("phonegps04" , "3a58c011-1ad5-5b60-b1fc-68f8d81098e0");
+  cmbSensor.addItem("phonegps05" , "06bbb064-e808-50b6-9fcc-bcf43550d09e");
   lblUUID.Caption = cmbSensor.selectedValue();
 return savethefunction_rvar; }
 
@@ -584,6 +593,23 @@ window.addEventListener('load', function() {
 
 
   NSB.addProperties(lblLon2);
+
+
+  NSB.addProperties(Label6);
+  $('#sldStep .ui-slider').css('margin','0px');
+  sldStep.__defineGetter__('value', function(){return sldStep_inner.value});
+  sldStep.__defineSetter__('value', function(n){ sldStep_inner.value=n});
+  sldStep.__defineGetter__('min', function(){return sldStep_inner.min});
+  sldStep.__defineSetter__('min', function(n){ sldStep_inner.min=n});
+  sldStep.__defineGetter__('max', function(){return sldStep_inner.max});
+  sldStep.__defineSetter__('max', function(n){ sldStep_inner.max=n});
+  sldStep.__defineGetter__('step', function(){return sldStep_inner.step});
+  sldStep.__defineSetter__('step', function(n){ sldStep_inner.step=n});
+  sldStep.setValue=function(n){$('#sldStep_inner').val(n).slider('refresh')};
+  NSB.addProperties(sldStep);
+  NSB.addDisableProperty(btnStopSend);
+  NSB.addProperties(btnStopSend);
+
   frmTrack.style.display = 'none';
   
 }, false);
@@ -596,80 +622,111 @@ var maxmsg;
 var req;
 var data;
 var increment;
+var stepRoute;
+var isInPause;
 
+ // initial settings
 frmTrack.onshow = function() { savethefunction_rvar="";
   cmbRoute.addItem("Torino - via Filadelfia" , "torino1.xml");
   cmbRoute.addItem("Torino - corso Agnelli - Beinasco" , "torino2.xml");
   cmbRoute.addItem("Torino - tangenziale" , "torino3.xml");
   cmbRoute.addItem("Torino - corso grosseto - corso agnelli" , "torino4.xml");
-  cmbRoute.addItem("Canavese Tour" , "canavese.xml");
 
   intervalSend = 1000;
+  stepRoute = 1;
 
   cmbRoute.onchange();
   nmsg = 0;
-  increment = 1;
+  increment = stepRoute;
+  isInPause = False;
 
 return savethefunction_rvar; }
 
+ // manage the play/stop button
 btnPlay.onclick = function() { savethefunction_rvar="";
   if(btnPlay.text == "Play") {
+ //Start sending data
     nmsg = 0;
     timerRefSend = setInterval (onTimerSend, intervalSend);
-    btnPlay.text = "Stop";
+    btnPlay.text = "Pause";
     sldSend.disabled = True;
     cmbRoute.disabled = True;
+    sldStep.disabled = True;
     ftLoop.disabled = True;
+    btnStopSend.disabled = False;
+    isInPause = False;
+  }else if (btnPlay.text == "Resume" ) {
+    btnPlay.text = "Pause";
+    isInPause = False;
  } else {
- //Stop checking the current location
-    clearInterval(timerRefSend);
-    btnPlay.text = "Play";
-    sldSend.disabled = False;
-    cmbRoute.disabled = False;
-    ftLoop.disabled = False;
+    btnPlay.text = "Resume";
+    isInPause = True;
   }
 return savethefunction_rvar; }
 
+btnStopSend.onclick = function() { savethefunction_rvar="";
+ //Stop data
+    clearInterval(timerRefSend);
+    isInPause = False;
+    sldSend.disabled = False;
+    cmbRoute.disabled = False;
+    ftLoop.disabled = False;
+    sldStep.disabled = False;
+    btnStopSend.disabled = True;
+    btnPlay.text = "Play";
+return savethefunction_rvar; }
+
+ // manage the "interval send" timer slider
 sldSend.onchange = function() { savethefunction_rvar="";
   intervalSend = sldSend.value;
 return savethefunction_rvar; }
 
-function onTimerSend() { savethefunction_rvar="";
- var jt;
-
-    lblSendN.Caption = "Sent "  +  (nmsg + 1)  +  " / "  +   maxmsg  +  " GPS points";
-
-    nmsg = nmsg + increment;
-
-    if(nmsg >= maxmsg || nmsg < 0) {
-      if(ftLoop.value() == "On") {
-          increment = - increment;
-           return;
- } else {
-        btnPlay.onclick();
-      }
-
- } else {
-      jt = "{" + '"' + "stream" + '"' + ": " + '"' + "" + NomeStream + "" + '"' + ", ";
-      jt = jt + "" + '"' + "sensor" + '"' + ": " + '"' + "" + SensorID + "" + '"' + ", ";
-      jt = jt + "" + '"' + "values" + '"' + ": [{";
-      jt = jt + "" + '"' + "time" + '"' + ": " + '"' + "" +  TimeStamp() + "" + '"' + ", ";
-      jt = jt + "" + '"' + "components" + '"' + ": {";
-      jt = jt + "" + '"' + "longitude" + '"' + ": " + '"' + "" + data.trkpt[nmsg].lon + "" + '"' + ", ";
-      jt = jt + "" + '"' + "latitude" + '"' + ": " + '"' + "" + data.trkpt[nmsg].lat + "" + '"' + ", ";
-      jt = jt + "" + '"' + "altitude" + '"' + ": " + '"' + "" + data.trkpt[nmsg].ele + "" + '"' + ", ";
-      jt = jt + "" + '"' + "speed" + '"' + ": 0.0}}]} ";
-
-      lblLat2.Caption = data.trkpt[nmsg].lat;
-      lblLon2.Caption = data.trkpt[nmsg].lon;
-var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "POST", urlSend, True);
-        xmlHttp.setRequestHeader("Authorization", "Basic c21hcnRsYWI6VXgwbXU1aXQ="); 
-        xmlHttp.setRequestHeader("Content-Type", "application/json "); 
-        xmlHttp.send( jt );
-}
+ // manage the "step" slider
+sldStep.onchange = function() { savethefunction_rvar="";
+  stepRoute = Math.floor(sldStep.value);
+  increment = stepRoute;
 return savethefunction_rvar; }
 
+
+ // send data to platform
+function onTimerSend() { savethefunction_rvar="";
+ var jt;
+    if(isInPause == False) {
+      lblSendN.Caption = "Sent "  +  (nmsg + 1)  +  " / "  +   maxmsg  +  " GPS points";
+
+      nmsg = nmsg + increment;
+
+      if(nmsg >= maxmsg || nmsg < 0) {
+        if(ftLoop.value() == "On") {
+            increment = - increment;
+             return;
+ } else {
+          btnPlay.onclick();
+        }
+
+ } else {
+        jt = "{" + '"' + "stream" + '"' + ": " + '"' + "" + NomeStream + "" + '"' + ", ";
+        jt = jt + "" + '"' + "sensor" + '"' + ": " + '"' + "" + SensorID + "" + '"' + ", ";
+        jt = jt + "" + '"' + "values" + '"' + ": [{";
+        jt = jt + "" + '"' + "time" + '"' + ": " + '"' + "" +  TimeStamp() + "" + '"' + ", ";
+        jt = jt + "" + '"' + "components" + '"' + ": {";
+        jt = jt + "" + '"' + "longitude" + '"' + ": " + '"' + "" + data.trkpt[nmsg].lon + "" + '"' + ", ";
+        jt = jt + "" + '"' + "latitude" + '"' + ": " + '"' + "" + data.trkpt[nmsg].lat + "" + '"' + ", ";
+        jt = jt + "" + '"' + "altitude" + '"' + ": " + '"' + "" + data.trkpt[nmsg].ele + "" + '"' + ", ";
+        jt = jt + "" + '"' + "speed" + '"' + ": 0.0}}]} ";
+
+        lblLat2.Caption = data.trkpt[nmsg].lat;
+        lblLon2.Caption = data.trkpt[nmsg].lon;
+var xmlHttp = new XMLHttpRequest();
+          xmlHttp.open( "POST", urlSend, True);
+          xmlHttp.setRequestHeader("Authorization", "Basic c21hcnRsYWI6VXgwbXU1aXQ="); 
+          xmlHttp.setRequestHeader("Content-Type", "application/json "); 
+          xmlHttp.send( jt );
+}
+    }
+return savethefunction_rvar; }
+
+ // manage the "route selection" combo box and load the route data
 cmbRoute.onchange = function() { savethefunction_rvar="";
    req = Ajax(urlRoute  +  cmbRoute.selectedValue());
    if(!req )  { return savethefunction_rvar; }
@@ -690,8 +747,7 @@ cmbRoute.onchange = function() { savethefunction_rvar="";
 return savethefunction_rvar; }
 
 
-
-
+ //manage the headerBar button
 hdrTrack.onclick = function(button) { savethefunction_rvar="";
   if(TypeName(button)=="object" )  { return savethefunction_rvar; }
 
@@ -707,6 +763,9 @@ hdrTrack.onclick = function(button) { savethefunction_rvar="";
 return savethefunction_rvar; }
 
 
+
+
+
 window.addEventListener('orientationchange', function(){window.scrollTo(0,0)});
 window.addEventListener('load', function() {
   browserWarningMessage('Please use Google Chrome, Apple Safari or another supported browser.');
@@ -718,7 +777,6 @@ window.addEventListener('load', function() {
 
 var NSBCurrentForm = frmHome;
 
-var intervalRefresh;
 var SensorID;
 var NomeStream;
 var latitudine;

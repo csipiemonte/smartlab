@@ -86,6 +86,11 @@ function Push(arr, el) {
   return arr.push(el)
 }
 
+//Push function: Push(array,item)
+function ForEach(obj, func) {
+  obj.forEach(func)
+}
+
 String.prototype.format = function () {
   var args = arguments;
   return this.replace(/\{(\d+)\}/g, function(m, n){return args[n]})
@@ -2203,16 +2208,8 @@ NSB.EULA=function(s){
   setTimeout(function(){NSB.EULAref.refresh()}, 200)
 }
 
-// Sound support
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
-if (window.AudioContext) {
-  NSB.audio_ctx = new AudioContext();
-  // polyfill the standard name on older browsers
-  NSB.audio_ctx.createGain = NSB.audio_ctx.createGain || NSB.audio_ctx.createGainNode;
-}
-NSB.sounds = {};
-
 NSB.PlaySound = function(filename) {
+  NSB.initSound();
   var src = NSB.audio_ctx.createBufferSource();
   src.buffer = NSB.sounds[filename];
   gain_node = NSB.audio_ctx.createGain();
@@ -2220,15 +2217,29 @@ NSB.PlaySound = function(filename) {
   gain_node.connect(NSB.audio_ctx.destination);
   // polyfill the standard name on older browsers
   src.start = src.start || src.noteOn;
-  src.start(0);
+  src.start();
+  return src;
 }
 
 NSB.decodeSound = function(name, data){
+  NSB.initSound();
   var arrayBuffer = Base64Binary.decodeArrayBuffer(data);
   NSB.audio_ctx.decodeAudioData(arrayBuffer,
     function(audioBuffer){
       NSB.sounds[name] = audioBuffer})
   }
+  
+NSB.initSound = function() {
+  if (NSB.audio_ctx == undefined) {
+	window.AudioContext = window.AudioContext || window.webkitAudioContext;
+	if (window.AudioContext) {
+  		NSB.audio_ctx = new AudioContext();
+  		// polyfill the standard name on older browsers
+  		NSB.audio_ctx.createGain = NSB.audio_ctx.createGain || NSB.audio_ctx.createGainNode;
+		}
+    }
+	if (NSB.sounds == undefined) NSB.sounds = {};
+}
 
 /*
 Copyright (c) 2011, Daniel Guerrero

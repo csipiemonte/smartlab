@@ -971,9 +971,9 @@ NSB.Checkbox_jqm = function(id, width, options, html, properties, Theme, klass, 
   var i,s;
   var arrOptions=split(options, ",");
   if(corners) corners=" data-corners=" + corners;
-  if(iconPos=='right') iconPos=" data-icon-pos=right";
+  if(iconPos=='right') iconPos="data-icon-pos=right";
   s="<fieldset data-role='controlgroup' id='" + id + "' " + enquote(html) + properties + corners;
-  s+=iconPos + " style='margin-top:0px;' class='needsclick " + klass + "'>\n";
+  s+=" " + iconPos + " style='margin-top:0px;' class='needsclick " + klass + "'>\n";
   for (i=0; i<arrOptions.length; i++){
     s=s+"  <input type='checkbox' data-theme=" + Theme + " name='" + id + "_" + (i+1) + "' id='" + id + "_" + (i+1) + "'>\n";
     s=s+"  <label for='" + id + "_" + (i+1) + "'>" + arrOptions[i] + "</label>";

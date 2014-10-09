@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <title>Smart Trek Visualizer</title>
-<meta name="generator" content="NSB/AppStudio 4.2.1.0$zkdb" />
-<meta name='date' content='2014-10-01 16:05:30.538193' />
+<meta name="generator" content="NSB/AppStudio 4.2.2.0$zkdb" />
+<meta name='date' content='2014-10-09 14:22:40.197630' />
 <meta name='version' content='1.0.0' />
 <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no, minimal-ui' />
 <meta name='apple-mobile-web-app-capable' content='YES' />
@@ -71,22 +71,23 @@
 #Line1 {position:absolute; left:10px; right:10px; top:5px; bottom:auto; height:733px; width:945px; margin:0px;}
 #btnConnetti {position:absolute; left:31px; right:auto; top:73px; bottom:auto; height:auto; width:100px}
 #btnDisconnetti {position:absolute; left:140px; right:auto; top:73px; bottom:auto; height:auto; width:100px}
-#GoogleMap1 {position:absolute; left:45px; right:auto; top:146px; bottom:auto; height:440px; width:900px}
+#GoogleMap1 {position:absolute; left:45px; right:auto; top:146px; bottom:auto; height:430px; width:900px}
 #Label1 {position:absolute; left:263px; right:auto; top:72px; bottom:auto; height:auto; width:70px}
 #cmbSensore {position:absolute; left:338px; right:auto; top:71px; bottom:auto; height:auto; width:254px}
 #lblSensore {position:absolute; left:600px; right:auto; top:71px; bottom:auto; height:34px; width:348px}
 #Label2 {position:absolute; left:362px; right:auto; top:15px; bottom:auto; height:auto; width:312px}
 #Image1 {position:absolute; left:24px; right:auto; top:10px; bottom:auto; height:44px; width:203px}
 #Image2 {position:absolute; left:879px; right:auto; top:14px; bottom:auto; height:39px; width:83px}
-#tblSensor_scroller {position: absolute; overflow:hidden; width:898px; height:149px; left:45px; top:590px; right:auto; bottom:auto;}
+#tblSensor_scroller {position: absolute; overflow:hidden; width:898px; height:165px; left:47px; top:580px; right:auto; bottom:auto;}
 #tblSensor {position:absolute; left:0px; top:0px; width:100%; height:auto }
 #Label3 {position:absolute; left:42px; right:auto; top:120px; bottom:auto; height:auto; width:135px}
 #fltBounds {position:absolute; left:178px; right:auto; top:116px; bottom:auto; height:auto; width:auto}
+#lblAlert {position:absolute; left:311px; right:auto; top:123px; bottom:auto; height:auto; width:309px}
 body * {font-family:helvetica}
 </style>
 </head>
 <body style="margin:0px;-ms-touch-action:none;">
-<script>window.addEventListener('load', function() {new FastClick(document.body)}, false)</script>
+<script>window.addEventListener('load', function() {new FastClick.attach(document.body)}, false)</script>
 <div data-role="page" id="Page_jqm" data-theme="a" style="">
 
 <form id="Form1" action="" method="GET" onsubmit="return false;" style="display:none; height:100%; position:absolute; top:0px; left:0px; width:100%; ">
@@ -101,9 +102,10 @@ Form1.innerHTML=[  "<hr id='Line1' class='' style='background-color:grigio;borde
   "<div id='Label2' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:30px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Smart Trek Visualizer</div>",
   "<div id='Image1' data-nsb-type=image><img src='img/logosdp.jpg'  height=100% width=100% name='Image1_img' style='' usemap='Image1_map'></div>",
   "<div id='Image2' data-nsb-type=image><img src='img/logoCSI.png'  height=100% width=100% name='Image2_img' style='' usemap='Image2_map'></div>",
-  NSB.Grid("tblSensor", "6", "6", "", "", "Sensor, TS, Latitude, Longitude, Altitude [m], Speed [m/s]", "", "style=", "", ""),
+  NSB.Grid("tblSensor", "6", "7", "", "11%, 23%, 18%, 19%, 11%, 10%, 9%", "Sensor, TS, Latitude, Longitude, Altitude [m], Speed [m/s], Inbound", "", "style=table-layout:fixed;\u000Afont-size:10;", "", ""),
   "<div id='Label3' class='' data-nsb-type=Label style='text-align:left; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:black; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' >Map auto resize:</div>",
   "<div id='fltBounds' style=''><select id='fltBounds_inner' name='fltBounds' data-role=flipswitch data-mini=true data-corners='false' style='' class=' '><option>Off</option><option>On</option></select></div>",
+  "<div id='lblAlert' class='' data-nsb-type=Label style='text-align:center; text-shadow:none; font-size:16px; font-family:helvetica; font-style:normal; font-weight:bold; color:red; background-color:trasparente; border-style:;border-color:transparent;border-width:1px; ' > no alert</div>",
   ].join('');
 </script>
 </form>
@@ -173,6 +175,9 @@ window.addEventListener('load', function() {
   fltBounds.setting=function() {return fltBounds_inner.options[fltBounds_inner.selectedIndex].innerHTML!='Off';}
   fltBounds.setValue=function(n) {$('#fltBounds_inner').val(n).flipswitch('refresh'); }
   NSB.addDisableProperty(fltBounds);NSB.addProperties(fltBounds);
+
+
+  NSB.addProperties(lblAlert);
   Form1.style.display = 'none';
   
 }, false);
@@ -181,6 +186,7 @@ NSB.addProperties(Form1);
 var NUMSENSOR = 5;
 var sensor=createMultiDimArray(NUMSENSOR);
 var marker=createMultiDimArray(NUMSENSOR);
+var markerH=createMultiDimArray(NUMSENSOR);
 var client;
 var topics;
 var topics2;
@@ -190,7 +196,8 @@ var map;
 var autobounds;
 var lineaConfineCoords;
 var lineaConfine;
-
+var poliConfineCoords;
+var poliConfine;
 
  // manage the click on "Connect" button
 btnConnetti.onclick = function() { savethefunction_rvar="";
@@ -229,11 +236,11 @@ return savethefunction_rvar; }
 Form1.onshow = function() { savethefunction_rvar="";
    var point;
  // define sensor metadata
-    sensor[0] = {name: "phonegps01" , id: "cc1bfe50-491c-560d-a235-0e4134bbdc23" , topic: "/topic/output.smartlab.cc1bfe50-491c-560d-a235-0e4134bbdc23_position" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
-    sensor[1] = {name: "phonegps02" , id: "5391c45d-7350-5f9b-b971-f711e2766123" , topic: "/topic/output.smartlab.5391c45d-7350-5f9b-b971-f711e2766123_position" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
-    sensor[2] = {name: "n.d." , id: "null" , topic: "null" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
-    sensor[3] = {name: "n.d." , id: "null" , topic: "null" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
-    sensor[4] = {name: "n.d." , id: "null" , topic: "null" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null"}
+    sensor[0] = {name: "phonegps01" , id: "cc1bfe50-491c-560d-a235-0e4134bbdc23" , topic: "/topic/output.smartlab.cc1bfe50-491c-560d-a235-0e4134bbdc23_position" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null" , inbound: "false"}
+    sensor[1] = {name: "phonegps02" , id: "5391c45d-7350-5f9b-b971-f711e2766123" , topic: "/topic/output.smartlab.5391c45d-7350-5f9b-b971-f711e2766123_position" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null" , inbound: "false"}
+    sensor[2] = {name: "phonegps03" , id: "a8b223bc-6aa8-5fa2-a217-32546bbd5b70" , topic: "/topic/output.smartlab.a8b223bc-6aa8-5fa2-a217-32546bbd5b70_position" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null" , inbound: "false"}
+    sensor[3] = {name: "phonegps04" , id: "3a58c011-1ad5-5b60-b1fc-68f8d81098e0" , topic: "/topic/output.smartlab.3a58c011-1ad5-5b60-b1fc-68f8d81098e0_position" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null" , inbound: "false"}
+    sensor[4] = {name: "phonegps05" , id: "06bbb064-e808-50b6-9fcc-bcf43550d09e" , topic: "/topic/output.smartlab.06bbb064-e808-50b6-9fcc-bcf43550d09e_position" , marked: 0, lat: 0, lon: 0, alt: 0, speed: 0, ts: "null" , inbound: "false"}
 
  // GUI Init
  //button
@@ -244,11 +251,13 @@ Form1.onshow = function() { savethefunction_rvar="";
  // combo box
     for   (i = 0; i  <= (NUMSENSOR-1); i ++) {
       if(sensor[i].name != "n.d.") {
-        cmbSensore.addItem(sensor[i].name, sensor[i].topic);
+        cmbSensore.addItem(sensor[i].name, sensor[i].name);
       }
-    }
-    cmbSensore.addItem("all phone" , "all sensor ID");
-    cmbSensore.addItem("all phone filtered" , "all sensor ID filtered");
+  }
+
+    cmbSensore.addItem("all phone (no filter)" , "all");
+    cmbSensore.addItem("all phone filtered" , "allfilter");
+    cmbSensore.addItem("all phone filtered polygon" , "allfiltergeo");
 
  // label
     lblSensore.Caption = cmbSensore.selectedValue();
@@ -271,20 +280,27 @@ Form1.onshow = function() { savethefunction_rvar="";
  // define marker
 
     for   (i = 0; i  <= (NUMSENSOR-1); i ++) {
-        marker[i] = new google.maps.Marker({position: point, map: map});
-        icon = new google.maps.MarkerImage(""  +  (i+1)  +  ".png");
+        marker[i] = new google.maps.Marker({position: point, map: map, title: sensor[i].name + ": " + sensor[i].id});
+        markerH[i] = new google.maps.Marker({position: point, map: map, title: sensor[i].name + ": " + sensor[i].id});
+        icon = new google.maps.MarkerImage(""  +  (i+1)  +  ".png" , new google.maps.Size(32, 32),new google.maps.Point(0,0), new google.maps.Point(16, 16));
         marker[i].setIcon(icon);
         marker[i].setVisible(False);
+        icon2 = new google.maps.MarkerImage(""  +  (i+1)  +  "x.png" , new google.maps.Size(32, 32),new google.maps.Point(0,0), new google.maps.Point(16, 16));
+        markerH[i].setIcon(icon2);
+        markerH[i].setVisible(False);
     }
 
     tblSensor.rows = NUMSENSOR + 1;
     autobounds = False;
 
-    lineaConfineCoords = [new google.maps.LatLng(0, 7.6), new google.maps.LatLng(360, 7.6)];
-
-    lineaConfine = new google.maps.Polyline({path: lineaConfineCoords, geodesic: True, strokeColor: "#FF0000" , strokeOpacity: 1.0, strokeWeight: 3});
-
+    poliConfineCoords = [new google.maps.LatLng(45.030603, 7.640563), new google.maps.LatLng(45.041278, 7.589752), new google.maps.LatLng(45.036183, 7.551986), new google.maps.LatLng(45.057044, 7.530357), new google.maps.LatLng(45.079837,7.617904), new google.maps.LatLng(45.030603, 7.640563)];
+    poliConfine = new google.maps.Polygon({path: poliConfineCoords, strokeColor: "#FF0000" , strokeOpacity: 1.0, strokeWeight: 3, fillColor: "#FF0000" , fillOpacity: 0.35});
+    poliConfine.setMap(map);
+    lineaConfineCoords = [new google.maps.LatLng(0, 7.6), new google.maps.LatLng(180, 7.6)];
+    lineaConfine = new google.maps.Polyline({path: lineaConfineCoords, geodesic: True, strokeColor: "#0000FF" , strokeOpacity: 1.0, strokeWeight: 3});
     lineaConfine.setMap(map);
+
+
 return savethefunction_rvar; }
 
 fltBounds.onchange = function() { savethefunction_rvar="";
@@ -299,26 +315,30 @@ return savethefunction_rvar; }
 cmbSensore.onchange = function() { savethefunction_rvar="";
 
     switch (True) {
-    case ((cmbSensore.selectedItem()) == "phonegps01"):
+    case ((cmbSensore.selectedValue()) == "phonegps01"):
         topics = sensor[0].topic;
 	break;
-    case ((cmbSensore.selectedItem()) == "phonegps02"):
+    case ((cmbSensore.selectedValue()) == "phonegps02"):
         topics = sensor[1].topic;
 	break;
-    case ((cmbSensore.selectedItem()) == "phonegps03"):
+    case ((cmbSensore.selectedValue()) == "phonegps03"):
         topics = sensor[2].topic;
 	break;
-    case ((cmbSensore.selectedItem()) == "phonegps04"):
+    case ((cmbSensore.selectedValue()) == "phonegps04"):
         topics = sensor[3].topic;
 	break;
-    case ((cmbSensore.selectedItem()) == "phonegps05"):
-        topics = sensor[3].topic;
+    case ((cmbSensore.selectedValue()) == "phonegps05"):
+        topics = sensor[4].topic;
 	break;
-    case ((cmbSensore.selectedItem()) == "all phone"):
+    case ((cmbSensore.selectedValue()) == "all"):
       topics = "/topic/output.smartlab.internal_allgps";
 	break;
-    case ((cmbSensore.selectedItem()) == "all phone filtered"):
+    case ((cmbSensore.selectedValue()) == "allfilter"):
       topics = "/topic/output.smartlab.internal_allgpsfilterlong";
+	break;
+    case ((cmbSensore.selectedValue()) == "allfiltergeo"):
+      topics = "/topic/output.smartlab.internal_allgpsfiltergeo";
+      topics2 = "/topic/output.smartlab.internal_gpscounter";
     }
 
     lblSensore.Caption = cmbSensore.selectedValue();
@@ -331,17 +351,24 @@ function connectCallBack(x) {
     btnDisconnetti.disabled = False;
     cmbSensore.disabled = True;
     switch (True) {
-    case ((cmbSensore.selectedItem()) == "phonegps01" ): case ((cmbSensore.selectedItem()) ==  "phonegps02" ): case ((cmbSensore.selectedItem()) ==  "all phone" ): case ((cmbSensore.selectedItem()) ==  "all phone filtered"):
+    case ((cmbSensore.selectedValue()) == "phonegps01" ): case ((cmbSensore.selectedValue()) ==  "phonegps02" ): case ((cmbSensore.selectedValue()) ==  "phonegps03" ): case ((cmbSensore.selectedValue()) ==  "phonegps04" ): case ((cmbSensore.selectedValue()) ==  "phonegps05" ): case ((cmbSensore.selectedValue()) ==  "all" ): case ((cmbSensore.selectedValue()) ==  "allfilter"):
         client.subscribe(topics, messageCallback);
         _msgbox_confirm("You are connected and subscribed to topics: " + topics);
-
+	break;
+    case ((cmbSensore.selectedValue()) == "allfiltergeo"):
+        client.subscribe(topics, messageCallback);
+        client.subscribe(topics2, messageCallback2);
+        _msgbox_confirm("You are connected and subscribed to topics: " + topics + '\n' + "and topic "+ topics2);
     }
 
 }
 
  // connection error
 function errorCallback(x) {
-  btnConnetti.onclick();
+  btnConnetti.disabled = False;
+  btnDisconnetti.disabled = True;
+  cmbSensore.disabled = False;
+  _msgbox_confirm("Connection error");
 }
 
  // manage the stop message
@@ -355,6 +382,7 @@ function messageCallback(x) {
  var tstamp;
  var indice;
  var markerBounds;
+ var inbound;
 
  // remove the stomp header
   jsText =""  +  x;
@@ -384,15 +412,35 @@ function messageCallback(x) {
   vel = obJSON.values[0].components.speed;
   tstamp = obJSON.values[0].time;
 
+
   sensor[indice].marked = 1;
   sensor[indice].lat = latitude;
   sensor[indice].lon = longitude;
   sensor[indice].alt = altezza;
   sensor[indice].ts = tstamp;
 
+  sensor[indice].inbound = "false";
+
   point = new google.maps.LatLng(latitude, longitude);
-  marker[indice].setPosition(point);
-  marker[indice].setVisible(True);
+
+  if(cmbSensore.selectedValue() == "allfiltergeo") {
+    inbound = obJSON.values[0].components.inbound;
+    sensor[indice].inbound = inbound;
+
+    if(inbound == "true") {
+      markerH[indice].setPosition(point);
+      markerH[indice].setVisible(True);
+      marker[indice].setVisible(False);
+ } else {
+      marker[indice].setPosition(point);
+      marker[indice].setVisible(True);
+      markerH[indice].setVisible(False);
+    }
+ } else {
+    marker[indice].setPosition(point);
+    marker[indice].setVisible(True);
+    markerH[indice].setVisible(False);
+  }
 
  // refresh screen
   markerBounds = new google.maps.LatLngBounds();
@@ -409,12 +457,14 @@ function messageCallback(x) {
       tblSensor.setValue(i+1, 3, sensor[i].lon);
       tblSensor.setValue(i+1, 4, sensor[i].alt);
       tblSensor.setValue(i+1, 5, sensor[i].speed);
+      tblSensor.setValue(i+1, 6, sensor[i].inbound);
  } else {
       tblSensor.setValue(i+1, 1, "-");
       tblSensor.setValue(i+1, 2, "-");
       tblSensor.setValue(i+1, 3, "-");
       tblSensor.setValue(i+1, 4, "-");
       tblSensor.setValue(i+1, 5, "-");
+      tblSensor.setValue(i+1, 6, "-");
     }
   }
 
@@ -427,10 +477,25 @@ function messageCallback(x) {
 
   map.fitBounds(markerBounds);
 
-
-
 }
 
+function messageCallback2(x) {
+ var v;
+  jsText =""  +  x;
+  p =  InStr(jsText, "{");
+  jsText = Mid(jsText, p);
+
+ // convert the JSON to an object
+
+  obJSON = JSON.parse(jsText);
+  v = Math.floor(obJSON.values[0].components.counter);
+
+  if(v == 0) {
+    lblAlert.Caption = "no alert";
+ } else {
+    lblAlert.Caption = "Alert!!! " + v + " veicle(s) in restricted area";
+  }
+}
 
 function disconnectCallback(x) {
   location = ".";
