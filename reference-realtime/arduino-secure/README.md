@@ -3,8 +3,7 @@ Smart Data Platform (SDP)
 
 Arduino secure JSON
 --------------
-This folder contains a first version of a secure protocol to send on Arduino platform a JSON created using smartdatanet specification. 
-
+This folder contains a first version of a secure protocol to send on Arduino platform a JSON created using smartdatanet specification and control management. T
 This code extends the features of the [*reference implementation*](https://github.com/csipiemonte/smartlab/tree/master/reference-realtime/arduino): commenting the line 
 
 ```
@@ -12,9 +11,11 @@ This code extends the features of the [*reference implementation*](https://githu
 #define SECURE_JSON 1
 ```
 
-the sketch will send a JSON according tO the [*smartdatanet specification*](http://www.smartdatanet.it/).
+the sketch will send a JSON according to the [*smartdatanet specification*](http://www.smartdatanet.it/).
+
 - *libraries/* directory has got all classes and interfaces that implement SDP specification.
 - *sketch/* directory has got an example of sketch that uses SDP Arduino libraries.
+- *patch/* patch file to use Time library on Arduino IDE > 1.5.6
 
 MQTTClient_sec.ino sketch can be work with WiFi and Ethernet shield. Ethernet on Arduino Mega has got some bugs in connection management and require a periodacal hardware reset. It is tested in the following configuration:
 - Arduino Mega 2560 rev3
@@ -22,6 +23,9 @@ MQTTClient_sec.ino sketch can be work with WiFi and Ethernet shield. Ethernet on
 - Arduino IDE 1.5.6-r2. You can download it from [Arduino Previous IDE Versions](http://arduino.cc/en/Main/OldSoftwareReleases)
 - TI LM35 (temperature sensor)
 The Arduino updates its local time from a NTP server. If you want to use a different sensor, you have to create e new convertion function in according to the sensor datasheet. 
+
+**Note:**
+Secure JSON and control management are developing features so to communicate with the smartdata platform you have to disable them.
 
 Requirement
 --------------
@@ -69,28 +73,43 @@ SDP JSON signature is coded in Base64 format and it is calculated taking the JSO
 **Note:**
 MQTT publish packet can be large maximum 256 Byte!
 
-Remote configuration update
+
+
+
+Remote control and configuration
 --------------
-The remote configuration update is a developing SDP feature. It uses the broker MQTT to receive the new configuration.
+The remote control and configuration is a developing SDP feature. It uses the broker MQTT to receive command and new configuration.
 A standard for the format of the configuration message sent to the Arduino in not already defined, so this a proposal.
 The Arduino subscribes itself to this topic on the MQTT broker:
 
 ```
-config/<tenant>/<sensor_id>
+output/<tenant>/control
 ```
 
-When a new configuration is published on this topic, arduino node received the new one and process it. To save memory and make simple the process of this message on Arduino board, on this family the new configuration is sent ad CSV (Comma-Separated Values). For example the configuration has this parameter:
-- Polling time
-- NTP polling time
-
-The CSV will be:
+the new command will have the following format:
 
 ```
-10000;600000;
+{ "to":"<smartobject_id>\","msg": "<control_msg>","data": <data_filed> }
 ```
 
-The  Arduino board receives the new configuration as CSV line, saves it on the SD card and then loads the  changed parameters.
-At every boot of the Arduino the new configuration will be loaded from the SD card.
+where:
+- *smartobject_id*: the object identifier
+- *control_msg*: control message. At the moment it is support only WCONFIG (write new configuration in local file) and CONFIG (load configuration from file)
+- *data*: this field can contain some information or be empty. 
+
+**WCONFIG message**
+WCONFIG is used to change current configuration. The "data" field contains the new configuration as a CSV line. For example:
+```
+{"to":"550e8400-e29b-41d4-a716-446655440000","msg": "wconfig","data": {"sec": "time","csv": "15;300;"}}
+```
+This message will change the reading time for the sensor*550e8400-e29b-41d4-a716-446655440000* and the time interval to update the system time. This changes are not active, they will be only saved in the configuration file on the SD card. They will be active at the next boot.
+
+
+**CONFIG message**
+CONFIG is used to load the configuration from the SDcard. It is useful to update configuration after the WCONFIG message without rebooting the Arduino. This is an example:
+```
+{"to":"550e8400-e29b-41d4-a716-446655440000","msg": "config","data": ""}
+```
 
 **Note:**
 This features is work in progress. 
@@ -121,21 +140,10 @@ This version supports MQTT authentication. To use it, you must set up the follow
 #define PASSWORD "smartlab$1"
 ```
 
-This sketch uses the USERNAME value as *Client Identifier* and it sends it to the MQTT broker. Please check that it is unique.
-To not use MQTT authentication you have to comment the following line:
-
-```
-// Create connection with the SPD server
-/*
-MTTQClient.setUsername(USERNAME);
-MTTQClient.setPassword(PASSWORD);
-*/
-```
-
 This is an example of configuration (at the moment GPS location are not used):
 
 ```
-/******************************************************************************************
+//******************************************************************************************
  * Global configuration
  * In this section you can enable or disable feature of the node.
  *
@@ -156,8 +164,8 @@ This is an example of configuration (at the moment GPS location are not used):
  *
  * SECURE_JSON        : use secure json. Default value is 0 (not). Comment it if you want 
  *                      to use standard SDP JSON. 
- * CONFIGURATION      : change configuration runtime receiving the new one from the broker
- *                      MQTT (work in progress)
+ * CONTROL            : process control message coming from the broker MQTT (work in progress)
+ *
  ******************************************************************************************/
 //! Global macro value to define if network connection is cable or Wi-Fi
 #define WIFI 1
@@ -172,7 +180,7 @@ This is an example of configuration (at the moment GPS location are not used):
 //#define SECURE_JSON 1
 
 //! Global macro value to define if handle changing configuration form remote using the broker MQTT
-//#define CONFIGURATION 1
+//#define CONTROL 1
 
 
 
@@ -214,16 +222,17 @@ This is an example of configuration (at the moment GPS location are not used):
 #define ARDUINO_MAC_ADDRESS { 0xDE, 0xED, 0xBA, 0xDE, 0xFE, 0xED }
 
 //! Arduino IP address 
-#define ARDUINO_IP_ADDRESS  { 192, 168, 253, 229 } //{ 192,168, 0, 100 }
+#define ARDUINO_IP_ADDRESS  { 192, 168, 1, 100 } 
 
 //! IP address mask (usually this value) 
 #define NETWORK_SUBNET  { 255, 255, 255,0 };
 
 //! Default gateway (your router) 
-#define NETWORK_GATEWAY { 192, 168, 253, 254 };
+#define NETWORK_GATEWAY { 192, 168, 1, 254 };
 
-//! DNS address
-#define NETWORK_DNS  { 194, 116, 4, 64 };
+//! DNS address (e.g. 208.67.222.222 from open DNS)
+#define NETWORK_DNS  { 208, 67, 222, 222 };
+
 
 
 
@@ -245,10 +254,10 @@ This is an example of configuration (at the moment GPS location are not used):
 #define WIRELESS_TYPE 2
 
 // Wireless SSID
-#define WIRELESS_SSID "InlabTest2";
+#define WIRELESS_SSID "network";
 
 // Wireless key or password
-#define WIRELESS_KEY "1nl4b$4cc3ss-p01nt";
+#define WIRELESS_KEY "secret";
 
 // Wireless index (WEP code)
 #define WIRELESS_INDEX 0
@@ -265,7 +274,6 @@ This is an example of configuration (at the moment GPS location are not used):
  ******************************************************************************************/
 //! IP address of NTP server
 #define NTP_SERVER_IP { 193, 204, 114, 232 };
-//#define NTP_SERVER_IP { 194, 116, 4, 64 };
 
 
 
@@ -274,29 +282,22 @@ This is an example of configuration (at the moment GPS location are not used):
  * In this section you can set up the MQTT server configuration. If it is defined 
  * SDP_SERVER_AS_IP you have to set MQTT_SERVER_IP value, otherwise MQTT_SERVER_DOMAIN.
  *
- * MQTT_CLIENTID      : Client Identifier
- *
  * MQTT_SERVER_IP     : IP address of the MQTT server.
  *
  * MQTT_SERVER_DOMAIN : Doamin of the MQTT server.
  *
  ******************************************************************************************/
 //! IP address of MQTT broker
-//#define MQTT_SERVER_IP { 194, 116, 5, 164 };
-#define MQTT_SERVER_IP { 194, 116, 5, 191 };
-//#define MQTT_SERVER_IP { 158, 102, 203, 201 }; 
+#define MQTT_SERVER_IP { 192, 168, 1, 50 };
 
 //! domain of MQTT broker
 #define MQTT_SERVER_DOMAIN "stream.smartdatanet.it";
-
-//! Client Identifier
-#define MQTT_CLIENTID "Ardu0001"
 
 //! MQTT Username
 #define MQTT_USERNAME "smartlab"
 
 //! MQTT Username
-#define MQTT_PASSWORD "Ux0mu5it"
+#define MQTT_PASSWORD "smartlab$01"
 
 
 
@@ -308,7 +309,7 @@ This is an example of configuration (at the moment GPS location are not used):
  *
  * SENSOR_ANALOG_INPUT_PIN : Number if the analog input where the sensor is connected
  *
- * SENSOR_IDENTIFIER       : Identifier of the sensor
+ * SMRTOBJ_ID              : Identifier of the smartdata object
  *
  * STREAM_IDENTIFIER       : Identifier of the data stream
  *
@@ -328,7 +329,7 @@ This is an example of configuration (at the moment GPS location are not used):
 #define SENSOR_ANALOG_INPUT_PIN  0
 
 //! Sensor identifier
-#define SENSOR_IDENTIFIER  "550e8400-e29b-41d4-a716-446655440000"
+#define SMRTOBJ_ID  "550e8400-e29b-41d4-a716-446655440000"
 
 //! Sensor identifier
 #define STREAM_IDENTIFIER  "temperature"
@@ -377,6 +378,24 @@ This is an example of configuration (at the moment GPS location are not used):
 
 //#define HMAC_KEYWORD_LENGTH  25
 #define HMAC_KEYWORD_LENGTH  8
+
+
+/******************************************************************************************
+ * Configuration file system
+ * In this section you can se the configuration file system.
+ *
+ * CFG_DIRECTORY        : directory where configuration files are saved
+ *
+ * SEC_TIME             : filename for section "time"
+ *
+ ******************************************************************************************/
+//! Configuration directory
+#define CFG_DIRECTORY "/etc"
+
+//! filename for section time
+#define SEC_TIME_FN "time.cvs"
+
+
 
 ```
 

@@ -9,7 +9,6 @@
 #include "sdpsource.h"
 #include <WiFi.h>
 
-#include <aJSON.h>
 #include <sdppublishmsg.h>
 /*
 #include <MemoryFree.h>
@@ -20,17 +19,20 @@ using namespace sdp::client;
 const char* SDPSource::DEFAULT_ID = "ARDUINO";
 const char* SDPSource::DEFAULT_TENANT = "smartlab";
 const char* SDPSource::CONNECTION_TYPE = "input";
-const char* SDPSource::CONNECTION_TYPE_1 = "config";
+const char* SDPSource::CONNECTION_TYPE_1 = "output";
+const char* SDPSource::CONNECTION_TYPE_2 = "control";
 const char* SDPSource::DEFAULT_COMPONENT_LABEL = "c0";
 const char SDPSource::CONC_CHAR = '/';
-sdp::message::CSVLine* SDPSource::configuration = 0;
+
+char* SDPSource::CONTROL_MSG = 0;
+//sdp::message::CSVLine* SDPSource::configuration = 0;
 const uint16_t SDPSource::RBUF_SIZE = 128;
 
 SDPSource::SDPSource() :
-    m_isCopy(false), m_subclient(NULL), m_message(NULL), m_hmacKeylength(0)
+    m_isCopy(false), m_subclient(0), m_message(0), m_hmacKeylength(0)
 {
-  m_server = NULL;
-  m_netclient = NULL;
+  m_server = 0;
+  m_netclient = 0;
 
   memset(m_username, 0, USERNAME_SIZE);
   memset(m_password, 0, PASSWORD_SIZE);
@@ -43,7 +45,7 @@ SDPSource::SDPSource() :
 }
 
 SDPSource::SDPSource(SDPServer& server, Client& client, const char* id) :
-    m_isCopy(false), m_subclient(NULL), m_message(NULL), m_hmacKeylength(0)
+    m_isCopy(false), m_subclient(0), m_message(0), m_hmacKeylength(0)
 {
   this->m_server = &server;
   this->m_netclient = &client;
@@ -79,7 +81,7 @@ SDPSource::SDPSource(const SDPSource& s)
 
 SDPSource::~SDPSource()
 {
-  if (!m_isCopy && m_subclient != NULL)
+  if (!m_isCopy && m_subclient != 0)
   {
     delete (m_subclient);
   }
@@ -106,7 +108,7 @@ void SDPSource::setHMACKey(uint8_t * key, size_t length)
 
 int8_t SDPSource::connect()
 {
-  if (m_subclient == NULL)
+  if (m_subclient == 0)
   {
     if (m_server->isDefinedByIP())
     {
@@ -186,21 +188,9 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
 
   memcpy(&topic[cIndex], tenant, lenTenant);
   cIndex += lenTenant;
-/*
-  topic[cIndex++] = CONC_CHAR;
-
-  memcpy(&topic[cIndex], sensor.id(), lenSensorId);
-  cIndex += lenSensorId;
-  topic[cIndex++] = '_';
-  memcpy(&topic[cIndex++], stream.id(), lenStreamId);
-  Serial.print("topic: ");
-  Serial.println(topic);
-*/
-
-
 
   // Create JSON
-  sdp::message::PublishJSON json(stream.id(), sensor.id());
+  sdp::message::PublishJSON json(stream.id(), m_id);
   sdp::message::ValueJSON value(measure.timestamp(0), "valid");
 
   // Add components
@@ -210,10 +200,10 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
   }
   json.addValue(value);
 
-  if (m_message != NULL)
+  if (m_message != 0)
   {
     free(m_message);
-    m_message = NULL;
+    m_message = 0;
   }
 //  m_message = aJson.print(json.getJson());
 
@@ -241,7 +231,7 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
   Serial.println(m_message);
 
   uint8_t n = 0;
-  if (m_message != NULL)
+  if (m_message != 0)
   {
     n = m_subclient->publish(topic, m_message);
   }
@@ -250,7 +240,7 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
   {
     //Serial.println("free m_message");
     free(m_message);
-    m_message = NULL;
+    m_message = 0;
   }
   else
   {
@@ -289,10 +279,7 @@ uint8_t SDPSource::subscribe(const char* tenant, SDPStream& stream, GenericSenso
 
   topic[cIndex++] = CONC_CHAR;
 
-  memcpy(&topic[cIndex], sensor.id(), lenSensorId);
-  cIndex += lenSensorId;
-  topic[cIndex++] = '_';
-  memcpy(&topic[cIndex++], stream.id(), lenStreamId);
+  memcpy(&topic[cIndex], CONNECTION_TYPE_2, strlen(CONNECTION_TYPE_2));
 
   if (m_subclient->subscribe(topic))
   {
@@ -309,13 +296,15 @@ void SDPSource::callback(char* topic, byte* payload, unsigned int length)
   // constructing the PUBLISH packet.
 
   // Free the memory old buffer
-  if (configuration != 0)
-  {
-    delete(configuration);
-    configuration = 0;
-  }
+  deleteControlMsg();
 
   // Copy the payload to the new buffer
-  SDPSource::configuration = new sdp::message::CSVLine();
-  SDPSource::configuration->set((const char*) payload, length);
+  CONTROL_MSG = new char[length + 1];
+
+  if(CONTROL_MSG != 0)
+  {
+    memcpy(CONTROL_MSG, payload, length);
+    CONTROL_MSG[length] = 0;
+  }
+  //SDPSource::configuration->set((const char*) payload, length);
 }

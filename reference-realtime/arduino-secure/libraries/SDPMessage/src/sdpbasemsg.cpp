@@ -13,7 +13,7 @@ using namespace sdp::message;
 
 bool JSON::dump(Stream& stream)
 {
-  if (m_json == NULL)
+  if (m_json == 0)
     return false;
 
   char* string = aJson.print(m_json);
@@ -22,7 +22,7 @@ bool JSON::dump(Stream& stream)
   stream.print( " : " );
   stream.println( freeMemory() );
 */
-  if (string != NULL)
+  if (string != 0)
   {
     aJsonStream serial_stream(&stream);
     aJson.print(m_json, &serial_stream);
@@ -32,7 +32,7 @@ bool JSON::dump(Stream& stream)
     return false;
   }
 
-  if (string != NULL)
+  if (string != 0)
   {
     free(string);
   } else
@@ -40,6 +40,24 @@ bool JSON::dump(Stream& stream)
   }
   return true;
 }
+
+
+bool JSON::initialize(char* json)
+{
+  if (m_json != 0)
+  {
+    aJson.deleteItem(m_json);
+    m_json = 0;
+  }
+
+  if ( (m_json = aJson.parse(json)) == 0 )
+  {
+    return false;
+  }
+
+  return true;
+}
+
 
 SDPBaseMsg::SDPBaseMsg()
 {

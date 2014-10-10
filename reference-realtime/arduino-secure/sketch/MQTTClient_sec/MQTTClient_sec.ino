@@ -47,6 +47,7 @@
 #include <Base64.h>
 #include <aJSON.h>
 #include <sdppublishmsg.h>
+#include <sdpctrlmsg.h>
 
 #include <stringparser.h>
 #include <csvline.h>
@@ -64,7 +65,6 @@
 #include <MemoryFree.h>
 #endif
 
-#define CFG_FILENAME "config.csv"
 
 
 /******************************************************************************************
@@ -88,8 +88,8 @@
  *
  * SECURE_JSON        : use secure json. Default value is 0 (not). Comment it if you want 
  *                      to use standard SDP JSON. 
- * CONFIGURATION      : change configuration runtime receiving the new one from the broker
- *                      MQTT (work in progress)
+ * CONTROL            : process control message coming from the broker MQTT (work in progress)
+ *
  ******************************************************************************************/
 //! Global macro value to define if network connection is cable or Wi-Fi
 #define WIFI 1
@@ -104,7 +104,7 @@
 //#define SECURE_JSON 1
 
 //! Global macro value to define if handle changing configuration form remote using the broker MQTT
-//#define CONFIGURATION 1
+//#define CONTROL 1
 
 
 
@@ -206,8 +206,6 @@
  * In this section you can set up the MQTT server configuration. If it is defined 
  * SDP_SERVER_AS_IP you have to set MQTT_SERVER_IP value, otherwise MQTT_SERVER_DOMAIN.
  *
- * MQTT_CLIENTID      : Client Identifier
- *
  * MQTT_SERVER_IP     : IP address of the MQTT server.
  *
  * MQTT_SERVER_DOMAIN : Doamin of the MQTT server.
@@ -218,9 +216,6 @@
 
 //! domain of MQTT broker
 #define MQTT_SERVER_DOMAIN "stream.smartdatanet.it";
-
-//! Client Identifier
-#define MQTT_CLIENTID "Ardu0001"
 
 //! MQTT Username
 #define MQTT_USERNAME "smartlab"
@@ -238,7 +233,7 @@
  *
  * SENSOR_ANALOG_INPUT_PIN : Number if the analog input where the sensor is connected
  *
- * SENSOR_IDENTIFIER       : Identifier of the sensor
+ * SMRTOBJ_ID              : Identifier of the smartdata object
  *
  * STREAM_IDENTIFIER       : Identifier of the data stream
  *
@@ -258,7 +253,7 @@
 #define SENSOR_ANALOG_INPUT_PIN  0
 
 //! Sensor identifier
-#define SENSOR_IDENTIFIER  "550e8400-e29b-41d4-a716-446655440000"
+#define SMRTOBJ_ID  "550e8400-e29b-41d4-a716-446655440000"
 
 //! Sensor identifier
 #define STREAM_IDENTIFIER  "temperature"
@@ -309,6 +304,22 @@
 #define HMAC_KEYWORD_LENGTH  8
 
 
+/******************************************************************************************
+ * Configuration file system
+ * In this section you can se the configuration file system.
+ *
+ * CFG_DIRECTORY        : directory where configuration files are saved
+ *
+ * SEC_TIME             : filename for section "time"
+ *
+ ******************************************************************************************/
+//! Configuration directory
+#define CFG_DIRECTORY "/etc"
+
+//! filename for section time
+#define SEC_TIME_FN "time.cvs"
+
+
 
 //! Size of a local buffer used to store data read from Flash memory
 #define FLASH_BUFFER_SIZE 40
@@ -333,6 +344,9 @@ enum _error_code
 
   //! GPS position, invalid altitude
   GPS_INVALID_ALTITUDE = 102,
+  
+  //! SD Error
+  OPEN_SD_ERROR = 104,
 };
 
 
@@ -374,10 +388,20 @@ enum _sensor_index
   NODE_TENANT = 0,
   
   //! Index for flash sensor table to get sensor identifier 
-  SENSOR_ID = 1,
+  NODE_ID = 1,
 
   //! Index for flash sensor table to get stream identifier 
   STREAM_ID = 2,
+};
+
+
+enum _config_index
+{
+  //! Index for flash sensor table to get configuration directory
+  CFG_DIR = 0,
+  
+  //! Index for flash sensor table to get time configuration filename 
+  TIME_FN = 1,
 };
 
 /*
@@ -508,23 +532,14 @@ uint16_t serverPort = 1883;
 byte serverIP[4] = MQTT_SERVER_IP;
 
 //! domain of MQTT broker
-#ifdef CONFIGURATION
 sdp::client::SDPServer *MQTTserver = NULL;
-#else
-sdp::client::SDPServer MQTTserver(serverIP, serverPort);
-#endif
 
 #else
 //! domain of MQTT broker
 char *serverDomain = MQTT_SERVER_DOMAIN;
 
 //! domain of MQTT broker
-#ifdef CONFIGURATION
 sdp::client::SDPServer *MQTTserver = NULL;
-#else
-sdp::client::SDPServer MQTTserver(serverDomain, serverPort);
-#endif
-
 #endif
 
 
@@ -540,11 +555,7 @@ sdp::sensor::AnalogSensor sensor(SENSOR_ANALOG_INPUT_PIN);
 sdp::client::SDPStream stream;
 
 //! SDP source
-#ifdef CONFIGURATION
 sdp::client::SDPSource *MTTQClient= NULL;
-#else
-sdp::client::SDPSource MTTQClient(MQTTserver, client, MQTT_CLIENTID);
-#endif
 
 //! Smart object state
 uint8_t state = IDLE;
@@ -553,7 +564,7 @@ uint8_t state = IDLE;
 const char tenant[] PROGMEM = TENANT;
 
 //! Sensor Identifier
-const char sensor_id[] PROGMEM = SENSOR_IDENTIFIER;
+const char sensor_id[] PROGMEM = SMRTOBJ_ID;
 
 //! Stream Identifier
 const char stream_id[] PROGMEM = STREAM_IDENTIFIER;
@@ -565,6 +576,21 @@ const char* const node_table[] PROGMEM =
   sensor_id,
   stream_id,
 };
+
+
+//! configuration directory
+const char cfg_dir[] PROGMEM = CFG_DIRECTORY;
+
+//! Wireless network password
+const char time_fn[] PROGMEM = SEC_TIME_FN;
+
+//! Flash table for wireless configuration
+const char* const configuration_table[] PROGMEM =
+{   
+  cfg_dir,
+  time_fn,
+};
+
 
 uint8_t hmacKey[HMAC_KEYWORD_LENGTH] = HMAC_KEYWORD;
 
@@ -580,6 +606,9 @@ unsigned long tRead = 0;
 
 // NTP update  interval (in ms)
 unsigned long tNtpUpdate = 0;
+
+//! Node Error
+bool SDstate = true;
 
 
 /*------------------------------------------------------------------------------------
@@ -716,35 +745,27 @@ char* getFlashString(PROGMEM const char *string_table[], byte index);
 bool openSD(uint8_t board, uint8_t shield);
 
 /**
- * checkNewConfig
- * Checks if there isa new node configuration (received from the broker MQTT).
+ * checkControlMsg
+ * Checks if there i sa new control message to process (received from the broker MQTT).
  *
  * \return true: it is received a new configuration, false: no new configuration
  */
-bool checkNewConfig();
-
-/**
- * updateConfig
- * Loads the new configuration and save it on SD card.
- *
- * \return true: if no errors, false: othewise
- */
-bool updateConfig();
-
-/**
- * updateConfig
- * Loads the new configuration and save it on SD card.
- *
- * \return true: if no errors, false: othewise
- */
-bool updateConfig();
+bool checkControlMsg();
 
 /**
  * loadConfig
- * Loads configuration from SD card, if #CFG_FILENAME file is not present, it will be use the default values.
+ * Loads configuration from SD card, if configuration file is not present, it will be use the default values.
  *
  */
 void loadConfig();
+
+/**
+ * defaultConfig
+ * Loads default onfiguration.
+ *
+ */
+void defaultConfig();
+
 
 
 
@@ -770,20 +791,19 @@ void setup()
     Serial.println( F(" done.") );    
   }
 
-#ifdef CONFIGURATION
+#ifdef CONTROL
   Serial.println( );
   Serial.println( F("Load Configuration...") );
   loadConfig();
 #else
-  tRead = READ_SENSOR_PERIOD;
-  tNtpUpdate = UPDATE_TIME_PERIOD;
+  defaultConfig();
 #endif
 
   Serial.println( );
   Serial.println( F("Configure smart object...") );
   
   // Set up SDP structures (sensor, stream and node position)
-  sensor.setID(getFlashString((const char**) node_table, SENSOR_ID));
+  sensor.setID(/*getFlashString((const char**) node_table, NODE_ID)*/ "LM35");
   stream.setID(getFlashString((const char**) node_table, STREAM_ID));
   
   stream.setSensor(sensor);
@@ -818,32 +838,21 @@ void setup()
 
   
   // Create connection with the SPD server
-#ifdef CONFIGURATION
-
 #ifdef SDP_SERVER_AS_IP  
   MQTTserver = new sdp::client::SDPServer(serverIP, serverPort);
 #else
   MQTTserver = new sdp::client::SDPServer(serverDomain, serverPort);
 #endif
 
-  MTTQClient = new sdp::client::SDPSource(*MQTTserver, client, MQTT_CLIENTID);
+  MTTQClient = new sdp::client::SDPSource(*MQTTserver, client, getFlashString((const char**) node_table, NODE_ID));
   
   MTTQClient->setUsername(getFlashString((const char**) mqtt_table, MQTT_USER));
   MTTQClient->setPassword(getFlashString((const char**) mqtt_table, MQTT_PASS));
-#else
-  MTTQClient.setUsername(getFlashString((const char**) mqtt_table, MQTT_USER));
-  MTTQClient.setPassword(getFlashString((const char**) mqtt_table, MQTT_PASS));
-#endif
-  
  
 #ifdef SECURE_JSON
-#ifndef CONFIGURATION
-  MTTQClient.setHMACKey(hmacKey, HMAC_KEYWORD_LENGTH);
-#else
   MTTQClient->setHMACKey(hmacKey, HMAC_KEYWORD_LENGTH);
 #endif
-#endif
- //MTTQClient.connect();
+ //MTTQClient->connect();
 
   
   state = NTPUPDATE;
@@ -913,32 +922,20 @@ void loop()
       Serial.println( m.value() );
 
       // Check if client is connected with the server
-#ifdef CONFIGURATION
       if (MTTQClient->isConnected())
-#else
-      if (MTTQClient.isConnected())
-#endif
       {
         Serial.print ( F("Sending measurement... ") );
 
         // Publish measurement
         int n = 0;
-#ifdef CONFIGURATION
         if ( n = (MTTQClient->publish(stream, m, getFlashString((const char**) node_table, NODE_TENANT))) )
-#else
-        if ( n = (MTTQClient.publish(stream, m, getFlashString((const char**) node_table, NODE_TENANT))) )
-#endif
         {
          Serial.println( F("done") );
         }
         else
         {
           Serial.println( F("Failed") );
-#ifdef CONFIGURATION
           MTTQClient->disconnect();
-#else
-          MTTQClient.disconnect();
-#endif
           Serial.println( F("SDP broker disconnected!") );
         }
 
@@ -955,13 +952,9 @@ void loop()
       else
       {
         Serial.println( F("SDP no connection") );
-#ifdef CONFIGURATION
         if ( MTTQClient->connect() )
-#else
-        if ( MTTQClient.connect() )
-#endif
         {
-#ifdef CONFIGURATION      
+#ifdef CONTROL      
           if ( (MTTQClient->subscribe(getFlashString((const char**) node_table, NODE_TENANT), stream, sensor)) )
           {}
 #endif
@@ -984,24 +977,79 @@ Serial.println(freeMemory());
     case IDLE :
     {
       // Do nothing and check the following state
-      if (tReadTime.residualTime(tRead /*READ_SENSOR_PERIOD*/) == 0)
+      if (tReadTime.residualTime(tRead) == 0)
       {
         state = READ_SENSORS;
       }
-      else if (tNtpUpdateTime.residualTime(tNtpUpdate/*UPDATE_TIME_PERIOD*/) == 0)
+      else if (tNtpUpdateTime.residualTime(tNtpUpdate) == 0)
       {
         state = NTPUPDATE;
       }
-#ifdef CONFIGURATION
       MTTQClient->loop();
-#else
-      MTTQClient.loop();
-#endif
-#ifdef CONFIGURATION      
-      if ( checkNewConfig() )
+      
+#ifdef CONTROL  
+      if ( checkControlMsg() )
       {
-        updateConfig();
-        loadConfig();
+        sdp::message::SDPCtrlMsg msg;
+        msg.initialize(sdp::client::SDPSource::getControlMsg());
+        sdp::client::SDPSource::deleteControlMsg();
+        
+        msg.dump(Serial);
+        Serial.println();
+        
+        sdp::message::SDPCtrlMsgHandler ctrlHandler;
+        if ( ctrlHandler.isBroadcast(msg) || ctrlHandler.isToProcess( msg, (char*) MTTQClient->id()) )
+        {
+          switch (ctrlHandler.getType( msg ))
+          {
+            case 0 : { Serial.println(F("INVALID!")); }; break;
+            case 1 : { Serial.println(F("UPDATE")); }; break;
+            case 2 : { Serial.println(F("RESTART")); }; break;
+            case 3 : { Serial.println(F("ENABLE")); }; break;
+            case 4 : { Serial.println(F("FACTORY")); }; break;
+            case 5 : { Serial.println(F("STATUS")); }; break;
+            case 6 : { Serial.println(F("TEST")); }; break;
+            case 7 : { Serial.println(F("CALIBRATE")); }; break;
+            case 8 : { Serial.println(F("SYNC")); }; break;
+            case 9 : { Serial.println(F("RCONFIG")); }; break;
+            case 10 : { 
+              Serial.println(F("WCONFIG")); 
+              aJsonObject* data = msg.dataObj();
+              if ( data != 0 )
+              {
+                Serial.print( "Data field: " ); 
+                Serial.println( data->valuestring ); 
+                aJsonObject* sec = aJson.getObjectItem(msg.dataObj(), "sec");
+                aJsonObject* csv = aJson.getObjectItem(msg.dataObj(), "csv");
+                if (sec != 0)
+                  Serial.println( sec->valuestring ); 
+                if (csv != 0)
+                {
+                  Serial.println( csv->valuestring );  
+                  sdp::message::CSVLine configuration;
+                  configuration.set((const char*) csv->valuestring, strlen(csv->valuestring));
+                  sdp::client::SDPSource::saveConfiguration((char*) getFlashString((const char**) configuration_table, TIME_FN), configuration);
+                }
+
+              }
+            }; break;
+            case 11 : { 
+              Serial.println(F("CONFIG")); 
+              loadConfig();
+            }; break;
+            case 12 : { Serial.println(F("CMD")); }; break;
+            case 13 : { Serial.println(F("HISTORY")); }; break;
+            default : { Serial.println(F("INVALID!"));}; break;
+          }
+        }
+        else
+        {
+          Serial.println("It isn't for me!");
+        }
+        
+        Serial.print( F("freeMemory()=") );
+        Serial.println(freeMemory());
+
       }
 #endif
 
@@ -1338,26 +1386,17 @@ bool openSD(uint8_t board, uint8_t shield)
   return true;
 }
 
-#ifdef CONFIGURATION
-bool checkNewConfig()
+void defaultConfig()
 {
-  return (sdp::client::SDPSource::getConfiguration() != 0);
+  Serial.println( F("Default values") );
+  tRead = READ_SENSOR_PERIOD;
+  tNtpUpdate = UPDATE_TIME_PERIOD;
 }
 
-bool updateConfig()
+#ifdef CONTROL
+bool checkControlMsg()
 {
-  if ( checkNewConfig() )
-  {
-    Serial.println( F("New configuration") );
-    
-    if ( !sdp::client::SDPSource::saveConfiguration(CFG_FILENAME) )
-    {
-      Serial.println( F("Error while saving configurazion") );
-    }
-    sdp::client::SDPSource::deleteConfiguration();
-  }
-  
-  return true;
+  return (sdp::client::SDPSource::getControlMsg() != 0);
 }
 
 
@@ -1367,7 +1406,7 @@ const uint8_t cfgNF = 2;
 
 void loadConfig()
 {
-  if (SD.exists(CFG_FILENAME))
+  if (SD.exists((char*) getFlashString((const char**) configuration_table, TIME_FN)))
   {
 //    Serial.println( F("Load from SD") );
 
@@ -1375,7 +1414,7 @@ void loadConfig()
     size_t i = 0;
 
     sdp::message::CSVLine conf;
-    if (sdp::client::SDPSource::loadConfiguration( CFG_FILENAME, conf))
+    if (sdp::client::SDPSource::loadConfiguration((char*) getFlashString((const char**) configuration_table, TIME_FN), conf))
     {
       //check number of fields
       if ( conf.NF() == cfgNF)
@@ -1430,11 +1469,12 @@ void loadConfig()
       // close the file:
     }
     // if the file didn't open, print an error:
-      Serial.println( F("error opening") );
+      Serial.println( F("Error opening") );
   }
   else
   {
-    Serial.println( F("Default values") );
   }
+  defaultConfig();
 }
+
 #endif

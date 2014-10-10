@@ -62,25 +62,72 @@ namespace sdp
           m_isRoot = isRoot;
         }
 
+        /**
+         * Adds an element as couple of "label" and "value"
+         *
+         * \param[in] label label of the element to add
+         * \param[in] value value of the element to add (as char array)
+         *
+         * \return false if element is not added
+         */
         bool add(const char* label, const char* value)
         {
           aJsonObject* item = NULL;
           if ( ( item = aJson.createItem(value) ) == NULL )
           {
-            return NULL;
+            return false;
           }
 
           return aJson.addItemToObject(m_json, label, item );
         }
 
+        /**
+         * Adds an element as couple of "label" and "value"
+         *
+         * \param[in] label label of the element to add
+         * \param[in] value value of the element to add (as double)
+         *
+         * \return false if element is not added
+         */
         bool add(const char* label, double value)
         {
           return aJson.addNumberToObject( m_json, label, value );
         }
 
+        /**
+         * Prints the JSON on a stream element (e.g. serial)
+         *
+         * \param[in] label label of the element to add
+         * \param[in] value value of the element to add (as double)
+         *
+         * \return false if there is an error
+         */
         bool dump(Stream& stream);
 
+        /**
+         * Initializes message from a char array. This one contains the JSON.
+         *
+         * \param[in] json JSON string
+         *
+         * \return false if there is an error, true otherwise
+         */
+        bool initialize(char* json);
+
+        /**
+         * Gets the JSON object
+         *
+         * \return the JSON object
+         */
         aJsonObject* getJson() const { return m_json; }
+
+        /**
+         * Gets item selectiong it from the label
+         *
+         * \param[in] label label used to select the item
+         *
+         * \return item
+         */
+        aJsonObject* getItem(char* label) const { return aJson.getObjectItem(m_json, label); }
 
     };
 

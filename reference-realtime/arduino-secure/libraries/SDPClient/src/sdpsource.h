@@ -17,7 +17,9 @@
 #include "sdpserver.h"
 #include "sdpstream.h"
 #include "measure.h"
+#include <aJSON.h>
 
+#include "sdpctrlmsg.h"
 #include "csvline.h"
 
 // External include
@@ -41,8 +43,9 @@ namespace sdp
     class SDPSource
     {
       private:
-        //! Configuration buffer (received from server)
-        static sdp::message::CSVLine *configuration;
+
+        //! Control message (received from server)
+        static char* CONTROL_MSG;
 
       public:
         /**
@@ -68,7 +71,7 @@ namespace sdp
         enum _internal_parameter
         {
           //! Max size for client identifier
-          ID_SIZE = 24,
+          ID_SIZE = 38,
 
 /*
           //! Max size for message (or JSON) to send to the server
@@ -273,6 +276,9 @@ namespace sdp
         /// MQTT connection type (receive)
         static const char *CONNECTION_TYPE_1;
 
+        /// MQTT control queue
+        static const char *CONNECTION_TYPE_2;
+
         /// Character used to concatenate Sensor ID and stream ID
         static const char CONC_CHAR;
 
@@ -281,36 +287,36 @@ namespace sdp
 
       public:
         /**
-         * Gets configuration buffer.
+         * Gets control message (JSON object).
          *
-         * \return configuration buffer, 0 otherwise
+         * \return message buffer
          */
-        static sdp::message::CSVLine *getConfiguration()
+        static char* getControlMsg()
         {
-          return configuration;
+          return CONTROL_MSG;
         }
 
         /**
-         * Deletes configuration buffer.
+         * Deletes control message (JSON object).
          *
          */
-        static void deleteConfiguration()
+        static void deleteControlMsg()
         {
-          if (configuration != 0)
+          if (CONTROL_MSG != 0)
           {
-            delete configuration;
-            configuration = 0;
+            delete[] CONTROL_MSG;
+            CONTROL_MSG = 0;
           }
         }
 
         /**
-         * Gets configuration buffer.
+         * Save configuration (CVS) in a file.
          *
          * \param[in] filename name of the configuration file
          *
          * \return true if no error, false otherwise
          */
-        static bool saveConfiguration(char* filename)
+        static bool saveConfiguration(char* filename, sdp::message::CSVLine &conf)
         {
           // Save new configuration
           //    Serial.println( F("Save on SD") );
@@ -325,10 +331,10 @@ namespace sdp
           if (myFile)
           {
             for (size_t i = 0;
-                i < sdp::client::SDPSource::getConfiguration()->NF(); i++)
+                i < conf.NF(); i++)
             {
               myFile.print(
-                  sdp::client::SDPSource::getConfiguration()->getItem(i));
+                  conf.getItem(i));
               myFile.print(sdp::message::CSVLine::FS);
             }
             // close the file:
@@ -342,7 +348,6 @@ namespace sdp
           return true;
 
         }
-
 
         //! Size of an internal input buffer
         static  const uint16_t RBUF_SIZE;
