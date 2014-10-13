@@ -22,20 +22,55 @@ namespace sdp
   namespace message
   {
     /**
-     * Class Component model a component for a value
+     * Class ValueJSON model a the value field in the publish message
      *
      */
     class ValueJSON: public JSON
     {
+        //! JSON for the component field
         JSON m_components;
 
       public:
         //! Label components
-        static const char PROGMEM LABEL_COMPONENTS[];
-        
-        //! Labels table
-        static const char* const LABEL[] PROGMEM;
-//        static const char PROGMEM *LABEL[];
+        static const char LABEL_COMPONENTS[] PROGMEM;
+
+        //! Label for a valid measurement
+        static const char LABEL_VALID[] PROGMEM;
+
+        //! Label for a erroneous measurement
+        static const char LABEL_ERRONEOUS[] PROGMEM;
+
+        //! Label for a doubtful measurement
+        static const char LABEL_DOUBTFUL[] PROGMEM;
+
+        //! Label for a unknown measurement
+        static const char LABEL_UNKNOWN[] PROGMEM;
+
+        //! Flash table for wireless configuration
+        static const char* const VALUE_TABLE[] PROGMEM;
+
+        /**
+         * \enum   _value_table_index
+         *
+         * Index of the elements in the value_table
+         */
+        enum _value_table_index
+        {
+          //! Valid value
+          VALID = 0,
+
+          //! Erroneous value
+          ERRONEOUS = 1,
+
+          //! Doubtful value
+          DOUBTFUL = 2,
+
+          //! Unknown validity for the value
+          UNKNOWN = 3,
+
+          //! Component value
+          COMPONENT = 4,
+        };
 
         /**
          * Default Constructor.
@@ -46,7 +81,10 @@ namespace sdp
           aJsonObject* p = m_components.getJson();
           char lcomponents[15] = { 0 };
 
-          strcpy_P(lcomponents, (char*)pgm_read_word(&(LABEL[0])));
+          memset(lcomponents, 0, 15);
+          strcpy_P(lcomponents,
+              (char*) pgm_read_word(&(VALUE_TABLE[COMPONENT])));
+
           if (p != NULL)
           {
             m_components.setAsRoot(false);
@@ -57,19 +95,25 @@ namespace sdp
         /**
          * Constructor.
          *
+         * \param[in] time time stamp for the measurement
+         * \param[in] validity validity field
          */
-        ValueJSON(const char* time, char* validity)
+        ValueJSON(const char* time, int validity)
         {
           aJsonObject* p = m_components.getJson();
-          char lcomponents[15] = { 0 };
+          char lbuffer[15] = { 0 };
 
-          strcpy_P(lcomponents, (char*)pgm_read_word(&(LABEL[0])));
+          memset(lbuffer, 0, 15);
+          strcpy_P(lbuffer,
+              (char*) pgm_read_word(&(VALUE_TABLE[COMPONENT])));
+
           if (p != NULL)
           {
             add("time", time);
             m_components.setAsRoot(false);
-            aJson.addItemToObject(m_json, lcomponents, p);
-            add("validity", validity);
+            aJson.addItemToObject(m_json, lbuffer, p);
+            getValilidity(validity, lbuffer, 15);
+            add("validity", lbuffer);
           } else
           {
           }
@@ -84,9 +128,13 @@ namespace sdp
         }
 
         /**
-         * adds components
+         * Adds a component
+         *
+         * \param[in] label label of the component
+         * \param[in] value value as string
+         *
+         * \retrun false if there is an error, true otherwise
          */
-
         bool addComponent(const char* label, const char* value)
         {
           if (m_components.getJson() == NULL)
@@ -101,6 +149,14 @@ namespace sdp
           return true;
         }
 
+        /**
+         * Adds a component
+         *
+         * \param[in] label label of the component
+         * \param[in] value value as double
+         *
+         * \retrun false if there is an error, true otherwise
+         */
         bool addComponent(const char* label, double value)
         {
           if (m_components.getJson() == NULL)
@@ -115,10 +171,59 @@ namespace sdp
           return true;
         }
 
+      private:
+        /**
+         * Gets the quality of the measurement ad a string
+         *
+         * \param[in] validity quality of the value
+         * \param[in] buffer char array where the validity will be stored as a string
+         * \param[in] bSize size of the buffer
+         *
+         * \retrun false if there is an error, true otherwise
+         */
+        bool getValilidity(uint16_t validity, char* buffer, size_t bSize = 15)
+        {
+          bool ret = true;
+          memset(buffer, 0, bSize);
+
+          switch (validity)
+          {
+            case VALID:
+            case ERRONEOUS:
+            case DOUBTFUL:
+            case UNKNOWN:
+            {
+              ret = true;
+            }
+              ;
+              break;
+            default:
+            {
+              ret = false;
+            }
+              ;
+              break;
+          };
+
+          if (ret)
+          {
+            strncpy_P(buffer, (char*) pgm_read_word(&(VALUE_TABLE[validity])),
+                bSize);
+          } else
+          {
+            strncpy_P(buffer, (char*) pgm_read_word(&(VALUE_TABLE[UNKNOWN])),
+                bSize);
+          }
+
+          return ret;
+
+        }
+        ;
+
     };
 
     /**
-     * Class Component model a component for a value
+     * Class PublishJSON model a SDP publish message
      *
      */
     class PublishJSON: public JSON
@@ -129,19 +234,15 @@ namespace sdp
       public:
         //! Label values
         static const char PROGMEM LABEL_VALUES[];
-//        static prog_char LABEL_VALUES[] PROGMEM;
 
         //! Label stream
         static const char PROGMEM LABEL_STREAM[];
-//        static prog_char LABEL_STREAM[] PROGMEM;
 
         //! Label sensor
         static const char PROGMEM LABEL_SENSOR[];
-//        static prog_char LABEL_SENSOR[] PROGMEM;
 
         //! Labels table
         static const char* const LABEL[] PROGMEM;
-//        static PROGMEM const char *LABEL[];
 
         /**
          * Default Constructor.
@@ -152,7 +253,7 @@ namespace sdp
         {
           char lvalues[10] = { 0 };
 
-          strcpy_P(lvalues, (char*)pgm_read_word(&(LABEL[0])));
+          strcpy_P(lvalues, (char*) pgm_read_word(&(LABEL[0])));
           m_values = aJson.createArray();
           aJson.addItemToObject(m_json, lvalues, m_values);
         }
@@ -160,29 +261,25 @@ namespace sdp
         /**
          * Constructor.
          *
+         *
+         * \param[in] stream identifier of the stream
+         * \param[in] smartObj identifier of the smartobject
          */
-        PublishJSON(const char* stream, const char* sensor)
+        PublishJSON(const char* stream, const char* smartObj)
         {
           char label[10] = { 0 };
 
           setAsRoot(true);
-          strcpy_P(label, (char*)pgm_read_word(&(LABEL[1])));
+          strcpy_P(label, (char*) pgm_read_word(&(LABEL[1])));
 
           add(label, stream);
-          strcpy_P(label, (char*)pgm_read_word(&(LABEL[2])));
-          add(label, sensor);
+          strcpy_P(label, (char*) pgm_read_word(&(LABEL[2])));
+          add(label, smartObj);
 
           m_values = aJson.createArray();
 
-          strcpy_P(label, (char*)pgm_read_word(&(LABEL[0])));
+          strcpy_P(label, (char*) pgm_read_word(&(LABEL[0])));
           aJson.addItemToObject(m_json, label, m_values);
-        }
-
-        bool addValue(ValueJSON &value)
-        {
-          aJson.addItemToArray(m_values, value.getJson());
-          value.setAsRoot(false);
-          return true;
         }
 
         /**
@@ -194,10 +291,25 @@ namespace sdp
         }
         ;
 
+        /**
+         * Adds a value to the JSON
+         *
+         * \param[in] value value object
+         *
+         * \return true if there is not error
+         */
+        bool addValue(ValueJSON &value)
+        {
+          aJson.addItemToArray(m_values, value.getJson());
+          value.setAsRoot(false);
+          return true;
+        }
+        ;
+
     };
 
     /**
-     * Class Component model a component for a value
+     * Class SecureJSON model a proposal SDP publish message in secure format
      *
      */
     class SecureJSON: public JSON
@@ -215,15 +327,12 @@ namespace sdp
         };
 
         //! Label values
-//        static prog_char LABEL_MESSAGE[] PROGMEM;
         static const char PROGMEM LABEL_MESSAGE[];
 
         //! Label stream
-//        static prog_char LABEL_DIGEST[] PROGMEM;
         static const char PROGMEM LABEL_DIGEST[];
 
         //! Labels table
-//        static PROGMEM const char *LABEL[];
         static const char* const LABEL[] PROGMEM;
 
         /**
@@ -301,10 +410,10 @@ namespace sdp
           json.setAsRoot(false);
           aJsonObject* p = json.getJson();
 
-          strcpy_P(label, (char*)pgm_read_word(&(LABEL[0])));
+          strncpy_P(label, (char*) pgm_read_word(&(LABEL[0])), 10);
           aJson.addItemToObject(m_json, label, p);
 
-          strcpy_P(label, (char*)pgm_read_word(&(LABEL[1])));
+          strncpy_P(label, (char*) pgm_read_word(&(LABEL[1])), 10);
           add(label, resultB64);
           /*
            Serial.print( F("freeMemory()=") );

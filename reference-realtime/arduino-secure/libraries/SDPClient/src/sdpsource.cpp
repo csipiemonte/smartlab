@@ -191,7 +191,18 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
 
   // Create JSON
   sdp::message::PublishJSON json(stream.id(), m_id);
-  sdp::message::ValueJSON value(measure.timestamp(0), "valid");
+
+  int validity = 0;
+  switch (measure.quality())
+  {
+    case sdp::sensor::Measure::VALID : { validity = sdp::message::ValueJSON::VALID; }; break;
+    case sdp::sensor::Measure::ERRONEOUS : { validity = sdp::message::ValueJSON::ERRONEOUS; }; break;
+    case sdp::sensor::Measure::DOUBTFUL : { validity = sdp::message::ValueJSON::DOUBTFUL; }; break;
+    case sdp::sensor::Measure::UNKNOWN : { validity = sdp::message::ValueJSON::UNKNOWN; }; break;
+    default : { validity = sdp::message::ValueJSON::UNKNOWN;}
+  }
+
+  sdp::message::ValueJSON value(measure.timestamp(0), validity);
 
   // Add components
   if ( !value.addComponent(DEFAULT_COMPONENT_LABEL, measure.value()) )

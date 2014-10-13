@@ -328,7 +328,9 @@
 /*------------------------------------------------------------------------------------
 /* Enum and type definiton
 /*------------------------------------------------------------------------------------*/
-/*
+/**
+ * \enum   _error_code
+ *
  * Running errors code
  */
 enum _error_code
@@ -350,6 +352,11 @@ enum _error_code
 };
 
 
+/**
+ * \enum   _node_state
+ *
+ * State of the node
+ */
 enum _node_state
 {
   //! Idle, do nothing
@@ -364,6 +371,11 @@ enum _node_state
 };
 
 
+/**
+ * \enum   _wireless_index
+ *
+ * Index of the table where wireless information are stored (FLASH memory)
+ */
 enum _wireless_index
 {
   //! Index for flash wireless table to get ssid
@@ -373,6 +385,12 @@ enum _wireless_index
   W_KEY = 1,
 };
 
+
+/**
+ * \enum   _mqtt_index
+ *
+ * Index of the table where MQTT information are stored (FLASH memory)
+ */
 enum _mqtt_index
 {
   //! Index for flash MQTT table to get username
@@ -382,7 +400,13 @@ enum _mqtt_index
   MQTT_PASS = 1,
 };
 
-enum _sensor_index
+
+/**
+ * \enum   _smartdata_obj_index
+ *
+ * Index of the table where Smartdata object information are stored (FLASH memory)
+ */
+enum _smartdata_obj_index
 {
   //! Index for flash sensor table to get tenant
   NODE_TENANT = 0,
@@ -395,6 +419,11 @@ enum _sensor_index
 };
 
 
+/**
+ * \enum   _config_index
+ *
+ * Index of the table where path of configuration files are stored (FLASH memory)
+ */
 enum _config_index
 {
   //! Index for flash sensor table to get configuration directory

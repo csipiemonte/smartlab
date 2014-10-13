@@ -11,13 +11,28 @@
 
 using namespace sdp::message;
 
-const char PROGMEM ValueJSON::LABEL_COMPONENTS[] = "components";
-//prog_char ValueJSON::LABEL_COMPONENTS[] PROGMEM  = {"components"};
+const char ValueJSON::LABEL_COMPONENTS[] PROGMEM = "components";
 
-//const char* PROGMEM ValueJSON::LABEL[] =       // change "string_table" name to suit
-const char* const ValueJSON::LABEL[] PROGMEM = 
+//! Label for a valid measurement
+const char ValueJSON::LABEL_VALID[] PROGMEM = "valid";
+
+//! Label for a erroneous measurement
+const char ValueJSON::LABEL_ERRONEOUS[] PROGMEM = "erroneous";
+
+//! Label for a doubtful measurement
+const char ValueJSON::LABEL_DOUBTFUL[] PROGMEM = "doubtful";
+
+//! Label for a unknown measurement
+const char ValueJSON::LABEL_UNKNOWN[] PROGMEM = "unknown";
+
+//! Flash table for wireless configuration
+const char* const ValueJSON::VALUE_TABLE[] PROGMEM =
 {
-    LABEL_COMPONENTS
+    LABEL_VALID,
+    LABEL_ERRONEOUS,
+    LABEL_DOUBTFUL,
+    LABEL_UNKNOWN,
+    LABEL_COMPONENTS,
 };
 
 const char PROGMEM PublishJSON::LABEL_VALUES[] = "values";

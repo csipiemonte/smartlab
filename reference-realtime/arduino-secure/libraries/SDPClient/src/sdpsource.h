@@ -73,10 +73,6 @@ namespace sdp
           //! Max size for client identifier
           ID_SIZE = 38,
 
-/*
-          //! Max size for message (or JSON) to send to the server
-          MSG_SIZE = 1024,
-*/
           //! Max size for username
           USERNAME_SIZE = 15,
 
@@ -266,6 +262,8 @@ namespace sdp
           else
             return false;
         }
+        ;
+
       protected:
         /// Separator field (constant string)
         static const char *DEFAULT_TENANT;
@@ -313,6 +311,7 @@ namespace sdp
          * Save configuration (CVS) in a file.
          *
          * \param[in] filename name of the configuration file
+         * \param[in] conf configuration as a line CSV
          *
          * \return true if no error, false otherwise
          */
@@ -330,11 +329,9 @@ namespace sdp
           // if the file opened okay, write to it:
           if (myFile)
           {
-            for (size_t i = 0;
-                i < conf.NF(); i++)
+            for (size_t i = 0; i < conf.NF(); i++)
             {
-              myFile.print(
-                  conf.getItem(i));
+              myFile.print(conf.getItem(i));
               myFile.print(sdp::message::CSVLine::FS);
             }
             // close the file:
@@ -350,8 +347,7 @@ namespace sdp
         }
 
         //! Size of an internal input buffer
-        static  const uint16_t RBUF_SIZE;
-
+        static const uint16_t RBUF_SIZE;
 
         /**
          * Loads configuration from the configuration file (it reads only the first line).
@@ -365,7 +361,7 @@ namespace sdp
         {
           char rBuffer[RBUF_SIZE];
           File myFile = SD.open(filename, FILE_READ);
-          memset(rBuffer, 0, sizeof(char)*RBUF_SIZE);
+          memset(rBuffer, 0, sizeof(char) * RBUF_SIZE);
 
           // if the file opened okay, read it and get only the first line
           if (myFile)

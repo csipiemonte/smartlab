@@ -40,6 +40,29 @@ namespace sdp
           IOT = 1,
         };
 
+
+        /**
+         * \enum _measurement_quality
+         *
+         * Index of the elements in the value_table
+         */
+        enum _measurement_quality
+        {
+          //! Valid value
+          VALID = 0,
+
+          //! Erroneous value
+          ERRONEOUS = 1,
+
+          //! Doubtful value
+          DOUBTFUL = 2,
+
+          //! Unknown validity for the value
+          UNKNOWN = 3,
+
+        };
+
+
         /**
          * Default Constructor
          *
@@ -97,6 +120,14 @@ namespace sdp
             byte &coord);
 
         /**
+         * Sets the quality of the measurement
+         *
+         * \param[in] quality  of the measurement
+         *
+         */
+        void setQuality(uint8_t quality);
+
+        /**
          * Gets the measurement value
          *
          * \return value of the measurement as float
@@ -124,6 +155,13 @@ namespace sdp
          */
         const GPSPosition& position() const;
 
+        /**
+         * Gets the quality of measurement.
+         *
+         * \return quality of measurement
+         */
+        const uint8_t quality() const;
+
       private:
         //! Measure value (ad float)
         float m_value;
@@ -136,6 +174,9 @@ namespace sdp
 
         //! buffer used to get timestamp as a string
         char m_buffer[BUFFER_SIZE];
+
+        //! measurement quality
+        uint8_t m_quality;
 
     };
 
@@ -152,6 +193,11 @@ namespace sdp
     inline const GPSPosition& Measure::position() const
     {
       return m_position;
+    }
+
+    inline const uint8_t Measure::quality() const
+    {
+      return m_quality;
     }
 
     inline void Measure::setValue(float value)

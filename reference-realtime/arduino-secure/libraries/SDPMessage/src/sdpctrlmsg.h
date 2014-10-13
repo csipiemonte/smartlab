@@ -1,22 +1,8 @@
-/*
- * Copyright (C) 2014 CSP Innovazione nelle ICT s.c.a r.l. (http://www.csp.it/)
- * All rights reserved.
+/**
+ * \file sdpctrlmsg.h
+ * \brief Arduino Library for describes a SDP control message.
  *
- * All information contained herein is, and remains the property of
- * CSP Innovazione nelle ICT s.c.a r.l. and its suppliers, if any.
- * The intellectual and technical concepts contained herein are proprietary to
- * CSP Innovazione nelle ICT s.c.a r.l. and its suppliers and may be covered
- * by Italian and Foreign Patents, in process, and are protected by trade secret
- * or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from CSP Innovazione nelle ICT s.c.a r.l.
- *
- * sdpctrlmsg.h
- *         <description>
- *
- * Authors:
- *         Marco Boeris Frusca <marco.boeris@csp.it>
+ * \author Marco Boeris Frusca
  *
  */
 
@@ -33,25 +19,68 @@ namespace sdp
   namespace message
   {
 
+    /**
+     * Class SDPCtrlMsg model a proposal SDP control message
+     *
+     */
     class SDPCtrlMsg: public JSON
     {
       public:
+        /**
+         * Default Constructor.
+         *
+         */
         SDPCtrlMsg();
+
+        /**
+         * Destructor
+         *
+         */
         virtual ~SDPCtrlMsg();
 
+        /**
+         * Get field "to" from the control message as a char array
+         *
+         * \return field "to" or 0 if error
+         */
         char* to();
 
+        /**
+         * Get field "msg" from the control message as a char array
+         *
+         * \return field "msg" or 0 if error
+         */
         char* msg();
 
+        /**
+         * Get field "data" from the control message as a char array
+         *
+         * \return field "data" or 0 if error
+         */
         char* data();
 
+        /**
+         * Get field "data" from the control message ad object JSON
+         *
+         * \return field "data" or 0 if error
+         */
         aJsonObject* dataObj();
 
+        /**
+         * Check if the control message is broadcast (for all node) or not
+         *
+         * \return true if the message is broadcastm false otherwise
+         */
         bool isToAll();
 
       private:
+        //! field "to"
         aJsonObject* m_to;
+
+        //! field "msg"
         aJsonObject* m_msg;
+
+        //! field "data"
         aJsonObject* m_data;
 
     };
@@ -60,11 +89,11 @@ namespace sdp
     {
       public:
         /**
-         * \enum    _sdpctrlmsg_type_error
+         * \enum    _sdpctrlmsg_type
          *
          * Message type
          */
-        enum _sdpsource_error
+        enum _sdpctrlmsg_type
         {
           //! Unknown commad
           INVALID = 0,
@@ -109,24 +138,60 @@ namespace sdp
           HISTORY = 13,
         };
 
+        //! Control message 0
         static const char cmd0[] PROGMEM;
+
+        //! Control message 1
         static const char cmd1[] PROGMEM;
+
+        //! Control message 2
         static const char cmd2[] PROGMEM;
+
+        //! Control message 3
         static const char cmd3[] PROGMEM;
+
+        //! Control message 4
         static const char cmd4[] PROGMEM;
+
+        //! Control message 5
         static const char cmd5[] PROGMEM;
+
+        //! Control message 6
         static const char cmd6[] PROGMEM;
+
+        //! Control message 7
         static const char cmd7[] PROGMEM;
+
+        //! Control message 8
         static const char cmd8[] PROGMEM;
+
+        //! Control message 9
         static const char cmd9[] PROGMEM;
+
+        //! Control message 10
         static const char cmd10[] PROGMEM;
+
+        //! Control message 11
         static const char cmd11[] PROGMEM;
+
+        //! Control message 12
         static const char cmd12[] PROGMEM;
+
+        //! Number of the control message supported (13 + invalid)
         static const uint8_t N_TYPE = 14;
 
         static const char* const crtl_msg_type[] PROGMEM;
 
+        /**
+         * Default Constructor.
+         *
+         */
         SDPCtrlMsgHandler() {};
+
+        /**
+         * Destructor
+         *
+         */
         virtual ~SDPCtrlMsgHandler() {};
 
         /**
@@ -154,6 +219,13 @@ namespace sdp
            return ( strcmp(msg.to(), id) == 0 );
         }
 
+        /**
+         * Gets the type of the control message from the msg field following #_sdpctrlmsg_type format
+         *
+         * \param[in] msg control message
+         *
+         * \return type of the control message following #_sdpctrlmsg_type format
+         */
         uint8_t getType( sdp::message::SDPCtrlMsg &msg );
 
 

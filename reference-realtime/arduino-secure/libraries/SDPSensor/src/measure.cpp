@@ -11,7 +11,7 @@
 using namespace sdp::sensor;
 
 Measure::Measure() :
-    m_value(0), m_timestamp(0.0)
+    m_value(0), m_timestamp(0.0), m_quality(VALID)
 
 {
   memset(m_buffer, 0, BUFFER_SIZE);
@@ -24,6 +24,7 @@ Measure::Measure(const Measure &m)
   m_timestamp = m.m_timestamp;
   memcpy(m_buffer, m.m_buffer, BUFFER_SIZE);
   m_position = m.m_position;
+  m_quality = m.m_quality;
 }
 
 Measure::~Measure()
@@ -112,4 +113,25 @@ int Measure::setPosition(char* latitude, char* longitude, char* altitude,
     coord = 0;
   }
   return err;
+}
+
+void Measure::setQuality(uint8_t quality)
+{
+  switch (quality)
+  {
+    case VALID:
+    case ERRONEOUS:
+    case DOUBTFUL:
+    case UNKNOWN:
+    {
+      m_quality = quality;
+    }
+      ;
+      break;
+    default:
+    {
+      m_quality = UNKNOWN;
+    }
+  };
+
 }
