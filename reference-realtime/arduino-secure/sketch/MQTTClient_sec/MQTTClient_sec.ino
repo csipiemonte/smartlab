@@ -875,7 +875,7 @@ void setup()
 #ifdef SECURE_JSON
   MTTQClient->setHMACKey(hmacKey, HMAC_KEYWORD_LENGTH);
 #endif
-  ConnectToBroker();
+  //ConnectToBroker();
 
   
   currentStatus = sdp::client::SmartObjStatus::UPDATE_TIME;
@@ -1038,10 +1038,7 @@ void startNetwork()
   if( !wifiHandler.connect() )
   {
     Serial.println( F("Error: no wireless connection!") );
-    for ( ; ; )
-    {
-      delay(5000);
-    }
+    return ;
   }
 
   Serial.println( F("Connected to wifi") );
@@ -1055,10 +1052,7 @@ void startNetwork()
     {
       Serial.println(F ("Failed to configure Ethernet using DHCP") );
       // no point in carrying on, so do nothing forevermore:
-      for (;;)
-      { 
-        delay(5000);
-      }
+      return;
     }
   }
   else
@@ -1442,6 +1436,11 @@ void readSensors()
 
 void sendMeasures()
 {
+#ifdef WIFI
+      // Reset wifi 
+      Serial.println( F("Reconnecting wifi...") );
+      wifiHandler.refresh();
+#endif      
 
       // Index of GPS coordinate, it is used to know which coordinate is in wrong format 
       byte coordIndex = 0;
@@ -1474,17 +1473,22 @@ void sendMeasures()
         // Check if the data transmission failed
         if (!n)
         {
+/*          
 #ifdef WIFI
           // Reset wifi 
           Serial.println( F("Reconnecting wifi...") );
           wifiHandler.refresh();
 #endif      
+*/
         }
       }
       else
       {
         Serial.println( F("SDP no connection") );
-        ConnectToBroker();
+        if ( wifiHandler.isConnect() )
+        {
+          ConnectToBroker();
+        }
       }
       printMemoryInfo();
 }

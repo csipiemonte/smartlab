@@ -248,6 +248,13 @@ class WiFiManager
     bool connect();
 
     /**
+     * Gets connection status
+     *
+     * \return true if connected, false otherwise
+     */
+    bool isConnect() {return WiFi.status() == WL_CONNECTED;};
+
+    /**
      * Checks if the wireless connection is active. If there is no connection, a new
      * connect operation will be done.
      *

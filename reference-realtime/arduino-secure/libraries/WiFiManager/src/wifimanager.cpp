@@ -124,7 +124,9 @@ bool WiFiManager::refresh()
       delay(1000);
     }
 
-    while (connect())
+    uint8_t n = 0;
+
+    while (!connect() && n++ < 1)
     {
       wdt_reset();
       delay(1000);
