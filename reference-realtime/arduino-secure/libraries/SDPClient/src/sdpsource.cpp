@@ -8,7 +8,7 @@
  */
 #include "sdpsource.h"
 #include <WiFi.h>
-
+#include <stringparser.h>
 #include <sdppublishmsg.h>
 /*
 #include <MemoryFree.h>
@@ -16,11 +16,20 @@
 
 using namespace sdp::client;
 
+const char SDPSource::CONN_DIRECTION_I[] PROGMEM = "input";
+const char SDPSource::CONN_DIRECTION_O[] PROGMEM = "output";
+const char SDPSource::ATTR_CONTROL[] PROGMEM = "control";
+
+PGM_P const SDPSource::SOURCE_TABLE_P[] PROGMEM =
+{
+    SDPSource::CONN_DIRECTION_I,
+    SDPSource::CONN_DIRECTION_O,
+    SDPSource::ATTR_CONTROL,
+};
+
+
 const char* SDPSource::DEFAULT_ID = "ARDUINO";
-const char* SDPSource::DEFAULT_TENANT = "smartlab";
-const char* SDPSource::CONNECTION_TYPE = "input";
-const char* SDPSource::CONNECTION_TYPE_1 = "output";
-const char* SDPSource::CONNECTION_TYPE_2 = "control";
+
 const char* SDPSource::DEFAULT_COMPONENT_LABEL = "c0";
 const char SDPSource::CONC_CHAR = '/';
 
@@ -29,34 +38,54 @@ char* SDPSource::CONTROL_MSG = 0;
 const uint16_t SDPSource::RBUF_SIZE = 128;
 
 SDPSource::SDPSource() :
-    m_isCopy(false), m_subclient(0), m_message(0), m_hmacKeylength(0)
+    m_isCopy(false), m_subclient(0), m_message(0), m_hmacKeylength(0), m_id(0), m_username(0), m_password(0)
 {
   m_server = 0;
   m_netclient = 0;
 
-  memset(m_username, 0, USERNAME_SIZE);
-  memset(m_password, 0, PASSWORD_SIZE);
+  // Set source ID
+  size_t maxSize = strlen(DEFAULT_ID) + 1;
+  StringParser::initBuffer(m_id, (char*) DEFAULT_ID, maxSize);
+
+  // Set username and password
+  maxSize = 2;
+  StringParser::initBuffer(m_username, (char*) "", maxSize);
+  StringParser::initBuffer(m_password, (char*) "", maxSize);
+  //memset(m_username, 0, USERNAME_SIZE);
+  //memset(m_password, 0, PASSWORD_SIZE);
 
   memset(m_hmacKey, 0, HMAC_KEY_SIZE);
 
+/*
 //  memset(m_message, 0, MSG_SIZE);
   memset(m_id, 0, ID_SIZE);
   memcpy(m_id, DEFAULT_ID, strlen(DEFAULT_ID));
+*/
 }
 
 SDPSource::SDPSource(SDPServer& server, Client& client, const char* id) :
-    m_isCopy(false), m_subclient(0), m_message(0), m_hmacKeylength(0)
+    m_isCopy(false), m_subclient(0), m_message(0), m_hmacKeylength(0), m_id(0), m_username(0), m_password(0)
 {
   this->m_server = &server;
   this->m_netclient = &client;
 
-  memset(m_username, 0, USERNAME_SIZE);
-  memset(m_password, 0, PASSWORD_SIZE);
-  memset(m_hmacKey, 0, HMAC_KEY_SIZE);
+  // Set source ID
+  size_t maxSize = strlen(id) + 1;
+  StringParser::initBuffer(m_id, (char*) id, maxSize);
 
+  // Set username and password
+  maxSize = 2;
+  StringParser::initBuffer(m_username, (char*) "", maxSize);
+  StringParser::initBuffer(m_password, (char*) "", maxSize);
+  //memset(m_username, 0, USERNAME_SIZE);
+  //memset(m_password, 0, PASSWORD_SIZE);
+
+  memset(m_hmacKey, 0, HMAC_KEY_SIZE);
+/*
   //memset(m_message, 0, MSG_SIZE);
   memset(m_id, 0, ID_SIZE);
   memcpy(m_id, id, strlen(id));
+*/
 }
 
 SDPSource::SDPSource(const SDPSource& s)
@@ -69,8 +98,12 @@ SDPSource::SDPSource(const SDPSource& s)
   m_message = s.m_message;
   m_hmacKeylength = s.m_hmacKeylength;
 
-  memcpy(m_username, s.m_username, USERNAME_SIZE);
-  memcpy(m_password, s.m_password, PASSWORD_SIZE);
+  m_id = s.m_id;
+  m_username = s.m_username;
+  m_password = s.m_password;
+
+  //memcpy(m_username, s.m_username, USERNAME_SIZE);
+  //memcpy(m_password, s.m_password, PASSWORD_SIZE);
   memcpy(m_hmacKey, s.m_hmacKey, HMAC_KEY_SIZE);
 
 /*
@@ -84,15 +117,26 @@ SDPSource::~SDPSource()
   if (!m_isCopy && m_subclient != 0)
   {
     delete (m_subclient);
+    StringParser::delBuffer(m_id);
+    StringParser::delBuffer(m_username);
+    StringParser::delBuffer(m_password);
   }
 }
 
-void SDPSource::setId(char * id)
+bool SDPSource::setId(char * id)
 {
-  memset(m_id, 0, ID_SIZE);
-  memcpy(m_id, id, strlen(id));
-
+  return StringParser::initBuffer(m_id, (char*) id, ID_SIZE);
 }
+bool SDPSource::setUsername(char * user)
+{
+  return StringParser::initBuffer(m_username, (char*) user, USERNAME_SIZE);
+}
+
+bool SDPSource::setPassword(char * pass)
+{
+  return StringParser::initBuffer(m_password, (char*) pass, PASSWORD_SIZE);
+}
+;
 
 void SDPSource::setHMACKey(uint8_t * key, size_t length)
 {
@@ -157,6 +201,41 @@ uint8_t SDPSource::publish(char* topic, char* msg)
   return n;
 }
 
+bool SDPSource::createTopic(char* direction, char* tenant, char* attribute, char* buffer, unsigned int bSize)
+{
+  size_t lenDirection = strlen(direction);
+  size_t lenTenant = strlen(tenant);
+  size_t lenAttrib = (attribute != 0) ?strlen(attribute):0;
+
+  memset(buffer, 0, bSize);
+
+  if ((lenDirection + lenTenant + lenAttrib + 3) >= bSize)
+  {
+    return false;
+  }
+
+// Create topic
+  size_t cIndex = 0;
+
+  memcpy(&buffer[cIndex], direction, lenDirection);
+
+  cIndex += lenDirection;
+  buffer[cIndex++] = CONC_CHAR;
+
+  memcpy(&buffer[cIndex], tenant, lenTenant);
+  cIndex += lenTenant;
+
+  if (lenAttrib > 0)
+  {
+    buffer[cIndex++] = CONC_CHAR;
+    memcpy(&buffer[cIndex], attribute, lenAttrib);
+  }
+
+  return true;
+
+}
+
+
 uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
     const char* tenant)
 {
@@ -167,27 +246,13 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
   GenericSensor *pSensor = (GenericSensor*) stream.sensor();
   GenericSensor &sensor = (*pSensor);
 
-/*
-  size_t lenStreamId = strlen(stream.id());
-  size_t lenSensorId = strlen(sensor.id());
-*/
-  size_t lenType = strlen(CONNECTION_TYPE);
-  size_t lenTenant = strlen(tenant);
+  char connI[10] = {0};
+  StringParser::getFlashString((const char**) SDPSource::SOURCE_TABLE_P, 0, &connI[0], 10);
 
-  if ((lenType + lenTenant /*+ lenStreamId + lenSensorId*/ + 3/*5*/) > TOPIC_SIZE)
+  if ( !createTopic(connI, (char*) tenant, (char*) 0, topic, (unsigned int) TOPIC_SIZE) )
   {
     return 0;
   }
-
-  // Create topic
-  size_t cIndex = 0;
-
-  memcpy(&topic[cIndex], CONNECTION_TYPE, lenType);
-  cIndex += lenType;
-  topic[cIndex++] = CONC_CHAR;
-
-  memcpy(&topic[cIndex], tenant, lenTenant);
-  cIndex += lenTenant;
 
   // Create JSON
   sdp::message::PublishJSON json(stream.id(), m_id);
@@ -221,12 +286,6 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
   if(m_hmacKeylength > 0)
   {
     sdp::message::SecureJSON secjson;
-    /*
-     uint8_t hmacKey2[]={
-     0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,0x13,0x14,
-     0x15,0x16,0x17,0x18,0x19
-     };
-     */
     secjson.setKey(m_hmacKey, m_hmacKeylength);
     secjson.create(json);
 
@@ -238,12 +297,12 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
     m_message = aJson.print(json.getJson());
   }
 
-  Serial.print("json: ");
-  Serial.println(m_message);
 
   uint8_t n = 0;
   if (m_message != 0)
   {
+    Serial.print( F("json: ") );
+    Serial.println(m_message);
     n = m_subclient->publish(topic, m_message);
   }
 
@@ -262,39 +321,34 @@ uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
   return n;
 }
 
+uint8_t SDPSource::publish(SmartObjStatus & status, const char* tenant)
+{
+#define TOPIC_SIZE 128
+
+  char topic[TOPIC_SIZE] = { 0 };
+
+  return 1;
+}
+
 uint8_t SDPSource::subscribe(const char* tenant, SDPStream& stream, GenericSensor& sensor)
 {
 
   char topic[TOPIC_SIZE] = { 0 };
 
-  size_t lenType = strlen(CONNECTION_TYPE_1);
-  size_t lenTenant = strlen(tenant);
-  size_t lenStreamId = strlen(stream.id());
-  size_t lenSensorId = strlen(sensor.id());
+  char connO[10] = {0};
+  StringParser::getFlashString((const char**) SDPSource::SOURCE_TABLE_P, 1, &connO[0], 10);
 
-  if ((lenType + lenTenant + lenStreamId + lenSensorId + 5) > TOPIC_SIZE)
+  char attrContrl[10] = {0};
+  StringParser::getFlashString((const char**) SDPSource::SOURCE_TABLE_P, 2, &attrContrl[0], 10);
+
+  if ( !createTopic((char*) connO, (char*) tenant, (char*) attrContrl, topic, (unsigned int) TOPIC_SIZE) )
   {
     return 0;
   }
-
-// Create topic
-  size_t cIndex = 0;
-
-  memcpy(&topic[cIndex], CONNECTION_TYPE_1, lenType);
-
-  cIndex += lenType;
-  topic[cIndex++] = CONC_CHAR;
-
-  memcpy(&topic[cIndex], tenant, lenTenant);
-  cIndex += lenTenant;
-
-  topic[cIndex++] = CONC_CHAR;
-
-  memcpy(&topic[cIndex], CONNECTION_TYPE_2, strlen(CONNECTION_TYPE_2));
-
+  Serial.println(topic);
   if (m_subclient->subscribe(topic))
   {
-    Serial.println(topic);
+    //Serial.println(topic);
     return 1;
   }
   return 0;
@@ -318,4 +372,72 @@ void SDPSource::callback(char* topic, byte* payload, unsigned int length)
     CONTROL_MSG[length] = 0;
   }
   //SDPSource::configuration->set((const char*) payload, length);
+}
+
+bool SDPSource::loadConfiguration(char* filename, sdp::message::CSVLine &conf)
+{
+  char rBuffer[RBUF_SIZE];
+  File myFile = SD.open(filename, FILE_READ);
+  memset(rBuffer, 0, sizeof(char) * RBUF_SIZE);
+
+  // if the file opened okay, read it and get only the first line
+  if (myFile)
+  {
+    size_t i = 0;
+    bool endline = false;
+    while (myFile.available() && !endline)
+    {
+      rBuffer[i] = myFile.read();
+      if (rBuffer[i] == '\n' || i == RBUF_SIZE)
+      {
+        endline = true;
+      }
+      i++;
+    }
+    myFile.close();
+  }
+  else
+  {
+    return false;
+  }
+/*
+  Serial.print("Conf: ");
+  Serial.println(rBuffer);
+*/
+  conf.set(rBuffer, RBUF_SIZE);
+
+  return true;
+}
+
+bool SDPSource::saveConfiguration(char* filename, sdp::message::CSVLine &conf)
+{
+  // Save new configuration
+  //    Serial.println( F("Save on SD") );
+  if (SD.exists(filename))
+  {
+    // Delete old configuration
+    SD.remove(filename);
+  }
+
+  File myFile = SD.open(filename, FILE_WRITE);
+  // if the file opened okay, write to it:
+  if (myFile)
+  {
+    for (size_t i = 0; i < conf.NF(); i++)
+    {
+
+      //Serial.println(conf.getItem(i));
+      myFile.print(conf.getItem(i));
+      myFile.print(sdp::message::CSVLine::FS);
+    }
+    // close the file:
+    myFile.close();
+    //      Serial.println();
+  } else
+  {
+    // if the file didn't open, print an error:
+    return false;
+  }
+  return true;
+
 }

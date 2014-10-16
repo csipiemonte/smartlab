@@ -52,9 +52,11 @@ namespace sdp
         /**
          * Sets the stream identifier. This is a string of ID_SIZE characters.
          *
-         * \param[in] id stream identifier.
+         * \param[in] id stream identifier
+         *
+         * \return false if there is an error while allocating memory, true otherwise
          */
-        virtual void setID(const char* id);
+        virtual bool setID(const char* id);
 
         /**
          * Gets the stream identifier.
@@ -113,13 +115,17 @@ namespace sdp
 
       private:
         //! Sensor identifier
-        char* m_identifier[ID_SIZE + 1];
+        char* m_identifier;
 
         //! Sensor associated to the stream
         GenericSensor* m_sensor;
 
         //! Mobile property of the stream. true if the source is a mobile object, false otherwise
         bool m_mobile;
+
+        //! Flag to check if object is a copy or not
+        bool m_isCopy;
+
     };
   }
 }

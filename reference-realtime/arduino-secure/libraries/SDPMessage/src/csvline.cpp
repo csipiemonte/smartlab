@@ -42,7 +42,6 @@ namespace sdp
       m_line = l.m_line;
       m_fields = l.m_fields;
       m_isCopy = true;
-      //memcpy(m_line, l.m_line, LINE_SIZE + 1);
     }
 
     CSVLine::~CSVLine()
@@ -79,17 +78,24 @@ namespace sdp
       if (m_line != 0)
       {
         delete[] m_line;
+        m_line = 0;
       }
 
       if (m_fields != 0)
       {
         delete[] m_fields;
+        m_fields = 0;
       }
 
       // Create line
       m_line = new char[m_length];
       memset(m_line, 0, m_length);
       memcpy(m_line, line, m_length - 1);
+      length = strlen(m_line);
+      if (m_line[length - 1] == FS)
+      {
+        m_line[length -1] = 0;
+      }
 
       m_nf = 0;
 
@@ -101,18 +107,25 @@ namespace sdp
         }
       }
 
-      if (m_length > 2 && m_line[m_length - 2] != FS && m_line[m_length] == 0)
+      if (m_length > 2 && m_line[length - 1] != FS && m_line[length] == 0)
       {
         m_nf++;
       }
 
       m_fields = new size_t[m_nf];
-      memset(m_fields, 0, sizeof(size_t) + m_nf);
+      memset(m_fields, 0, sizeof(size_t) * m_nf);
+
 
       size_t j = 0;
-      for (size_t i = 0; i < m_length; i++)
+      size_t i = 0;
+      for (; i < m_length; i++)
       {
-        if (m_line[i -1] == FS || i == 0)
+        if (i == 0)
+        {
+          m_fields[j++] = i;
+        }
+
+        if ( i > 0 && j < m_nf && m_line[i -1] == FS)
         {
           m_line[i -1] = 0;
           m_fields[j++] = i;

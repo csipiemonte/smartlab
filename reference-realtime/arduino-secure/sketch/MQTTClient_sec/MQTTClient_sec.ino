@@ -31,12 +31,14 @@
 #include <Time.h>
 #include <PubSubClient.h> 
 
+#include <smartobjstatus.h>
 #include <sdpserver.h>
 #include <sdpsource.h>
 #include <sdpstream.h>
 #include <analogsensor.h>
 #include <gpsposition.h>
 #include <measure.h>
+#include <average.h>
 
 #include <ntpclient.h>
 #include <networkconfig.h>
@@ -279,10 +281,13 @@
  * UPDATE_TIME_PERIOD : time between two NTP request (in milliseconds).
  *
  ******************************************************************************************/
-//! IP address of MQTT broker
-#define READ_SENSOR_PERIOD 5000L
+//! Sensor reading time
+#define READ_SENSOR_PERIOD 1000L
 
-//! domain of MQTT broker
+//! Sending time of the measures
+#define SEND_MEASURE_PERIOD 5000L
+
+//! period of updating the system time
 #define UPDATE_TIME_PERIOD 60000L
 
 
@@ -314,7 +319,7 @@
  *
  ******************************************************************************************/
 //! Configuration directory
-#define CFG_DIRECTORY "/etc"
+#define CFG_DIRECTORY "/etc/"
 
 //! filename for section time
 #define SEC_TIME_FN "time.cvs"
@@ -349,25 +354,6 @@ enum _error_code
   
   //! SD Error
   OPEN_SD_ERROR = 104,
-};
-
-
-/**
- * \enum   _node_state
- *
- * State of the node
- */
-enum _node_state
-{
-  //! Idle, do nothing
-  IDLE = 0, 
-  
-  //! Read sensors
-  READ_SENSORS = 1,
-   
-  //! Update time through NTP request
-  NTPUPDATE = 2,
- 
 };
 
 
@@ -580,20 +566,23 @@ GPSPosition location;
 //! Input sensor
 sdp::sensor::AnalogSensor sensor(SENSOR_ANALOG_INPUT_PIN);
 
+// Measurement
+Average mAvg;
+ 
 //! Data stream
 sdp::client::SDPStream stream;
 
 //! SDP source
 sdp::client::SDPSource *MTTQClient= NULL;
 
-//! Smart object state
-uint8_t state = IDLE;
+//! Smart object status
+uint8_t currentStatus = sdp::client::SmartObjStatus::IDLE;
 
 //! Tenant
 const char tenant[] PROGMEM = TENANT;
 
 //! Sensor Identifier
-const char sensor_id[] PROGMEM = SMRTOBJ_ID;
+const char smrtobj_id[] PROGMEM = SMRTOBJ_ID;
 
 //! Stream Identifier
 const char stream_id[] PROGMEM = STREAM_IDENTIFIER;
@@ -602,7 +591,7 @@ const char stream_id[] PROGMEM = STREAM_IDENTIFIER;
 const char* const node_table[] PROGMEM =
 {
   tenant,
-  sensor_id,
+  smrtobj_id,
   stream_id,
 };
 
@@ -630,14 +619,23 @@ Interval tNtpUpdateTime;
 //! Read sensor period
 Interval tReadTime; //(READ_SENSOR_PERIOD + 1);
 
+//! Read sensor period
+Interval tSendTime; //(SEND_MEASURE_PERIOD + 1);
+
 // Read interval (in ms)
 unsigned long tRead = 0;
+
+// Sent interval (in ms)
+unsigned long tSend = 0;
 
 // NTP update  interval (in ms)
 unsigned long tNtpUpdate = 0;
 
 //! Node Error
 bool SDstate = true;
+
+//! Smartdata Object Status
+sdp::client::SmartObjStatus status;
 
 
 /*------------------------------------------------------------------------------------
@@ -757,12 +755,6 @@ void printSensor(sdp::sensor::AnalogSensor &sensor);
 void printPosition(GPSPosition &coordinate);
 
 /**
- * getFlashString
- * Reads a word from flash and returns it as a string, using a global buffer ( flashBuffer ).
- */
-char* getFlashString(PROGMEM const char *string_table[], byte index);
-
-/**
  * openSD
  * Opens SD card.
  *
@@ -795,6 +787,8 @@ void loadConfig();
  */
 void defaultConfig();
 
+void processStatusMsg(sdp::message::SDPCtrlMsg &msg);
+void processWConfigMsg(sdp::message::SDPCtrlMsg &msg);
 
 
 
@@ -832,8 +826,8 @@ void setup()
   Serial.println( F("Configure smart object...") );
   
   // Set up SDP structures (sensor, stream and node position)
-  sensor.setID(/*getFlashString((const char**) node_table, NODE_ID)*/ "LM35");
-  stream.setID(getFlashString((const char**) node_table, STREAM_ID));
+  sensor.setID("");
+  stream.setID(StringParser::getFlashString((const char**) node_table, STREAM_ID, flashBuffer, FLASH_BUFFER_SIZE));
   
   stream.setSensor(sensor);
   printStream(stream);
@@ -873,18 +867,20 @@ void setup()
   MQTTserver = new sdp::client::SDPServer(serverDomain, serverPort);
 #endif
 
-  MTTQClient = new sdp::client::SDPSource(*MQTTserver, client, getFlashString((const char**) node_table, NODE_ID));
+  MTTQClient = new sdp::client::SDPSource(*MQTTserver, client, StringParser::getFlashString((const char**) node_table, NODE_ID, flashBuffer, FLASH_BUFFER_SIZE));
   
-  MTTQClient->setUsername(getFlashString((const char**) mqtt_table, MQTT_USER));
-  MTTQClient->setPassword(getFlashString((const char**) mqtt_table, MQTT_PASS));
+  MTTQClient->setUsername(StringParser::getFlashString((const char**) mqtt_table, MQTT_USER, flashBuffer, FLASH_BUFFER_SIZE));
+  MTTQClient->setPassword(StringParser::getFlashString((const char**) mqtt_table, MQTT_PASS, flashBuffer, FLASH_BUFFER_SIZE));
  
 #ifdef SECURE_JSON
   MTTQClient->setHMACKey(hmacKey, HMAC_KEYWORD_LENGTH);
 #endif
- //MTTQClient->connect();
+  ConnectToBroker();
 
   
-  state = NTPUPDATE;
+  currentStatus = sdp::client::SmartObjStatus::UPDATE_TIME;
+  tReadTime.update(); 
+  tSendTime.update(); 
 }
 
 
@@ -895,198 +891,67 @@ void setup()
 /*------------------------------------------------------------------------------------*/
 void loop()
 {
-  // Handle node state
-  switch(state)
+  // Handle node status
+  switch(currentStatus)
   {
     // Update time using NTP protocol
-    case NTPUPDATE : 
+    case sdp::client::SmartObjStatus::UPDATE_TIME : 
     {
-
-
-      Serial.println( );
-      Serial.println( F("Updating time...") );
       tNtpUpdateTime.update(); 
-      if ( ntpupdate() )
-      {
-        Serial.println( F("done") );
-      }
-      else
-      {
-        Serial.println( F("Failed") );
-      }
-      state = IDLE;
+      
+      updateTime();
+
+      currentStatus = sdp::client::SmartObjStatus::IDLE;
     } break;
     
-     // Read sensor and publish measurement
-    case READ_SENSORS : 
+    // Read sensor and publish measurement
+    case sdp::client::SmartObjStatus::READ_SENSORS : 
     {
       tReadTime.update(); 
-
-      float value = sensor.measure();
-/*        
-      Serial.print("read: ");
-      Serial.print(sensor.digital());
-      Serial.print("  ");
-      Serial.println(value);
-*/  
-      // Generate a random value for tests
-      //float measure = generateRandMeasurement(13, 30, 10);
-               
-      // Convert measure fot LM35 temperature sensor
-      float measure = convertLM35(value);
-
-      // Index of GPS coordinate, it is used to know which coordinate is in wrong format 
-      byte coordIndex = 0;
-        
-      // Measurement
-      Measure m;
-      m.setValue(measure);
-      m.setTimestamp(now());
-      m.setPosition(location, coordIndex);
-  
-      Serial.print( stream.id() );
-      Serial.print( ";" );
-      Serial.print( m.timestamp(0) );
-      Serial.print( ";" );
-      Serial.println( m.value() );
-
-      // Check if client is connected with the server
-      if (MTTQClient->isConnected())
-      {
-        Serial.print ( F("Sending measurement... ") );
-
-        // Publish measurement
-        int n = 0;
-        if ( n = (MTTQClient->publish(stream, m, getFlashString((const char**) node_table, NODE_TENANT))) )
-        {
-         Serial.println( F("done") );
-        }
-        else
-        {
-          Serial.println( F("Failed") );
-          MTTQClient->disconnect();
-          Serial.println( F("SDP broker disconnected!") );
-        }
-
-        // Check if the data transmission failed
-        if (!n)
-        {
-#ifdef WIFI
-          // Reset wifi 
-          Serial.println( F("Reconnecting wifi...") );
-          wifiHandler.refresh();
-#endif      
-        }
-      }
-      else
-      {
-        Serial.println( F("SDP no connection") );
-        if ( MTTQClient->connect() )
-        {
-#ifdef CONTROL      
-          if ( (MTTQClient->subscribe(getFlashString((const char**) node_table, NODE_TENANT), stream, sensor)) )
-          {}
-#endif
-          Serial.println( F("SDP connected") );
-        }
-        else
-        {
-          Serial.println( F("Connection failed") );
-        }
-      }
-  
-#ifdef DEBUG_MEMORY
-Serial.print( F("freeMemory()=") );
-Serial.println(freeMemory());
-#endif
       
-      state = IDLE;
+      readSensors();
+  
+      printMemoryInfo();
+      
+      currentStatus = sdp::client::SmartObjStatus::IDLE;
+    }; break;
+    
+    // Read sensor and publish measurement
+    case sdp::client::SmartObjStatus::SEND_MEASURE : 
+    {
+      tSendTime.update(); 
+      
+      sendMeasures();
+      
+      currentStatus = sdp::client::SmartObjStatus::IDLE;
     } break;
 
-    case IDLE :
+    case sdp::client::SmartObjStatus::IDLE :
     {
-      // Do nothing and check the following state
+      // Do nothing and check the following status
       if (tReadTime.residualTime(tRead) == 0)
       {
-        state = READ_SENSORS;
+        currentStatus = sdp::client::SmartObjStatus::READ_SENSORS;
+      }
+      else if (tSendTime.residualTime(tSend) == 0)
+      {
+        currentStatus = sdp::client::SmartObjStatus::SEND_MEASURE;
       }
       else if (tNtpUpdateTime.residualTime(tNtpUpdate) == 0)
       {
-        state = NTPUPDATE;
+        currentStatus = sdp::client::SmartObjStatus::UPDATE_TIME;
       }
       MTTQClient->loop();
       
 #ifdef CONTROL  
-      if ( checkControlMsg() )
-      {
-        sdp::message::SDPCtrlMsg msg;
-        msg.initialize(sdp::client::SDPSource::getControlMsg());
-        sdp::client::SDPSource::deleteControlMsg();
-        
-        msg.dump(Serial);
-        Serial.println();
-        
-        sdp::message::SDPCtrlMsgHandler ctrlHandler;
-        if ( ctrlHandler.isBroadcast(msg) || ctrlHandler.isToProcess( msg, (char*) MTTQClient->id()) )
-        {
-          switch (ctrlHandler.getType( msg ))
-          {
-            case 0 : { Serial.println(F("INVALID!")); }; break;
-            case 1 : { Serial.println(F("UPDATE")); }; break;
-            case 2 : { Serial.println(F("RESTART")); }; break;
-            case 3 : { Serial.println(F("ENABLE")); }; break;
-            case 4 : { Serial.println(F("FACTORY")); }; break;
-            case 5 : { Serial.println(F("STATUS")); }; break;
-            case 6 : { Serial.println(F("TEST")); }; break;
-            case 7 : { Serial.println(F("CALIBRATE")); }; break;
-            case 8 : { Serial.println(F("SYNC")); }; break;
-            case 9 : { Serial.println(F("RCONFIG")); }; break;
-            case 10 : { 
-              Serial.println(F("WCONFIG")); 
-              aJsonObject* data = msg.dataObj();
-              if ( data != 0 )
-              {
-                Serial.print( "Data field: " ); 
-                Serial.println( data->valuestring ); 
-                aJsonObject* sec = aJson.getObjectItem(msg.dataObj(), "sec");
-                aJsonObject* csv = aJson.getObjectItem(msg.dataObj(), "csv");
-                if (sec != 0)
-                  Serial.println( sec->valuestring ); 
-                if (csv != 0)
-                {
-                  Serial.println( csv->valuestring );  
-                  sdp::message::CSVLine configuration;
-                  configuration.set((const char*) csv->valuestring, strlen(csv->valuestring));
-                  sdp::client::SDPSource::saveConfiguration((char*) getFlashString((const char**) configuration_table, TIME_FN), configuration);
-                }
-
-              }
-            }; break;
-            case 11 : { 
-              Serial.println(F("CONFIG")); 
-              loadConfig();
-            }; break;
-            case 12 : { Serial.println(F("CMD")); }; break;
-            case 13 : { Serial.println(F("HISTORY")); }; break;
-            default : { Serial.println(F("INVALID!"));}; break;
-          }
-        }
-        else
-        {
-          Serial.println("It isn't for me!");
-        }
-        
-        Serial.print( F("freeMemory()=") );
-        Serial.println(freeMemory());
-
-      }
+      controlManage();
 #endif
 
     } break;
     
     default : 
     {
-      state = IDLE;
+      currentStatus = sdp::client::SmartObjStatus::IDLE;
     }
   }
   
@@ -1098,6 +963,13 @@ Serial.println(freeMemory());
 /*------------------------------------------------------------------------------------
  * Functions
 /*------------------------------------------------------------------------------------*/
+void printMemoryInfo()
+{
+#ifdef DEBUG_MEMORY
+      Serial.print( F("freeMemory()=") );
+      Serial.println(freeMemory());
+#endif
+}
 
 void setNetworkConfiguration()
 {
@@ -1149,8 +1021,8 @@ void startNetwork()
     case 2 : { wifiHandler.setType(WiFiManager::WL_WPA);}; break;
     default : { wifiHandler.setType(WiFiManager::WL_OPEN); }; break;
   }
-  wifiHandler.setSSID(getFlashString((const char**) wireless_table, W_SSID));
-  wifiHandler.setKey(getFlashString((const char**) wireless_table, W_KEY));
+  wifiHandler.setSSID(StringParser::getFlashString((const char**) wireless_table, W_SSID, flashBuffer, FLASH_BUFFER_SIZE));
+  wifiHandler.setKey(StringParser::getFlashString((const char**) wireless_table, W_KEY, flashBuffer, FLASH_BUFFER_SIZE));
 
 /*
   Serial.print("SSID: ");
@@ -1369,13 +1241,6 @@ void printWifiStatus() {
 }
 #endif
 
-char* getFlashString(PROGMEM const char *string_table[], byte index)
-{
-  memset(flashBuffer, 0, FLASH_BUFFER_SIZE);
-  strcpy_P(flashBuffer, (char*) pgm_read_word(&(string_table[index])));
-  return flashBuffer;
-}
-
 bool openSD(uint8_t board, uint8_t shield)
 {
 
@@ -1419,6 +1284,7 @@ void defaultConfig()
 {
   Serial.println( F("Default values") );
   tRead = READ_SENSOR_PERIOD;
+  tSend = SEND_MEASURE_PERIOD;
   tNtpUpdate = UPDATE_TIME_PERIOD;
 }
 
@@ -1431,11 +1297,11 @@ bool checkControlMsg()
 
 
 #define RBUF_SIZE 128
-const uint8_t cfgNF = 2;
+const uint8_t cfgNF = 3;
 
 void loadConfig()
-{
-  if (SD.exists((char*) getFlashString((const char**) configuration_table, TIME_FN)))
+{  
+  if (SD.exists((char*) StringParser::getFlashString((const char**) configuration_table, TIME_FN, flashBuffer, FLASH_BUFFER_SIZE)))
   {
 //    Serial.println( F("Load from SD") );
 
@@ -1443,8 +1309,9 @@ void loadConfig()
     size_t i = 0;
 
     sdp::message::CSVLine conf;
-    if (sdp::client::SDPSource::loadConfiguration((char*) getFlashString((const char**) configuration_table, TIME_FN), conf))
+    if (sdp::client::SDPSource::loadConfiguration((char*) StringParser::getFlashString((const char**) configuration_table, TIME_FN, flashBuffer, FLASH_BUFFER_SIZE), conf))
     {
+          
       //check number of fields
       if ( conf.NF() == cfgNF)
       {
@@ -1470,6 +1337,22 @@ void loadConfig()
             } break;
             
             case 1 : {
+              int n = 0;
+              
+              if ( conf.getItemAsInt(i, n) )
+              {
+                tSend = ( (unsigned long) n) * 1000;
+              }
+              else
+              {
+                tSend = SEND_MEASURE_PERIOD;
+              }
+              
+              Serial.print( F("\ttSend: ") );
+              Serial.println(tSend);
+            } break;
+
+            case 2 : {
               int n = 0;
               
               if ( conf.getItemAsInt(i, n) )
@@ -1504,6 +1387,206 @@ void loadConfig()
   {
   }
   defaultConfig();
+  printMemoryInfo();
+
 }
 
 #endif
+
+// STATE functions
+void updateTime()
+{
+  Serial.println( );
+  Serial.println( F("Updating time...") );
+  if ( ntpupdate() )
+  {
+    Serial.println( F("done") );
+  }
+  else
+  {
+    Serial.println( F("Failed") );
+  }
+}
+
+void readSensors()
+{
+
+      float value = sensor.measure();
+/*        
+      Serial.print("read: ");
+      Serial.print(sensor.digital());
+      Serial.print("  ");
+      Serial.println(value);
+*/  
+      // Convert measure fot LM35 temperature sensor
+      float measure = convertLM35(value);
+        
+      // Measurement
+      mAvg.update(measure);
+
+      Measure m;
+      m.setValue(measure);
+      m.setTimestamp(now());
+
+      status.updateLastReadTime();
+  
+      Serial.print( stream.id() );
+      Serial.print( ";" );
+      Serial.print( m.timestamp(0) );
+      Serial.print( ";" );
+      Serial.print( m.value() );
+      Serial.print( ";" );
+      Serial.println( mAvg.value() );
+
+}
+
+void sendMeasures()
+{
+
+      // Index of GPS coordinate, it is used to know which coordinate is in wrong format 
+      byte coordIndex = 0;
+
+      Measure m;
+      m.setValue(mAvg.value());
+      m.setTimestamp(now());
+      m.setPosition(location, coordIndex);
+      mAvg.reset();
+      
+      // Check if client is connected with the server
+      if (MTTQClient->isConnected())
+      {
+        Serial.print ( F("Sending measurement... ") );
+
+        // Publish measurement
+        int n = 0;
+        if ( n = (MTTQClient->publish(stream, m, StringParser::getFlashString((const char**) node_table, NODE_TENANT, flashBuffer, FLASH_BUFFER_SIZE))) )
+        {
+         Serial.println( F("done") );
+         status.updateLastSendTime();
+        }
+        else
+        {
+          Serial.println( F("Failed") );
+          MTTQClient->disconnect();
+          Serial.println( F("SDP broker disconnected!") );
+        }
+
+        // Check if the data transmission failed
+        if (!n)
+        {
+#ifdef WIFI
+          // Reset wifi 
+          Serial.println( F("Reconnecting wifi...") );
+          wifiHandler.refresh();
+#endif      
+        }
+      }
+      else
+      {
+        Serial.println( F("SDP no connection") );
+        ConnectToBroker();
+      }
+      printMemoryInfo();
+}
+
+void controlManage()
+{
+        if ( checkControlMsg() )
+      {
+        sdp::message::SDPCtrlMsg msg;
+        msg.initialize(sdp::client::SDPSource::getControlMsg());
+        sdp::client::SDPSource::deleteControlMsg();
+        
+        msg.dump(Serial);
+        Serial.println();
+        
+        sdp::message::SDPCtrlMsgHandler ctrlHandler;
+        if ( ctrlHandler.isBroadcast(msg) || ctrlHandler.isToProcess( msg, (char*) MTTQClient->id()) )
+        {
+          switch (ctrlHandler.getType( msg ))
+          {
+            case 0 : { Serial.println(F("INVALID!")); }; break;
+            case 1 : { Serial.println(F("UPDATE")); }; break;
+            case 2 : { Serial.println(F("RESTART")); }; break;
+            case 3 : { Serial.println(F("ENABLE")); }; break;
+            case 4 : { Serial.println(F("FACTORY")); }; break;
+            case 5 : { 
+              Serial.println(F("STATUS")); 
+              processStatusMsg(msg);
+            }; break;
+            case 6 : { Serial.println(F("TEST")); }; break;
+            case 7 : { Serial.println(F("CALIBRATE")); }; break;
+            case 8 : { Serial.println(F("SYNC")); }; break;
+            case 9 : { Serial.println(F("RCONFIG")); }; break;
+            case 10 : { 
+              Serial.println(F("WCONFIG")); 
+              processWConfigMsg(msg);
+            }; break;
+            case 11 : { 
+              Serial.println(F("CONFIG")); 
+              loadConfig();
+            }; break;
+            case 12 : { Serial.println(F("CMD")); }; break;
+            case 13 : { Serial.println(F("HISTORY")); }; break;
+            default : { Serial.println(F("INVALID!"));}; break;
+          }
+        }
+        else
+        {
+//          Serial.println("It isn't for me!");
+        }
+     }
+}
+
+void processStatusMsg(sdp::message::SDPCtrlMsg &msg)
+{
+              Serial.print( F("Uptime: ") );
+              Serial.println( (byte) status.uptime() ); 
+              Serial.print( F("Last read: ") );
+              Serial.println( (byte) status.lastReadTime() ); 
+              Serial.print( F("Last send: ") );
+              Serial.println( (byte) status.lastSendTime() ); 
+              printMemoryInfo();
+}
+
+void processWConfigMsg(sdp::message::SDPCtrlMsg &msg)
+{
+              aJsonObject* data = msg.dataObj();
+              if ( data != 0 )
+              {
+                Serial.print( F("Data field: ") ); 
+                Serial.println( data->valuestring ); 
+                aJsonObject* sec = aJson.getObjectItem(msg.dataObj(), "sec");
+                aJsonObject* csv = aJson.getObjectItem(msg.dataObj(), "csv");
+                if (sec != 0)
+                  Serial.println( sec->valuestring ); 
+                if (csv != 0)
+                {
+                  Serial.println( csv->valuestring );
+                  sdp::message::CSVLine configuration;
+                  configuration.set((const char*) csv->valuestring, strlen(csv->valuestring));
+                  sdp::client::SDPSource::saveConfiguration((char*) StringParser::getFlashString((const char**) configuration_table, TIME_FN, flashBuffer, FLASH_BUFFER_SIZE), configuration);
+                  printMemoryInfo();
+                }
+              }
+              printMemoryInfo();
+}
+
+bool ConnectToBroker()
+{
+        if ( MTTQClient->connect() )
+        {
+#ifdef CONTROL      
+          if ( (MTTQClient->subscribe(StringParser::getFlashString((const char**) node_table, NODE_TENANT, flashBuffer, FLASH_BUFFER_SIZE), stream, sensor)) )
+          {}
+#endif
+          Serial.println( F("SDP connected") );
+          
+          return true;
+        }
+        else
+        {
+          Serial.println( F("Connection failed") );
+        }
+        return false;
+}

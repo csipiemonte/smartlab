@@ -182,6 +182,9 @@ namespace sdp
 
         static const char* const crtl_msg_type[] PROGMEM;
 
+        //! label for broadcast message:
+        static const char *BROADCAST;
+
         /**
          * Default Constructor.
          *
@@ -203,7 +206,7 @@ namespace sdp
          */
         bool isBroadcast( sdp::message::SDPCtrlMsg &msg )
         {
-           return ( strcmp(msg.to(), "any") == 0 );
+           return ( strcmp(msg.to(), BROADCAST) == 0 );
         }
 
         /**

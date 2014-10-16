@@ -122,12 +122,13 @@ namespace sdp
         ;
 
         /**
-         * Sets the domain of the server.
+         * Sets the domain of the server. It allocates the memory and copy the domain.
          *
          * \param[in] domain common name or domain of the server
          *
+         * \return false if there is an error while allocating memory, true otherwise
          */
-        void setDomain(const char* domain);
+        bool setDomain(const char* domain);
 
         /**
          * Gets the domain of the server.
@@ -141,12 +142,13 @@ namespace sdp
         ;
 
         /**
-         * Sets the service of the server.
+         * Sets the service of the server. It allocates the memory and copy the service page
          *
          * \param[in] service service page (or path)
          *
+         * \return false if there is an error while allocating memory, true otherwise
          */
-        void setService(const char* service);
+        bool setService(const char* service);
 
         /**
          * Gets the service of the server.
@@ -177,14 +179,17 @@ namespace sdp
         //! Port number
         uint16_t m_port;
 
-        //! Service page (To delete if POST generated from file!)
-        char m_domain[SERVICE_SIZE];
+        //! Service page
+        char *m_domain;
 
         //! Service page (not used!)
-        char m_service[DOMAIN_SIZE];
+        char *m_service;
 
         //! Flag true if the server is defined by IP, false otherwise
         bool m_defined_by_IP;
+
+        //! Flag to check if object is a copy or not
+        bool m_isCopy;
     };
   }
 }

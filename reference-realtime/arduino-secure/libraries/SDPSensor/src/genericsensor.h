@@ -25,7 +25,7 @@ namespace sdp
       public:
 
         //! Size of the identifier filed
-        static const byte ID_SIZE = 128;
+        static const byte ID_SIZE = 32;
 
         /**
          * Default Constructor

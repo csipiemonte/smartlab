@@ -7,13 +7,14 @@
  *
  */
 #include "sdpserver.h"
+#include "stringparser.h"
 
 using namespace sdp::client;
 
 const char* SDPServer::DEFAULT_DOMAIN = "smartdatanet.it";
 
 SDPServer::SDPServer() :
-    m_port(DEFAULT_PORT), m_defined_by_IP(false)
+    m_port(DEFAULT_PORT), m_defined_by_IP(false), m_isCopy(false), m_domain(0), m_service(0)
 {
   // Set IP address to 0
   for (int i = 0; i < 4; i++)
@@ -21,14 +22,12 @@ SDPServer::SDPServer() :
     m_ipAddress[i] = 0;
   }
 
-  // set service page to NULL
-  memset(m_service, 0, SERVICE_SIZE);
-  memset(m_domain, 0, DOMAIN_SIZE);
-  memcpy(m_domain, DEFAULT_DOMAIN, strlen(DEFAULT_DOMAIN));
+  // Set default domain
+  setDomain(DEFAULT_DOMAIN);
 }
 
 SDPServer::SDPServer(char* domain, uint16_t port) :
-    m_port(port), m_defined_by_IP(false)
+    m_port(port), m_defined_by_IP(false), m_isCopy(false), m_domain(0), m_service(0)
 {
   // Set IP address to 0
   for (int i = 0; i < 4; i++)
@@ -36,28 +35,35 @@ SDPServer::SDPServer(char* domain, uint16_t port) :
     m_ipAddress[i] = 0;
   }
 
-  // set service page to NULL
-  memset(m_service, 0, SERVICE_SIZE);
-  memset(m_domain, 0, DOMAIN_SIZE);
-  memcpy(m_domain, domain, strlen(domain));
+  setDomain(domain);
 }
 
 SDPServer::SDPServer(uint8_t address[], uint16_t port) :
-    m_port(port), m_defined_by_IP(true)
+    m_port(port), m_defined_by_IP(true), m_isCopy(false), m_domain(0), m_service(0)
 {
   // Set IP address to 0
   for (int i = 0; i < 4; i++)
   {
     m_ipAddress[i] = address[i];
   }
+}
 
-  // set service page to NULL
-  memset(m_service, 0, SERVICE_SIZE);
-  memset(m_domain, 0, DOMAIN_SIZE);
+SDPServer::SDPServer(const SDPServer& s)
+{
+  m_isCopy = true;
+  m_port = s.m_port;
+  m_defined_by_IP = s.m_defined_by_IP;
+  m_domain = s.m_domain;
+  m_service = s.m_service;
 }
 
 SDPServer::~SDPServer()
 {
+  if (!m_isCopy)
+  {
+    StringParser::delBuffer(m_domain);
+    StringParser::delBuffer(m_service);
+  }
 }
 
 bool SDPServer::setIPAddress(uint8_t address[])
@@ -76,18 +82,14 @@ bool SDPServer::setIPAddress(uint8_t address[])
   return true;
 }
 
-void SDPServer::setDomain(const char* domain)
+bool SDPServer::setDomain(const char* domain)
 {
-  int len = strlen(domain);
-  memset(m_domain, 0, DOMAIN_SIZE);
-  memcpy(m_domain, domain, (len > DOMAIN_SIZE) ? (DOMAIN_SIZE - 1) : len);
-
   m_defined_by_IP = false;
+
+  return StringParser::initBuffer(m_domain, (char*) domain,  DOMAIN_SIZE);
 }
 
-void SDPServer::setService(const char* service)
+bool SDPServer::setService(const char* service)
 {
-  int len = strlen(service);
-  memset(m_service, 0, SERVICE_SIZE);
-  memcpy(m_service, service, (len > SERVICE_SIZE) ? (SERVICE_SIZE - 1) : len);
+  return StringParser::initBuffer(m_service, (char*) service,  SERVICE_SIZE);
 }

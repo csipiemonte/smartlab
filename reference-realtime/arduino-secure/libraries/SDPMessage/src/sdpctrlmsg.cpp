@@ -39,6 +39,7 @@ namespace sdp
     const char SDPCtrlMsgHandler::cmd10[] PROGMEM = "config";
     const char SDPCtrlMsgHandler::cmd11[] PROGMEM = "cmd";
     const char SDPCtrlMsgHandler::cmd12[] PROGMEM = "history";
+    const char* SDPCtrlMsgHandler::BROADCAST = "any";
 
     const char* const SDPCtrlMsgHandler::crtl_msg_type[] PROGMEM =
     {

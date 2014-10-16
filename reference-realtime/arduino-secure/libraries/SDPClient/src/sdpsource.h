@@ -9,6 +9,8 @@
 #define SDPSOURCE_H_
 
 #include <Arduino.h>
+#include <avr/pgmspace.h>
+
 #include <SPI.h>
 #include <SD.h>
 
@@ -17,6 +19,7 @@
 #include "sdpserver.h"
 #include "sdpstream.h"
 #include "measure.h"
+#include "smartobjstatus.h"
 #include <aJSON.h>
 
 #include "sdpctrlmsg.h"
@@ -129,32 +132,27 @@ namespace sdp
          *
          * \param[in] user MQTT username.
          *
+         * \return false if there is an error while allocating memory, true otherwise
          */
-        void setUsername(char * user)
-        {
-          memcpy(m_username, user, USERNAME_SIZE);
-        }
-        ;
+        bool setUsername(char * user);
 
         /**
          * Sets the MQTT password.
          *
          * \param[in] pass MQTT password.
          *
+         * \return false if there is an error while allocating memory, true otherwise
          */
-        void setPassword(char * pass)
-        {
-          memcpy(m_password, pass, PASSWORD_SIZE);
-        }
-        ;
+        bool setPassword(char * pass);
 
         /**
          * Sets the client identifier.
          *
          * \param[in] id client identifier.
          *
+         * \return false if there is an error while allocating memory, true otherwise
          */
-        void setId(char * id);
+        bool setId(char * id);
 
         /**
          * Gets the client identifier.
@@ -239,6 +237,16 @@ namespace sdp
         uint8_t publish(char* topic, char* msg);
 
         /**
+         * This function published an information of a specific topic.
+         *
+         * \param[in] topic output topic
+         * \param[in] msg message to publish
+         *
+         * \return
+         */
+        uint8_t publish(SmartObjStatus & status, const char* tenant/* = DEFAULT_TENANT*/);
+
+        /**
          * This function published a measurement.
          *
          * \param[in] stream Data stream associated to sensor
@@ -248,7 +256,7 @@ namespace sdp
          * \return
          */
         uint8_t publish(SDPStream& stream, Measure& measure,
-            const char* tenant = DEFAULT_TENANT);
+            const char* tenant/* = DEFAULT_TENANT*/);
 
         /**
          * This function keep connection alive and receive message from MQTT broker.
@@ -265,17 +273,17 @@ namespace sdp
         ;
 
       protected:
-        /// Separator field (constant string)
-        static const char *DEFAULT_TENANT;
+        /// MQTT connection type (send to broker)
+        static const char CONN_DIRECTION_I[] PROGMEM;
 
-        /// MQTT connection type (send)
-        static const char *CONNECTION_TYPE;
-
-        /// MQTT connection type (receive)
-        static const char *CONNECTION_TYPE_1;
+        /// MQTT connection type (receive from broker)
+        static const char CONN_DIRECTION_O[] PROGMEM;
 
         /// MQTT control queue
-        static const char *CONNECTION_TYPE_2;
+        static const char ATTR_CONTROL[] PROGMEM;
+
+        /// Table where store source attributes (in flash memory)
+        static PGM_P const SOURCE_TABLE_P[] PROGMEM;
 
         /// Character used to concatenate Sensor ID and stream ID
         static const char CONC_CHAR;
@@ -315,36 +323,7 @@ namespace sdp
          *
          * \return true if no error, false otherwise
          */
-        static bool saveConfiguration(char* filename, sdp::message::CSVLine &conf)
-        {
-          // Save new configuration
-          //    Serial.println( F("Save on SD") );
-          if (SD.exists(filename))
-          {
-            // Delete old configuration
-            SD.remove(filename);
-          }
-
-          File myFile = SD.open(filename, FILE_WRITE);
-          // if the file opened okay, write to it:
-          if (myFile)
-          {
-            for (size_t i = 0; i < conf.NF(); i++)
-            {
-              myFile.print(conf.getItem(i));
-              myFile.print(sdp::message::CSVLine::FS);
-            }
-            // close the file:
-            myFile.close();
-            //      Serial.println();
-          } else
-          {
-            // if the file didn't open, print an error:
-            return false;
-          }
-          return true;
-
-        }
+        static bool saveConfiguration(char* filename, sdp::message::CSVLine &conf);
 
         //! Size of an internal input buffer
         static const uint16_t RBUF_SIZE;
@@ -357,37 +336,7 @@ namespace sdp
          *
          * \return true if no error, false otherwise
          */
-        static bool loadConfiguration(char* filename, sdp::message::CSVLine &conf)
-        {
-          char rBuffer[RBUF_SIZE];
-          File myFile = SD.open(filename, FILE_READ);
-          memset(rBuffer, 0, sizeof(char) * RBUF_SIZE);
-
-          // if the file opened okay, read it and get only the first line
-          if (myFile)
-          {
-            size_t i = 0;
-            bool endline = false;
-            while (myFile.available() && !endline)
-            {
-              rBuffer[i] = myFile.read();
-              if (rBuffer[i] == '\n' || i == RBUF_SIZE)
-              {
-                endline = true;
-              }
-              i++;
-            }
-            myFile.close();
-          }
-          else
-          {
-            return false;
-          }
-
-          conf.set(rBuffer, RBUF_SIZE);
-
-          return true;
-        }
+        static bool loadConfiguration(char* filename, sdp::message::CSVLine &conf);
 
       protected:
         /**
@@ -402,6 +351,20 @@ namespace sdp
         static void callback(char* topic, byte* payload, unsigned int length);
 
       private:
+        /**
+         * Creates topic from three information: direction, tenant and attribute. the last parameter
+         * is optional.
+         *
+         * \param[in] direction first element of the topic
+         * \param[in] tenant second element of the topic
+         * \param[in] attribute third element of the topic. It is optional, if you don't use it use NULL (or 0) value.
+         * \param[out] buffer buffer where topic will be saved
+         * \param[in] bSize buffer size
+         *
+         * \return false if buffer size is not enough big, true otherwise
+         */
+        bool createTopic(char* direction, char* tenant, char* attribute, char* buffer, unsigned int bSize);
+      private:
         //! Smart Data server
         SDPServer* m_server;
 
@@ -409,16 +372,19 @@ namespace sdp
         Client* m_netclient;
 
         //! Client identifier
-        char m_id[ID_SIZE];
+        char *m_id;
+        //char m_id[ID_SIZE];
 
         //! Message to send to the server
         char *m_message;
 
         //! MQTT Username
-        char m_username[USERNAME_SIZE];
+        char *m_username;
+        //char m_username[USERNAME_SIZE];
 
         //! MQTT Password
-        char m_password[PASSWORD_SIZE];
+        char *m_password;
+        //char m_password[PASSWORD_SIZE];
 
         //! HMAC keyword
         uint8_t m_hmacKey[HMAC_KEY_SIZE];

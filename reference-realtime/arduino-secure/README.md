@@ -44,7 +44,7 @@ To install a library, you have to copy the directory that contains all source fi
 Install all required and SDP libraries. For example, if you have installed Arduino IDE in /opt directory, you can use the following instructions:
 
 ```
-cp libraries/
+cd libraries/
 cp -r SDP* /opt/arduino-1.5.6-r2/libraries/
 ```
 If you use the lastest version of Arduino IDE (>= 1.5.7) you have to patch the Time library:

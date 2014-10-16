@@ -7,30 +7,33 @@
  *
  */
 #include "sdpstream.h"
+#include <stringparser.h>
 
 using namespace sdp::client;
 
 SDPStream::SDPStream() :
-    m_sensor(NULL), m_mobile(false)
+    m_sensor(NULL), m_mobile(false), m_isCopy(false), m_identifier(0)
 {
-  memset(m_identifier, 0, ID_SIZE);
 }
 
 SDPStream::SDPStream(const SDPStream &s)
 {
   m_sensor = s.m_sensor;
   m_mobile = s.m_mobile;
-  setID((const char*) s.m_identifier);
+  m_isCopy = true;
+  m_identifier = s.m_identifier;
 }
 
 SDPStream::~SDPStream()
 {
+  if (!m_isCopy)
+  {
+    StringParser::delBuffer(m_identifier);
+  }
 }
 
-void SDPStream::setID(const char* id)
+bool SDPStream::setID(const char* id)
 {
-  uint8_t len = strlen(id);
-  memset(m_identifier, 0, ID_SIZE);
-  memcpy(m_identifier, id, (len > ID_SIZE) ? ID_SIZE : len);
+  return StringParser::initBuffer(m_identifier, (char*) id, ID_SIZE);
 }
 
