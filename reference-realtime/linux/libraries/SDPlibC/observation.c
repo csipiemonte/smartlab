@@ -50,14 +50,14 @@ Value addComponetsAtValue(Value val, Component component){
 }
 
 
-Component newComponent(char *name, char* value){
+Component newComponent(char *name, int value/*char* value*/){
         Component comp;
         comp.sensor_name = name;
         comp.sensor_value = value;
         return comp;
 }
 
-Component newComponentDefault( char* value){
+Component newComponentDefault( int value/*char* value*/){
         Component comp;
         comp.sensor_name = "0";
         comp.sensor_value = value;
@@ -78,7 +78,7 @@ char* toJson(Observation observation){
             sprintf(sendMessage,"%s{\"time\":\"%s\",\"components\":{",sendMessage,observation.mValues[lValue].time);
             int lComp = 0;
             while(lComp<observation.mValues[lValue].contComponents){
-                sprintf(sendMessage,"%s\"%s\":\"%s\"",sendMessage, 
+                sprintf(sendMessage,"%s\"%s\":%d",sendMessage, 
                 observation.mValues[lValue].components[lComp].sensor_name,observation.mValues[lValue].components[lComp].sensor_value);
                 lComp++;
                 if(lComp==observation.mValues[lValue].contComponents){

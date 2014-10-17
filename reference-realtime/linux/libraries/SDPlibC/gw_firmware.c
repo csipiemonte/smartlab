@@ -117,7 +117,7 @@ void loadFirmware(char *filename, char *device){
         memset(command,0,500);
         printf("load the firmware\n");
         snprintf(command, 500,"avrdude -p m2560 -P %s -c stk500v2 -b 115200 -U flash:w:%s &", device, filename);
-	system(command);	
+	//system(command);	
         memset(command,0,500);  
 
 }

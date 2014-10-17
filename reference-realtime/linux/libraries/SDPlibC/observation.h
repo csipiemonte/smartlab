@@ -39,7 +39,7 @@ typedef struct
 typedef struct 
 {
   char *sensor_name; /**< The type of sensor */
-  char *sensor_value; /**< The value of the sensor */
+  int /*char* */sensor_value; /**< The value of the sensor */
 } Component;
 
 /**
@@ -128,7 +128,7 @@ Value addComponetsAtValue(Value value, Component component);
  * @param value the value of component
  * @return l'oggetto component
  */
-Component newComponent(char *name, char* value);
+Component newComponent(char *name,int value/*char* value*/);
 
 /**
  * @brief Create a new component
@@ -137,7 +137,7 @@ Component newComponent(char *name, char* value);
  * @param value the value of component
  * @return l'object component
  */
-Component newComponentDefault( char* value);
+Component newComponentDefault( int value/*char* value*/);
 
 /**
  * @brief Create the json
