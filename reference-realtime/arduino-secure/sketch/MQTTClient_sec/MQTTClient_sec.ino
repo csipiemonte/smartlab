@@ -1443,6 +1443,12 @@ void sendMeasures()
 #ifdef WIFI
       // Reset wifi 
       Serial.println( F("Reconnecting wifi...") );
+      if ( !MTTQClient->isConnected()  && status.serverConnected())
+      {
+        Serial.println("closeMQTTConnection");
+        MTTQClient->closeMQTTConnection();
+        status.setServerConnected(false);
+      }        
       wifiHandler.refresh();
 #endif      
 
@@ -1470,7 +1476,10 @@ void sendMeasures()
         else
         {
           Serial.println( F("Failed") );
+          
           MTTQClient->disconnect();
+          status.setServerConnected(false);
+
           Serial.println( F("SDP broker disconnected!") );
         }
 
@@ -1598,6 +1607,11 @@ bool ConnectToBroker()
 {
   if ( !MTTQClient->isConnected() )
   {
+        if (status.serverConnected())
+        {
+          Serial.println("closeMQTTConnection");
+           MTTQClient->closeMQTTConnection();
+        }        
         if ( MTTQClient->connect() )
         {
 #ifdef CONTROL      
@@ -1605,14 +1619,20 @@ bool ConnectToBroker()
           {}
 #endif
           Serial.println( F("SDP connected") );
+          status.setServerConnected(true);
           
           return true;
         }
         else
         {
           Serial.println( F("Connection failed") );
+          status.setServerConnected(false);
         }
         return false;
+  }
+  else
+  {
+    status.setServerConnected(true);
   }
   return true;
 }

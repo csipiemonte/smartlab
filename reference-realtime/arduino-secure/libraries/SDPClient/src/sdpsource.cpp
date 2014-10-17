@@ -397,7 +397,7 @@ uint8_t SDPSource::subscribe(const char* tenant, SDPStream& stream, GenericSenso
   {
     return 0;
   }
-  Serial.println(topic);
+  //Serial.println(topic);
   if (m_subclient->subscribe(topic))
   {
     //Serial.println(topic);

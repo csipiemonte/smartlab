@@ -215,6 +215,11 @@ namespace sdp
         }
         ;
 
+        void closeMQTTConnection()
+        {
+          m_subclient->closeConnection();
+        };
+
         /**
          * This function subscribes client to a specific topic.
          *
@@ -227,7 +232,7 @@ namespace sdp
         uint8_t subscribe(const char* tenant, SDPStream& stream, GenericSensor& sensor);
 
         /**
-         * This function published an information of a specific topic.
+         * This function publishes an information of a specific topic.
          *
          * \param[in] topic output topic
          * \param[in] msg message to publish
@@ -237,7 +242,7 @@ namespace sdp
         uint8_t publish(char* topic, char* msg);
 
         /**
-         * This function published an information of a specific topic.
+         * This function publishes an information of a specific topic.
          *
          * \param[in] topic output topic
          * \param[in] msg message to publish
@@ -247,7 +252,7 @@ namespace sdp
         uint8_t publish(SmartObjStatus & status, const char* tenant/* = DEFAULT_TENANT*/);
 
         /**
-         * This function published a measurement.
+         * This function publishes a measurement.
          *
          * \param[in] stream Data stream associated to sensor
          * \param[in] measure Measure measurement to send
@@ -258,6 +263,20 @@ namespace sdp
         uint8_t publish(SDPStream& stream, Measure& measure,
             const char* tenant/* = DEFAULT_TENANT*/);
 
+        /**
+         * This function published the status response on the control topic.
+         *
+         * \param[in] tenant publishing tenant(or domain)
+         * \param[in] time system time (in epoch format)
+         * \param[in] lastTS time (in epoch format) of the last successful sending.
+         * \param[in] nextTS time (in epoch format) of the next sending.
+         * \param[in] version firmware version
+         * \param[in] status status string
+         * \param[in] data data string
+         * \param[in] enable true if sensor is active, false otherwise
+         *
+         * \return
+         */
         uint8_t sendStatus(const char* tenant, unsigned long time, unsigned long lastTS, unsigned long nextTS, char* version, char* status, char* data = "", bool enable = true);
 
         /**

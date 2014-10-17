@@ -28,7 +28,7 @@ namespace sdp
   {
 
     SmartObjStatus::SmartObjStatus() :
-        m_status(IDLE)
+        m_status(IDLE), m_serverConnected(false)
     {
       //! Reset counters
       m_uptime.update();

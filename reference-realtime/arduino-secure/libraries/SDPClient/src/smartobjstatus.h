@@ -34,6 +34,9 @@ namespace sdp
         //! Time from the last sending of  a measurement
         IntervalSeconds m_lastErrorTime;
 
+        //! MQTT connection status
+        bool m_serverConnected;
+
       public:
         /**
          * \enum   _node_state
@@ -118,6 +121,16 @@ namespace sdp
         void start()
         {
           m_uptime.update();
+        }
+
+        bool serverConnected()
+        {
+          return m_serverConnected;
+        };
+
+        void setServerConnected(bool conn)
+        {
+          m_serverConnected = conn;
         }
     };
 
