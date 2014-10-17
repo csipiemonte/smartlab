@@ -130,9 +130,6 @@ mqtt_broker_handle_t * mqtt_connect(const char* client, const char * server_ip, 
         return broker;
 }
 
-
-
-
 int mqtt_subscribe(mqtt_broker_handle_t *broker, const char *topic, QoS qos)
 {
         if (!broker->connected) {
@@ -187,7 +184,7 @@ int mqtt_subscribe(mqtt_broker_handle_t *broker, const char *topic, QoS qos)
    // broker->topic = strlen(topic);
         //fprintf("valore del topic=%s",broker->topic);
         struct timeval tv;
-        tv.tv_sec = 30;  
+        tv.tv_sec = 360000;  
         tv.tv_usec = 0;  // Not init'ing this can cause strange errors
     
         setsockopt(broker->socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
@@ -334,8 +331,7 @@ void mqtt_disconnect(mqtt_broker_handle_t *broker)
 int sendMessageMqtt(SenderMqtt sender, char *message, char* userName, char* password)
 {
         mqtt_broker_handle_t *broker = mqtt_connect(sender.client, sender.ip, 1883, userName, password);
-
-    
+   
         if(broker == 0) {
             puts("Failed to connect");
             exit(1);
@@ -361,34 +357,61 @@ int message_register_state_cb( message_state_cb_t cb){
         //printf("richiamata callback\n");
 }
 
+int sendPingReq(mqtt_broker_handle_t *broker){
+        printf("Sending PINGREQ\n");
+	uint8_t var_header[] = { MSB(MESSAGE_ID), LSB(MESSAGE_ID) };
+	uint8_t fixed_header[] = { SET_MESSAGE(PINGREQ), sizeof(var_header)};
+        if (!broker->connected) {
+	    printf("Error broker disconnected. Impossible send PINGREQ\n");
+            return -1;
+        }	
+        if (send(broker->socket, fixed_header, sizeof(fixed_header), 0) < sizeof(fixed_header)) {
+	        printf("Error to send message pingreq\n");
+                return -1;
+        }
+ 
+        mqtt_display_message(broker, &putchar);
+//         sleep(1);
+}
+
 void mqtt_display_message(mqtt_broker_handle_t *broker, int (*print)(int))
 {
         uint8_t buffer[512];
         char bufferJson[512];
-        //printf("valore del topic=%s\n",broker->topic);
+
+//         printf("valore del topic=%s\n",broker->topic);
         SetSocketTimeout(broker->socket, 30000);
         memset(bufferJson,0,512);
         while(1) {
-            // wait for next message
+//             printf(" wait for next message");
             long sz = recv(broker->socket, buffer, sizeof(buffer), 0);
-            if (sz == 0){
-                printf("\nSocket EOF\n");
-                close(broker->socket);
-                broker->socket = 0;
-                return;
-            }
+//             if (sz == 0){
+//                  printf("\nSocket EOF\n");
+// //                 close(broker->socket);
+// //                 broker->socket = 0;
+// //                 usleep(500);
+//                 break;
+// 
+//             }
 
             if(sz < 0){
-                printf("\nSocket recv returned %ld, errno %d %s\n",sz,errno, strerror(errno));
-                close(broker->socket); 
-                broker->socket = 0;
-                exit(0);
+//                 printf("\nSocket recv returned %ld, errno %d %s\n",sz,errno, strerror(errno));
+//                 close(broker->socket); 
+//                 broker->socket = 0;
+//                 exit(0);
+                sendPingReq(broker);
+                usleep(500);
+                break;
+
             }
 
             if(sz > 0) {
                 int l=0;
-                printf("\n");
-            
+//                 printf("buffer[0]=%x\n",buffer[0]);
+                if( GET_MESSAGE(buffer[0]) == PINGRESP) {
+                    printf("received PINGRESP\n");
+                    break;
+                }
                 if( GET_MESSAGE(buffer[0]) == PUBLISH) {                
                 //printf("Got PUBLISH message with size %d\n", (uint8_t)buffer[1]);
                     uint32_t topicSize;
@@ -405,7 +428,8 @@ void mqtt_display_message(mqtt_broker_handle_t *broker, int (*print)(int))
                         uint8_t puback[4] = { SET_MESSAGE(PUBACK), 2, buffer[4+topicSize], buffer[4+topicSize+1] };
                         if (send(broker->socket, puback, sizeof(puback), 0) < sizeof(puback)) {
                             puts("failed to PUBACK");
-                            return;
+//                             return;
+
                         }
                     }
                     int l=0;

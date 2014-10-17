@@ -2,7 +2,8 @@
  * @file mqtt.h
  * @author Leonardo Sileo
  * @date 15 Settembre 2014
- * @brief Allows you create a MQTT subscribe or publisher
+ * @brief Allows to realize a subscribe or a publiscer MQTT. It provides functionality for connecting to a topic, 
+ * publishing and receiving messages MQTT. For now implements such as quality of service only 0
  * 
  */
 #ifndef mqtt_h
@@ -24,7 +25,7 @@
 #define PROTOCOL_NAME       "MQIsdp"    // 
 #define PROTOCOL_VERSION    3U          // version 3.0 of MQTT
 #define CLEAN_SESSION       (1U<<1)
-#define KEEPALIVE           30U         // specified in seconds
+#define KEEPALIVE           120U         // specified in seconds
 #define MESSAGE_ID          1U // not used by QoS 0 - value must be > 0
 
 /* Macros for accessing the MSB and LSB of a uint16_t */
@@ -52,8 +53,8 @@ typedef enum {
         SUBACK,
         UNSUBSCRIBE,
         UNSUBACK,
-        PINGREQ,
-        PINGRESP,
+        PINGREQ = 12,
+        PINGRESP = 13,
         DISCONNECT       
 } connect_msg_t;
 
@@ -142,8 +143,8 @@ typedef void (*message_state_cb_t)( const message__state_t *message_state);
 /**
  * @brief Set the callback for message state updates.
  *
- * @param cb		A funcion pointer or NULL to disable callbacks.
- * @return			Zero on success or NULL on error.
+ * @param cb	A funcion pointer or NULL to disable callbacks.
+ * @return	Zero on success or NULL on error.
  */
 extern int message_register_state_cb( message_state_cb_t cb);
 

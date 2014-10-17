@@ -2,7 +2,7 @@
  * @file senderHttp.h
  * @author Leonardo Sileo
  * @date 18 Luglio 2014
- * @brief Allow to send the json
+ * @brief Creates an HTTP connection with the server and make a post of your message
  * 
  */
 
@@ -15,7 +15,10 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
+#include <netinet/tcp.h>
+#include <curl/curl.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #define SA struct sockaddr /**< Struttura per il server */
 #define MAXLINE 4096 /**< dimensione massima del messaggio */
@@ -31,6 +34,8 @@ typedef struct
 char *port; /**<The port of the server */
 char *ip;  /**< Address IP of the server */
 char *service; /**< Link of the server */
+char *key; /**< Key of the server */
+char *destination; /**< Name of platform that receive the message */
 } SenderHttp;
 
 
@@ -42,9 +47,10 @@ char *service; /**< Link of the server */
  * @param _ip address ip of the server
  * @param _port port of the server
  * @param _service link of the server
+ * @param _key key of the server 
  * @return the sender
  */
-SenderHttp newSenderHttp(char* _ip, char* _port, char* _service);
+SenderHttp newSenderHttp(char* _ip, char* _port, char* _service,char* _key, char* _destination);
 
 
 /**
@@ -54,5 +60,17 @@ SenderHttp newSenderHttp(char* _ip, char* _port, char* _service);
  * 
  * @param sender the object sender 
  * @param message the message to send
+ * @param destination the platform that receive the message
  */
 int sendMessageHttp(SenderHttp sender, char *message);
+
+/**
+ * @brief Send the message with libCURL
+ * 
+ * Send the message at server. The messagge is sending with POST request
+ * 
+ * @param sender the object sender 
+ * @param message the message to send
+ * @param destination the platform that receive the message
+ */
+int sendMessageHttpCurl(SenderHttp sender, char *message);

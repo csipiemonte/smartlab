@@ -2,7 +2,9 @@
  * @file gw_firmware.h
  * @author Leonardo Sileo
  * @date 15 Settembre 2014
- * @brief Allows you to locate and downlad a new firmware for Arduino
+ * @brief manages the firmware update dell'Arduino via a gateway. Allows you to create a message for a configuration, 
+ * perform the parsing of a configuration message, do the firmware download and 
+ * update the arduino (in this release only the Arduino Mega 2560).
  * 
  */
 
@@ -66,14 +68,14 @@ char* getJson(cJSON *root);
  * @brief Parser for the JSON received
  * 
  * Parser the json for search URL and HASH value
- * @param buffer a array representing the content of the json
+ * @param buffer a object FirmwareComponent representing the values of URL and HASH into the json message
  * 
  * @return Return 1 for message published, -1 for error
  */
 FirmwareComponent getFirmwareComponent(char *buffer);
 
 /**
- * @brief Write the data into the file
+ * @brief Write the data
  * 
  * Write the data into the file
  * @param ptr the data
@@ -110,7 +112,8 @@ int checkHash(char* filename, char* hash);
 /**
  * @brief Load the firmware for Arduino
  * 
- * Load the firmware for Arduino. At moment this function works for Arduino MEGA 2560
+ * This function loads the firmware for the aurduino through the gateway. 
+ * At moment this function works for Arduino MEGA 2560
  * @param filename the name of file
  * @param device the serial port where is attached the Arduino
  * 
