@@ -22,6 +22,7 @@
  */
 
 #include "stringparser.h"
+#include <Time.h>
 
 StringParser::StringParser()
 {
@@ -399,4 +400,77 @@ char* StringParser::removeTabs(char* str, byte size, bool end)
 
   }
   return p;
+}
+
+bool StringParser::newBuffer(char* &dest, size_t maxSize)
+{
+  if (dest != 0)
+  {
+    return false;
+  }
+
+  dest = new char[maxSize];
+  if (dest == 0)
+  {
+    return false;
+  }
+
+  memset(dest, 0, maxSize);
+
+  return true;
+}
+
+bool StringParser::initBuffer(char* &dest, const char* src, size_t maxSize)
+{
+  // Delete old string
+
+  if (delBuffer(dest))
+  {
+  }
+
+  return setBuffer(dest, src, maxSize);
+}
+
+bool StringParser::setBuffer(char* &dest, const char* src, size_t maxSize)
+{
+  // Get length source string
+  size_t length = strlen(src) + 1;
+  length = (maxSize > length)?length:maxSize;
+
+
+  if (!newBuffer(dest, length))
+  {
+    return false;
+  }
+
+  memcpy(dest, src, length - 1);
+
+  return true;
+
+}
+bool StringParser::delBuffer(char* &buf)
+{
+  if (buf != 0)
+  {
+    delete[] buf;
+    buf = 0;
+    return true;
+  }
+  return false;
+}
+
+char* StringParser::getFlashString(PROGMEM const char *table[], byte index, char* flashBuffer, size_t bSize)
+{
+  memset(flashBuffer, 0, bSize);
+  strcpy_P(flashBuffer, (char*) pgm_read_word(&(table[index])));
+  return flashBuffer;
+}
+
+
+
+bool StringParser::convertTimeISO8601(unsigned long time, char * buffer, size_t bSize)
+{
+  snprintf(buffer, bSize, "%04d-%02d-%02dT%02d:%02d:%02dZ",
+            year(time), month(time), day(time),
+            hour(time), minute(time), second(time));
 }

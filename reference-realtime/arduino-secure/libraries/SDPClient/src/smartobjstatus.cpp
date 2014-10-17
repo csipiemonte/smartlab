@@ -34,6 +34,7 @@ namespace sdp
       m_uptime.update();
       updateLastReadTime();
       updateLastSendTime();
+      updateLastErrorTime();
     }
 
     SmartObjStatus::~SmartObjStatus()

@@ -25,6 +25,7 @@
 #define STRINGPARSER_H_
 
 #include "Arduino.h"
+#include <avr/pgmspace.h>
 
 /**
  * The class StringParser gives the functions to manage an array of characters.
@@ -201,6 +202,62 @@ class StringParser
      * \return the pointer to the first character different from '\\t' and ' '.
      */
     static char* removeTabs(char* str, byte size = 255, bool end = false);
+
+    /**
+     * Allocates a new array of chars.
+     *
+     * \param[out] dest pointer to the array to allocate
+     * \param[in] maxSize array size
+     *
+     * \return false if the array is just allocated or if there is a memory error, true otherwise.
+     */
+    static bool newBuffer(char* &dest, size_t maxSize);
+
+    /**
+     * Allocates a char array and copies in it a string.
+     *
+     * \param[out] dest pointer to the array to allocate
+     * \param[out] src string to copy
+     * \param[in] maxSize destination array size
+     *
+     * \return false if the array is just allocated or if there is a memory error, true otherwise.
+     */
+    static bool initBuffer(char* &dest, const char* src, size_t maxSize);
+
+    /**
+     * Copies a string into the array of chars.
+     *
+     * \param[out] dest pointer to the array to allocate
+     * \param[out] src string to copy
+     * \param[in] maxSize destination array size
+     *
+     * \return false if there is a memory error, true otherwise.
+     */
+    static bool setBuffer(char* &dest, const char* src, size_t maxSize);
+
+    /**
+     * Deletes the array of chars an puts the pointer to NULL (0 value).
+     *
+     * \param[out] buf pointer to the array to delete
+     *
+     * \return false if the array has been just deleted before, true otherwise.
+     */
+    static bool delBuffer(char* &buf);
+
+    /**
+     * Reads a word from flash and returns it as a string, using a global buffer ( flashBuffer ).
+     *
+     * \param[in] table string table stored in the flash memory
+     * \param[in] index position of the string to get in the table
+     * \param[out] flashBuffer array of char where save the string
+     * \param[in] bSize size of flashBuffer array
+     *
+     * \return pointer to the string (flashBuffer)
+     */
+    static char* getFlashString(PROGMEM const char *table[], byte index, char* flashBuffer, size_t bSize);
+
+    static bool convertTimeISO8601(unsigned long time, char * buffer, size_t bSize = 21);
+
 };
 
 #endif /* STRINGPARSER_H_ */

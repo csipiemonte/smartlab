@@ -258,6 +258,8 @@ namespace sdp
         uint8_t publish(SDPStream& stream, Measure& measure,
             const char* tenant/* = DEFAULT_TENANT*/);
 
+        uint8_t sendStatus(const char* tenant, unsigned long time, unsigned long lastTS, unsigned long nextTS, char* version, char* status, char* data = "", bool enable = true);
+
         /**
          * This function keep connection alive and receive message from MQTT broker.
          *

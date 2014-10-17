@@ -31,6 +31,9 @@ namespace sdp
         //! Time from the last sending of  a measurement
         IntervalSeconds m_lastSendTime;
 
+        //! Time from the last sending of  a measurement
+        IntervalSeconds m_lastErrorTime;
+
       public:
         /**
          * \enum   _node_state
@@ -77,6 +80,12 @@ namespace sdp
         }
         ;
 
+        void updateLastErrorTime()
+        {
+          m_lastErrorTime.update();
+        }
+        ;
+
         unsigned long lastReadTime()
         {
           return m_lastReadTime.time();
@@ -86,6 +95,12 @@ namespace sdp
         unsigned long lastSendTime()
         {
           return m_lastSendTime.time();
+        }
+        ;
+
+        unsigned long lastErrorTime()
+        {
+          return m_lastErrorTime.time();
         }
         ;
 

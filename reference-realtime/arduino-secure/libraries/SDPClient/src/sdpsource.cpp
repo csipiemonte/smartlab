@@ -235,11 +235,63 @@ bool SDPSource::createTopic(char* direction, char* tenant, char* attribute, char
 
 }
 
+uint8_t SDPSource::sendStatus(const char* tenant, unsigned long time, unsigned long lastTS, unsigned long nextTS, char* version, char* status, char* data, bool enable)
+{
+#define TOPIC_SIZE 128
+
+  char topic[TOPIC_SIZE] = { 0 };
+
+  char connO[10] = {0};
+  StringParser::getFlashString((const char**) SDPSource::SOURCE_TABLE_P, 0, &connO[0], 10);
+
+  char attrContrl[10] = {0};
+  StringParser::getFlashString((const char**) SDPSource::SOURCE_TABLE_P, 2, &attrContrl[0], 10);
+
+  if ( !createTopic((char*) connO, (char*) tenant, (char*) attrContrl, topic, (unsigned int) TOPIC_SIZE) )
+  {
+    return 0;
+  }
+  Serial.println(topic);
+
+  char buffer[25] = {0};
+
+  sdp::message::JSON json;
+  json.add("id", m_id);
+  StringParser::convertTimeISO8601(time, buffer);
+  json.add("time", buffer);
+  StringParser::convertTimeISO8601(lastTS, buffer);
+  json.add("last", buffer);
+  StringParser::convertTimeISO8601(nextTS, buffer);
+  json.add("next", buffer);
+
+
+  StringParser::delBuffer(m_message);
+  m_message = aJson.print(json.getJson());
+
+
+  uint8_t n = 0;
+  if (m_message != 0)
+  {
+    Serial.print( F("json: ") );
+    Serial.println(m_message);
+    n = m_subclient->publish(topic, m_message);
+  }
+
+  if (m_message == 0)
+  {
+    //Serial.println("return 0");
+    return 0;
+  }
+
+  StringParser::delBuffer(m_message);
+
+  return n;
+
+}
 
 uint8_t SDPSource::publish(SDPStream& stream, Measure& measure,
     const char* tenant)
 {
-#define TOPIC_SIZE 128
 
   char topic[TOPIC_SIZE] = { 0 };
 

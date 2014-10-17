@@ -881,6 +881,10 @@ void setup()
   currentStatus = sdp::client::SmartObjStatus::UPDATE_TIME;
   tReadTime.update(); 
   tSendTime.update(); 
+  
+  status.updateLastReadTime();
+  status.updateLastSendTime();
+  status.updateLastErrorTime();
 }
 
 
@@ -1473,22 +1477,20 @@ void sendMeasures()
         // Check if the data transmission failed
         if (!n)
         {
-/*          
-#ifdef WIFI
-          // Reset wifi 
-          Serial.println( F("Reconnecting wifi...") );
-          wifiHandler.refresh();
-#endif      
-*/
+          status.updateLastErrorTime();
         }
       }
       else
       {
         Serial.println( F("SDP no connection") );
+#ifdef WIFI
         if ( wifiHandler.isConnect() )
         {
           ConnectToBroker();
         }
+#else
+        ConnectToBroker();
+#endif      
       }
       printMemoryInfo();
 }
@@ -1544,6 +1546,22 @@ void controlManage()
 
 void processStatusMsg(sdp::message::SDPCtrlMsg &msg)
 {
+  unsigned long ts = status.lastSendTime();
+  unsigned long te = status.lastErrorTime();
+  unsigned long n = now();
+  
+  Serial.println(ts);
+  Serial.println(te);
+  
+  MTTQClient->sendStatus(
+    StringParser::getFlashString((const char**) node_table, NODE_TENANT, flashBuffer, FLASH_BUFFER_SIZE),
+    (unsigned long) n,
+    (unsigned long) (n - ts),
+    (unsigned long) (n - (ts > te)?te:ts ) + (tSend / 1000), //MAX (last error, last send) + tSend
+    (char*) "1.0",
+    ""
+    ); 
+//    unsigned long time, unsigned long lastTS, unsigned long nextTS, char* version, char* status, char* data = "", bool enable = true)
               Serial.print( F("Uptime: ") );
               Serial.println( (byte) status.uptime() ); 
               Serial.print( F("Last read: ") );
@@ -1578,6 +1596,8 @@ void processWConfigMsg(sdp::message::SDPCtrlMsg &msg)
 
 bool ConnectToBroker()
 {
+  if ( !MTTQClient->isConnected() )
+  {
         if ( MTTQClient->connect() )
         {
 #ifdef CONTROL      
@@ -1593,4 +1613,6 @@ bool ConnectToBroker()
           Serial.println( F("Connection failed") );
         }
         return false;
+  }
+  return true;
 }

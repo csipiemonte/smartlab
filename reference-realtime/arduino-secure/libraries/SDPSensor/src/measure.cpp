@@ -7,6 +7,7 @@
  *
  */
 #include "measure.h"
+#include "stringparser.h"
 
 using namespace sdp::sensor;
 
@@ -37,9 +38,12 @@ const char* Measure::timestamp(byte format)
   {
     case DEFAULT_TS:
     {
+      StringParser::convertTimeISO8601(m_timestamp, m_buffer, BUFFER_SIZE);
+/*
       snprintf(m_buffer, BUFFER_SIZE, "%04d-%02d-%02dT%02d:%02d:%02dZ",
           year(m_timestamp), month(m_timestamp), day(m_timestamp),
           hour(m_timestamp), minute(m_timestamp), second(m_timestamp));
+*/
     }
       break;
     case IOT:
