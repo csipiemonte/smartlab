@@ -97,6 +97,12 @@ where:
 - *control_msg*: control message. At the moment it is support only WCONFIG (write new configuration in local file) and CONFIG (load configuration from file)
 - *data*: this field can contain some information or be empty. 
 
+All messages response, when they are expected, are sent to the following topic
+
+```
+output/<tenant>/control
+```
+
 **WCONFIG message**
 WCONFIG is used to change current configuration. The "data" field contains the new configuration as a CSV line. For example:
 ```
@@ -104,11 +110,22 @@ WCONFIG is used to change current configuration. The "data" field contains the n
 ```
 This message will change the reading time for the sensor*550e8400-e29b-41d4-a716-446655440000* and the time interval to update the system time. This changes are not active, they will be only saved in the configuration file on the SD card. They will be active at the next boot.
 
-
 **CONFIG message**
 CONFIG is used to load the configuration from the SDcard. It is useful to update configuration after the WCONFIG message without rebooting the Arduino. This is an example:
 ```
 {"to":"550e8400-e29b-41d4-a716-446655440000","msg": "config","data": ""}
+```
+
+**STATUS message**
+STATUS is used to get the status of the smart object. At  the moment the response message is a subset of all property defined for this message. The information included  in Status message are:
+- *id*: smart object identifier
+- *time*: system time
+- *last*: time stamp of the last successfully sent
+- *next*: time stamp of the expected measurement
+
+```
+{"id":"550e8400-e29b-41d4-a716-446655440000","time":"2014-10-20T09:22:29Z","last":"2014-10-20T09:22:24Z","next":"2014-10-20T09:22:12Z"}
+
 ```
 
 **Note:**
