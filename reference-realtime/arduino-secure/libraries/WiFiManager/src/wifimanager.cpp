@@ -64,11 +64,10 @@ bool WiFiManager::connect()
       && timeout.time() <= WIFI_CONNECTION_TIMEOUT)
   {
     /*
-     Serial.print("Attempting to connect to SSID: ");
+#ifdef DEBUG
+     Serial.print(F("Attempting to connect to SSID: "));
      Serial.println( (char* )m_ssid.c_str());
-
-     // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
-     debug.println("WiFi.status(): %d - timeout %ul", WiFi.status(), timeout.time());
+#endif
      */
 
     switch (m_connectionType)
@@ -116,6 +115,9 @@ bool WiFiManager::refresh()
 {
   if (WiFi.status() != WL_CONNECTED)
   {
+#ifdef DEBUG
+    Serial.println( F("Reconnecting wifi...") );
+#endif
     WiFi.disconnect();
     // Wait 10 seconds
     for (byte i = 0; i < 5; i++)
