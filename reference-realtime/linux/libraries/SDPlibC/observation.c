@@ -50,14 +50,14 @@ Value addComponetsAtValue(Value val, Component component){
 }
 
 
-Component newComponent(char *name, int value/*char* value*/){
+Component newComponent(char *name, float value/*char* value*/){
         Component comp;
         comp.sensor_name = name;
         comp.sensor_value = value;
         return comp;
 }
 
-Component newComponentDefault( int value/*char* value*/){
+Component newComponentDefault( float value/*char* value*/){
         Component comp;
         comp.sensor_name = "0";
         comp.sensor_value = value;

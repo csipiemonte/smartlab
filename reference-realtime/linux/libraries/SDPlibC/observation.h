@@ -128,7 +128,7 @@ Value addComponetsAtValue(Value value, Component component);
  * @param value the value of component
  * @return l'oggetto component
  */
-Component newComponent(char *name,int value/*char* value*/);
+Component newComponent(char *name,float value/*char* value*/);
 
 /**
  * @brief Create a new component
@@ -137,7 +137,7 @@ Component newComponent(char *name,int value/*char* value*/);
  * @param value the value of component
  * @return l'object component
  */
-Component newComponentDefault( int value/*char* value*/);
+Component newComponentDefault( float value/*char* value*/);
 
 /**
  * @brief Create the json

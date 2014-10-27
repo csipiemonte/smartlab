@@ -14,7 +14,8 @@ SenderHttp newSenderHttp(char* _ip, char* _port, char* _service, char* _key, cha
 void timeNow(){
         time_t curtime;
         struct tm *timeTF;
-        char *buffer=malloc(30*sizeof(char));
+        char *buffer;
+	buffer=malloc(30*sizeof(char));
         time(&curtime);
         timeTF = localtime( &curtime );
         strftime(buffer,30,"%Y-%m-%dT%XZ",timeTF);
