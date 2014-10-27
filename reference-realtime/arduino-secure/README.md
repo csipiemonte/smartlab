@@ -83,7 +83,7 @@ A standard for the format of the configuration message sent to the Arduino in no
 The Arduino subscribes itself to this topic on the MQTT broker:
 
 ```
-output/<tenant>/control
+input/<tenant>/control
 ```
 
 the new command will have the following format:
