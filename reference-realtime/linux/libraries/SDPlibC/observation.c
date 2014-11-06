@@ -15,6 +15,17 @@ char* getTime(){
         return buffer;
 }
 
+char* getNextTime(int seconds){
+        time_t curtime;
+        struct tm *timeTF;
+        char *buffer=malloc(30*sizeof(char));
+        //time(&curtime) + seconds;
+	curtime = time (NULL) + seconds;
+        timeTF = localtime( &curtime);
+        strftime(buffer,30,"%Y-%m-%dT%XZ",timeTF);
+        return buffer;
+}
+
 Observation newObservation(char *idStream, char *idSensor){
         Observation obs;
         obs.mStream.idStream = idStream;

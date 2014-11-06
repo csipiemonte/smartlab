@@ -81,6 +81,14 @@ typedef struct
 char* getTime();
 
 /**
+ * @brief Return the time of next message
+ * 
+ * Allow of return the next message the date and time in the format ISO8601
+ * @param seconds the time between messages
+ * @return Date and time
+ */
+char* getNextTime(int seconds);
+/**
  * @brief Create a object Observation
  * 
  * Crea a new Observation whit streamID and sensorID 

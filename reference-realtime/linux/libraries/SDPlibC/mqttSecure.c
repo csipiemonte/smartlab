@@ -18,6 +18,7 @@ SLLMqtt newSLLMqtt(char* _cafile, char* _capath, char* _certfile, char* _keyfile
 
 void my_message_callback(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
 {
+  printf("callback  my_message_callback\n");
         char bufferJson[512];
         if(message->payloadlen){
 //             printf("%s \n", message->payload);//, message->payload);
@@ -84,6 +85,7 @@ void my_publish_callback(struct mosquitto *mosq, void *obj, int mid)
             disconnect_sent = true;
         }
 }
+
 void my_disconnect_callback(struct mosquitto *mosq, void *obj, int rc)
 {
         connected = false;
@@ -118,13 +120,12 @@ int mqtt_subscribe_sll(SenderMqtt sender, SLLMqtt sllMqtt, char* _userName, char
                 return 1;
         }
 //         mosquitto_log_callback_set(mosq, my_log_callback);
-        mosquitto_username_pw_set(mosq, userName, password ) ;
+        mosquitto_username_pw_set(mosq, userName, password) ;
         mosquitto_tls_set(mosq, cafile, capath, certfile, keyfile, NULL);
         mosquitto_connect_callback_set(mosq, my_connect_callback);
-        
-        mosquitto_message_callback_set(mosq, my_message_callback);
         mosquitto_subscribe_callback_set(mosq, my_subscribe_callback);
-        
+        mosquitto_message_callback_set(mosq, my_message_callback);
+	
         if(mosquitto_connect(mosq, host, port, keepalive)){
                 fprintf(stderr, "Unable to connect.\n");
                 return 1;
@@ -169,12 +170,10 @@ int mqtt_pubscribe_sll(SenderMqtt sender, SLLMqtt sllMqtt, char *_message, char*
         mosquitto_username_pw_set(mosq, userName, password);//
         mosquitto_tls_set(mosq, cafile, capath, certfile, keyfile, NULL);
         mosquitto_connect_callback_set(mosq, my_connect_callback);
-        mosquitto_disconnect_callback_set(mosq, my_disconnect_callback);
+//         mosquitto_disconnect_callback_set(mosq, my_disconnect_callback);
         mosquitto_message_callback_set(mosq, my_message_callback);
         mosquitto_subscribe_callback_set(mosq, my_subscribe_callback);
 
-
-        
         if(mosquitto_connect(mosq, host, port, keepalive)){
                 fprintf(stderr, "Unable to connect.\n");
                 return 1;
@@ -186,6 +185,7 @@ int mqtt_pubscribe_sll(SenderMqtt sender, SLLMqtt sllMqtt, char *_message, char*
        // mosquitto_loop_forever(mosq, -1, 1);
        // while(!mosquitto_loop(mosq,-1, 1)){
        // }
+	mosquitto_disconnect(mosq);
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
         return 0;
