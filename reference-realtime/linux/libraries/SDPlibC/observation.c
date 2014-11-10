@@ -89,7 +89,7 @@ char* toJson(Observation observation){
             sprintf(sendMessage,"%s{\"time\":\"%s\",\"components\":{",sendMessage,observation.mValues[lValue].time);
             int lComp = 0;
             while(lComp<observation.mValues[lValue].contComponents){
-                sprintf(sendMessage,"%s\"%s\":%d",sendMessage, 
+                sprintf(sendMessage,"%s\"%s\":%.2f",sendMessage, 
                 observation.mValues[lValue].components[lComp].sensor_name,observation.mValues[lValue].components[lComp].sensor_value);
                 lComp++;
                 if(lComp==observation.mValues[lValue].contComponents){

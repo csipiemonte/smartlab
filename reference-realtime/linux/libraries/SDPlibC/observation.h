@@ -39,7 +39,7 @@ typedef struct
 typedef struct 
 {
   char *sensor_name; /**< The type of sensor */
-  int /*char* */sensor_value; /**< The value of the sensor */
+  float /*char* */sensor_value; /**< The value of the sensor */
 } Component;
 
 /**
