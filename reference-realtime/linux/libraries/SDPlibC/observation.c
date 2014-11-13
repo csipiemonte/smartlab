@@ -10,7 +10,7 @@ char* getTime(){
         struct tm *timeTF;
         char *buffer=malloc(30*sizeof(char));
         time(&curtime);
-        timeTF = localtime( &curtime );
+        timeTF = gmtime(&curtime);
         strftime(buffer,30,"%Y-%m-%dT%XZ",timeTF);
         return buffer;
 }
