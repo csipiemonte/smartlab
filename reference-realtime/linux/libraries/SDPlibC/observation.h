@@ -76,18 +76,21 @@ typedef struct
  * 
  * Allow of return the date and time in the format ISO8601
  * 
+ * @param buffer the container of the time
  * @return Date and time
  */
-char* getTime();
+char* getTime(char *buffer);
 
 /**
  * @brief Return the time of next message
  * 
  * Allow of return the next message the date and time in the format ISO8601
+ * 
+ * @param buffer the container of the time
  * @param seconds the time between messages
  * @return Date and time
  */
-char* getNextTime(int seconds);
+char* getNextTime(char *buffer, int seconds);
 /**
  * @brief Create a object Observation
  * 
@@ -113,11 +116,19 @@ Observation observationAddValue(Observation obs, Value value);
  * @brief Create a object values
  * 
  * Create a new values. If the field time is empty the time is added automatically
- * @param time the date and time of values. 
+ * @param time the contaioner the date and time of values. 
  * @return the object value
  */
 Value newValue(char *time);
 
+/**
+ * @brief Create a object values
+ * 
+ * Create a new values. If the field time is empty the time is added automatically
+ * @param time the date and time of values. 
+ * @return the object value
+ */
+Value newValueWithTime(char *time);
 /**
  * @brief Add a component at Value
  * 
@@ -151,9 +162,10 @@ Component newComponentDefault( float value/*char* value*/);
  * @brief Create the json
  * 
  * Create the json from observation for send message
- * @param obs l'observation 
+ * @param obs l'observation
+ * @param sendMessage the container of the message 
  * @return the message
  */
-char* toJson(Observation obs);
+char* toJson(Observation obs, char *sendMessage);
 
 #endif /* JSON_H_ */

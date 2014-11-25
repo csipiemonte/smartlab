@@ -5,24 +5,24 @@
 #include <curl/curl.h>
 #include <string.h>
 
-char* getTime(){
+char* getTime(char *buffer){
         time_t curtime;
         struct tm *timeTF;
-        char *buffer=malloc(30*sizeof(char));
+//         char *buffer=malloc(30*sizeof(char));
         time(&curtime);
         timeTF = gmtime(&curtime);
-        strftime(buffer,30,"%Y-%m-%dT%XZ",timeTF);
+        strftime(buffer,21,"%Y-%m-%dT%H:%M:%SZ",timeTF);
         return buffer;
 }
 
-char* getNextTime(int seconds){
+char* getNextTime(char *buffer ,int seconds){
         time_t curtime;
         struct tm *timeTF;
-        char *buffer=malloc(30*sizeof(char));
+//         char *buffer=malloc(30*sizeof(char));
         //time(&curtime) + seconds;
 	curtime = time (NULL) + seconds;
         timeTF = localtime( &curtime);
-        strftime(buffer,30,"%Y-%m-%dT%XZ",timeTF);
+        strftime(buffer,21,"%Y-%m-%dT%H:%M:%SZ",timeTF);
         return buffer;
 }
 
@@ -42,12 +42,22 @@ Observation observationAddValue(Observation obs, Value value){
         return obs;
 }
 
-Value newValue(char* time){
+Value newValue(char *time){
         Value val;
-        if(strlen(time)>0)
-            val.time = time;
-        else
-            val.time = getTime();
+//      if(strlen(time)>0)
+//          val.time = time;
+//      else{
+        val.time = getTime(time);   
+//         }
+        val.contComponents = 0;
+        val.validity = "unknown";
+        val.components = (struct Component*)malloc(100*sizeof*val.components);
+        return val;
+}
+
+Value newValueWithTime(char *time){
+        Value val;
+        val.time = time;
         val.contComponents = 0;
         val.validity = "unknown";
         val.components = (struct Component*)malloc(100*sizeof*val.components);
@@ -75,10 +85,10 @@ Component newComponentDefault( float value/*char* value*/){
         return comp;
 }
 
-char* toJson(Observation observation){
+char* toJson(Observation observation, char *sendMessage){
 	//printf("JSON completo con contValues=%d e contComponents=%d\n", observation.contValues, observation.mValues->contComponents);;
-        char *sendMessage;
-        sendMessage = malloc(1000*sizeof(char));
+//         char *sendMessage;
+//         sendMessage = malloc(1000*sizeof(char));
         int lValue=0;
 
         sprintf(sendMessage,"{\"stream\":\"%s\",",observation.mStream.idStream);
