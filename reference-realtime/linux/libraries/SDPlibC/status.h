@@ -61,4 +61,5 @@ void sendStatus(ClientMqtt _sender, send_status_t status_t);
  * @param status_t the state of client
  *
  */
-config_state_t getValueTo(cJSON *json,config_state_t state_t,ClientMqtt _sender, send_status_t status_t);
+// config_state_t getValueTo(cJSON *json,config_state_t state_t,ClientMqtt _sender, send_status_t status_t);
+void getValueTo(cJSON *json,config_state_t state_t,ClientMqtt _sender, send_status_t status_t);

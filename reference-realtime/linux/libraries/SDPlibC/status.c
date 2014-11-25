@@ -18,18 +18,21 @@ void parseWConfig(cJSON *data, config_state_t state_t){
         }
 }
 
-void sendStatus(SenderMqtt _sender, send_status_t status_t){
+void sendStatus(ClientMqtt _sender, send_status_t status_t){
        cJSON *root = cJSON_CreateObject();
        cJSON_AddStringToObject(root,"id",status_t.id);
-       cJSON_AddStringToObject(root,"time",getTime());
+       char *time1;
+       time1=calloc(21,sizeof(char));       
+       cJSON_AddStringToObject(root,"time",getTime(time1));
        cJSON_AddStringToObject(root,"last",status_t.lastSend);
        cJSON_AddStringToObject(root,"next",status_t.nextSend);
        printf("valore del json status=%s\n",cJSON_Print(root));
-       SenderMqtt sender = newSenderMqtt( _sender.ip, _sender.port, _sender.client, _sender.topic);//
-       sendMessageMqtt(sender, cJSON_Print(root), "", "");
+       ClientMqtt sender = newClientMqtt( _sender.ip, _sender.port, _sender.client, _sender.topic, 0);//
+       client_publish(sender, cJSON_Print(root), "", "");
 }
 
-void getValueTo(cJSON *json,config_state_t state_t,SenderMqtt _sender, send_status_t status_t){
+
+void getValueTo(cJSON *json,config_state_t state_t,ClientMqtt _sender, send_status_t status_t){
 
         cJSON *jsonTo;      
         cJSON *jsonMsg;
