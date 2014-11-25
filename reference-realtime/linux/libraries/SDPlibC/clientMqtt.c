@@ -1,41 +1,44 @@
-#include "mqttSecure.h"
+#include "clientMqtt.h"
 
-#define MSGMODE_NONE 0
-#define MSGMODE_CMD 1
-#define MSGMODE_STDIN_LINE 2
-#define MSGMODE_STDIN_FILE 3
-#define MSGMODE_FILE 4
-#define MSGMODE_NULL 5
 
 #define STATUS_CONNECTING 0
 #define STATUS_CONNACK_RECVD 1
 #define STATUS_WAITING 2
-static int mode = MSGMODE_NONE;
 static int status = STATUS_CONNECTING;
 static int mid_sent = 0;
 static int last_mid = -1;
 static int last_mid_sent = -1;
 static bool disconnect_sent = true;
 char *topic;
-int qos;
 char* userName;
 char* password;
+int qos;
+static bool connected = true;
+const void *message;
+long msglen = 0;
+int retain = 0;
+
 //struct and callback for the message
 message__mqtt_t state_message;
 message_mqtt_cb_t state_callback_message;
-bool connected;
 
-SSLMqtt newSSLMqtt(char* _cafile, char* _capath, char* _certfile, char* _keyfile)
+ClientMqtt newClientMqtt(char* _ip, char* _port, char* _client, char* _topic, int _qos)
 {
-        SSLMqtt sslMqtt;
-        sslMqtt.cafile = _cafile;
-        sslMqtt.capath = _capath;
-        sslMqtt.certfile = _certfile;
-        sslMqtt.keyfile = _keyfile;
-        return sslMqtt;
+        ClientMqtt clientMqtt;
+        clientMqtt.ip = _ip;
+        clientMqtt.port = _port;
+        clientMqtt.client = _client;
+        clientMqtt.topic = _topic;
+	clientMqtt.qos = _qos;
+        return clientMqtt;
 }
 
-void my_message_callback_sll(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
+int message_mqtt_state_cb( message_mqtt_cb_t cb){
+
+        state_callback_message=cb;
+}
+
+void my_message_callback(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
 {
       //printf("callback  my_message_callback\n");
         char bufferJson[512];
@@ -44,20 +47,20 @@ void my_message_callback_sll(struct mosquitto *mosq, void *userdata, const struc
             memset(state_message.message,0,512);
             int cp = 0;
             sprintf(state_message.message, "%s", message->payload);          
-            state_callback_message(&state_message);	
+            state_callback_message(&state_message);
         }else{
             printf("%s (null)\n", message->topic);
         }
         fflush(stdout);
 }
 
-
-void my_subscribe_username_sll(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
+void my_subscribe_username(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
 {
-        mosquitto_username_pw_set(mosq, userName, password);
+        mosquitto_username_pw_set(mosq, userName, password);	
 }
 
-void my_sub_connect_callback_ssl(struct mosquitto *mosq, void *obj, int result)
+
+void my_sub_connect_callback(struct mosquitto *mosq, void *obj, int result)
 {
         int i;
         struct ClientMqtt *ud;
@@ -74,14 +77,14 @@ void my_sub_connect_callback_ssl(struct mosquitto *mosq, void *obj, int result)
         }
 }
 
-void my_pub_connect_callback_ssl(struct mosquitto *mosq, void *userdata, int result)
+void my_pub_connect_callback(struct mosquitto *mosq, void *userdata, int result)
 {
         int rc = MOSQ_ERR_SUCCESS;
         bool quiet = true;
         status = STATUS_CONNACK_RECVD;
 }
 
-void my_subscribe_callback_sll(struct mosquitto *mosq, void *userdata, int mid, int qos_count, const int *granted_qos)
+void my_subscribe_callback(struct mosquitto *mosq, void *userdata, int mid, int qos_count, const int *granted_qos)
 {
         int i;
         printf("Subscribed (mid: %d): %d", mid, granted_qos[0]);
@@ -91,68 +94,62 @@ void my_subscribe_callback_sll(struct mosquitto *mosq, void *userdata, int mid, 
         printf("\n");
 }
 
-void my_log_callback_sll(struct mosquitto *mosq, void *userdata, int level, const char *str)
+void my_log_callback(struct mosquitto *mosq, void *obj, int level, const char *str)
 {
-        /* Pring all log messages regardless of level. */
         printf("%s\n", str);
 }
 
-void my_publish_callback_sll(struct mosquitto *mosq, void *obj, int mid)
+void my_publish_callback(struct mosquitto *mosq, void *obj, int mid)
 {
+      //printf("richiamato publish callback\n");
+        connected = false;
         last_mid_sent = mid;
-        if(mode == MSGMODE_STDIN_LINE){
-            if(mid == last_mid){
-                mosquitto_disconnect(mosq);
-                disconnect_sent = true;
-            }
-        }else if(disconnect_sent == false){
+
+        if(mid == last_mid){
+            mosquitto_disconnect(mosq);
+            disconnect_sent = true;
+        }
+        else if(disconnect_sent == false){
             mosquitto_disconnect(mosq);
             disconnect_sent = true;
         }
 }
 
-void my_disconnect_callback_sll(struct mosquitto *mosq, void *obj, int rc)
+void my_disconnect_callback(struct mosquitto *mosq, void *obj, int rc)
 {
         connected = false;
 }
 
 
-int mqtt_subscribe_ssl(ClientMqtt sender, SSLMqtt sslMqtt, char* _userName, char* _password){
+int client_subscribe(ClientMqtt sender, char* _userName, char* _password){
         char id[30];
         int i;
-        printf( "INIT.\n");
         char *host = sender.ip;
         char *client = sender.client;
         int port = atoi(sender.port);//8000;
         topic = sender.topic;
+        qos = sender.qos;
         userName = _userName;
         password = _password;
-        char *cafile = sslMqtt.cafile;
-        char *capath = sslMqtt.capath;
-        char *certfile = sslMqtt.certfile;
-        char *keyfile = sslMqtt.keyfile;             
-
         int keepalive = 60;
-        bool clean_session = true;
+        bool clean_session = false;
         struct mosquitto *mosq ;
 
         mosquitto_lib_init();
 
-        mosq = mosquitto_new(client, clean_session, NULL);
+        mosq = mosquitto_new(client, clean_session, &sender);
         if(!mosq){
                 printf("Error: Impossible create struct mosquitto.\n");
                 return ERROR_MOSQUITTO;
         }
-//         mosquitto_log_callback_set(mosq, my_log_callback);
         mosquitto_username_pw_set(mosq, userName, password) ;
-        mosquitto_tls_set(mosq, cafile, capath, certfile, keyfile, NULL);
-        mosquitto_connect_callback_set(mosq, my_sub_connect_callback_ssl);
-        mosquitto_subscribe_callback_set(mosq, my_subscribe_callback_sll);
-        mosquitto_message_callback_set(mosq, my_message_callback_sll);
-	
+        mosquitto_connect_callback_set(mosq, my_sub_connect_callback);
+        mosquitto_message_callback_set(mosq, my_message_callback);	
+        mosquitto_subscribe_callback_set(mosq, my_subscribe_callback);
+
         if(mosquitto_connect(mosq, host, port, keepalive)){
                 fprintf(stderr, "Unable to connect.\n");
-                return 1;
+                return ERROR_CONNECT;
         }
 
         int lp;
@@ -163,59 +160,44 @@ int mqtt_subscribe_ssl(ClientMqtt sender, SSLMqtt sslMqtt, char* _userName, char
         return SUBSCRIBE_CORRECT;
 }
 
-int mqtt_publish_ssl(ClientMqtt sender, SSLMqtt sslMqtt, char *_message, char* _userName, char* _password){
+int client_publish(ClientMqtt sender, char *_message, char* _userName, char* _password){
         char id[30];
         int i;
-        fprintf(stderr, "INIT.\n");
         char *host = sender.ip;
         char *client = sender.client;
         int port = atoi(sender.port);//8000;
-        printf("valore della porta=%d client=%s\n",port,client);
         topic = sender.topic;
-        qos = sender.qos;	
-        char *cafile = sslMqtt.cafile;
-        char *capath = sslMqtt.capath;
-        char *certfile = sslMqtt.certfile;
-        char *keyfile = sslMqtt.keyfile; 
+        qos = sender.qos;
         userName = _userName;
         password = _password;      
         int keepalive = 60;
-        int rc;
-        const void *message = _message;
+        connected = true;
+
+        message = _message;
+        msglen = strlen(message);
+        retain = 1;
         bool clean_session = true;
         struct mosquitto *mosq ;
 
         mosquitto_lib_init();
-        printf("MOSQUITTO NEW.\n");
-        mosq = mosquitto_new(client, clean_session, NULL);
+        mosq = mosquitto_new(client, true, NULL);
         if(!mosq){
                 printf("Error: Impossible create struct mosquitto.\n");
                 return ERROR_MOSQUITTO;
         }
-
-
+        mosquitto_log_callback_set(mosq, my_log_callback);
+        mosquitto_username_pw_set(mosq, userName, password);//	
         int max_inflight = 20;
         mosquitto_max_inflight_messages_set(mosq, max_inflight);
+        mosquitto_connect_callback_set(mosq, my_pub_connect_callback);
+        mosquitto_disconnect_callback_set(mosq, my_disconnect_callback);
+        mosquitto_publish_callback_set(mosq, my_publish_callback);
 
-        mosquitto_disconnect_callback_set(mosq, my_disconnect_callback_sll);
-        
-	
-        mosquitto_username_pw_set(mosq, userName, password);//
-        mosquitto_tls_set(mosq, cafile, capath, certfile, keyfile, NULL);
-        mosquitto_connect_callback_set(mosq, my_pub_connect_callback_ssl);
-        mosquitto_publish_callback_set(mosq, my_publish_callback_sll);
-        mosquitto_message_callback_set(mosq, my_message_callback_sll);
-
-        if(mosquitto_connect(mosq, host, port, keepalive)){
-                fprintf(stderr, "Unable to connect.\n");
-                return 1;
-        }
-
-        if(rc == MOSQ_ERR_ERRNO){
-                fprintf(stderr, "Unable to connect.\n");
+        int rc = mosquitto_connect(mosq, host, port, keepalive);
+            if(rc == MOSQ_ERR_ERRNO){
+                printf("Error to connect\n");
                 return ERROR_CONNECT;
-        }
-        
+            }
         int lp=1;
         int p = -1;
         int rc1=1;
@@ -233,12 +215,11 @@ int mqtt_publish_ssl(ClientMqtt sender, SSLMqtt sslMqtt, char *_message, char* _
         }while(rc1 == MOSQ_ERR_SUCCESS && connected);	    
 	
         mosquitto_loop_stop(mosq, false);
-//         free(message);
-        printf("esito della publish=%d topic=%s qos=%d\n",p,topic,qos);
+        printf("Publish at the topic=%s with qos=%d\n",topic,qos);
         mosquitto_disconnect(mosq);
 
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
-        printf("invio terminato\n");
+        printf("Publish End\n");
         return PUBLISH_CORRECT;
 }        

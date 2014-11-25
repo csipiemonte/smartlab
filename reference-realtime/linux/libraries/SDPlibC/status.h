@@ -1,8 +1,7 @@
 #include "observation.h"
 #include "senderHttp.h"
-#include "mqttSecure.h"
-#include "gw_firmware.h"
-#include <cJSON.h>
+#include "cJSON.h"
+#include "clientMqtt.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -30,14 +29,16 @@ typedef struct {
 } send_status_t;
 
 /**
- * @brief Parsing the message from server
+ * @brief Parsing the message from server for extract the time
  * 
- * Parsing the message send to server for status or configuration
+ * Parsing the message send to server for for extract the time
  *
  * @param data the message
  * @param state_t the configure state of client
+ * 
+ * @return the new time
  */
-void parseWConfig(cJSON *data,config_state_t state_t);
+int getTimeConfig(cJSON *data);
 
 /**
  * @brief Send the status of client 
@@ -47,7 +48,7 @@ void parseWConfig(cJSON *data,config_state_t state_t);
  * @param _sender the sender MQTT
  * @param status_t the state of client
  */
-void sendStatus(SenderMqtt _sender, send_status_t status_t);
+void sendStatus(ClientMqtt _sender, send_status_t status_t);
 
 /**
  * @brief Parsing the message from server
@@ -60,4 +61,4 @@ void sendStatus(SenderMqtt _sender, send_status_t status_t);
  * @param status_t the state of client
  *
  */
-void getValueTo(cJSON *json,config_state_t state_t,SenderMqtt _sender, send_status_t status_t);
+config_state_t getValueTo(cJSON *json,config_state_t state_t,ClientMqtt _sender, send_status_t status_t);
