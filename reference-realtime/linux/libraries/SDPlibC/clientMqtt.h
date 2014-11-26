@@ -18,6 +18,7 @@
 
 #define ERROR_MOSQUITTO -1
 #define ERROR_CONNECT -2
+// #define ERROR_PUBLISH -3
 #define PUBLISH_CORRECT 1
 #define SUBSCRIBE_CORRECT 1
 /**
@@ -88,7 +89,7 @@ extern int message_mqtt_state_cb( message_mqtt_cb_t cb);
  * @param userName the name for the authentication
  * @param password the password for the authentication 
  * 
- * @return Return 1 for publish succed, -1 for error
+ * @return Return SUBSCRIBE_CORRECT for publish succed, ERROR_MOSQUITTO or ERROR_CONNECT for error
  */
 int client_subscribe(ClientMqtt sender, char* userName, char* password);
 
@@ -101,6 +102,6 @@ int client_subscribe(ClientMqtt sender, char* userName, char* password);
  * @param userName the name for the authentication
  * @param password the password for the authentication 
  * 
- * @return Return 1 for publish succed, -1 for error
+ * @return Return PUBLISH_CORRECT for publish succed, ERROR_MOSQUITTO or ERROR_CONNECT for error
  */
 int client_publish(ClientMqtt sender, char *_message, char* userName, char* password);

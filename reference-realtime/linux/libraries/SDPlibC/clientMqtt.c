@@ -165,7 +165,7 @@ int client_publish(ClientMqtt sender, char *_message, char* _userName, char* _pa
         int i;
         char *host = sender.ip;
         char *client = sender.client;
-        int port = atoi(sender.port);//8000;
+        int port = atoi(sender.port);//1883;
         topic = sender.topic;
         qos = sender.qos;
         userName = _userName;
@@ -207,7 +207,12 @@ int client_publish(ClientMqtt sender, char *_message, char* _userName, char* _pa
                 if(p){
                     printf( "Error: Publish returned %d, disconnecting.\n", p);
                     mosquitto_disconnect(mosq);
-                }
+                }/*else{
+                    printf( "Error: Impossible publish the message.\n");  
+                    mosquitto_disconnect(mosq);
+                    return ERROR_PUBLISH;
+                }*/
+
             }
             
             rc1 = mosquitto_loop(mosq, -1, 1);
