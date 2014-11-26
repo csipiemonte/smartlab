@@ -1,6 +1,6 @@
 #include "status.h"
 
-void parseWConfig(cJSON *data, config_state_t state_t){
+config_state_t parseWConfig(cJSON *data, config_state_t state_t){
         cJSON *sec = cJSON_GetObjectItem( data, "sec" );
         cJSON *csv = cJSON_GetObjectItem( data, "csv" );
         char *token = strtok(cJSON_Print(csv),"\"");
@@ -10,14 +10,14 @@ void parseWConfig(cJSON *data, config_state_t state_t){
         while (token2 != NULL){
           pchToken[i]=token2;
           token2 = strtok (NULL, ";");
-          if(i==1)
+          if(i==0){
               state_t.temp_sleep_time = atoi(pchToken[i]);
-
+              return state_t;
+	  }
           printf("valore del token[%d]=%s\n",i, pchToken[i]);
           i++;
         }
 }
-
 void sendStatus(ClientMqtt _sender, send_status_t status_t){
        cJSON *root = cJSON_CreateObject();
        cJSON_AddStringToObject(root,"id",status_t.id);
@@ -29,10 +29,11 @@ void sendStatus(ClientMqtt _sender, send_status_t status_t){
        printf("valore del json status=%s\n",cJSON_Print(root));
        ClientMqtt sender = newClientMqtt( _sender.ip, _sender.port, _sender.client, _sender.topic, 0);//
        client_publish(sender, cJSON_Print(root), "", "");
+       return status_t;
 }
 
-
-void getValueTo(cJSON *json,config_state_t state_t,ClientMqtt _sender, send_status_t status_t){
+config_state_t getValueTo(cJSON *json,config_state_t state_t,ClientMqtt _sender, send_status_t status_t){
+// void getValueTo(cJSON *json,config_state_t state_t,ClientMqtt _sender, send_status_t status_t){
 
         cJSON *jsonTo;      
         cJSON *jsonMsg;
@@ -58,7 +59,7 @@ void getValueTo(cJSON *json,config_state_t state_t,ClientMqtt _sender, send_stat
             jsonMsg= cJSON_GetObjectItem( json, "msg" );
             if(!jsonMsg){
                 printf("Error for jsonMsg before: [%s]\n",cJSON_GetErrorPtr());
-                return;
+                return state_t;
             }else{
                 msg = strtok (cJSON_Print(jsonMsg),"\"");
                 printf("valore di msg=%s\n",msg);
@@ -67,10 +68,12 @@ void getValueTo(cJSON *json,config_state_t state_t,ClientMqtt _sender, send_stat
             if(!strcmp(msg, "status")){
                 printf("mando status\n");
                 sendStatus(_sender, status_t);
+		return state_t;
             }else{
                     if(!strcmp(msg, "config")){
                     printf("ricevuto config\n");
                     state_t.sleep_time = state_t.temp_sleep_time;
+		    return state_t;
                 }else{
                     if(!strcmp(msg, "wconfig")){
                         printf("ricevuto wconfig\n");
@@ -81,7 +84,8 @@ void getValueTo(cJSON *json,config_state_t state_t,ClientMqtt _sender, send_stat
                         }else{
                             data = cJSON_Print(jsonData);
                             printf("valore di data=%s\n",data);
-                            parseWConfig(jsonData, state_t);
+                            state_t = parseWConfig(jsonData, state_t);
+			    return state_t;
                         }
                     }else
                     printf("messaggio sconosciuto");
