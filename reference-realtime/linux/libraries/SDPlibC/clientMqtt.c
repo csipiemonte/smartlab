@@ -40,7 +40,7 @@ int message_mqtt_state_cb( message_mqtt_cb_t cb){
 
 void my_message_callback(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
 {
-      //printf("callback  my_message_callback\n");
+      //printf("CLIENTMQTT: callback  my_message_callback\n");
         char bufferJson[512];
         if(message->payloadlen){
             state_message.auth_sts=0;
@@ -49,7 +49,7 @@ void my_message_callback(struct mosquitto *mosq, void *userdata, const struct mo
             sprintf(state_message.message, "%s", message->payload);          
             state_callback_message(&state_message);
         }else{
-            printf("%s (null)\n", message->topic);
+//             printf("CLIENTMQTT: %s (null)\n", message->topic);
         }
         fflush(stdout);
 }
@@ -87,21 +87,21 @@ void my_pub_connect_callback(struct mosquitto *mosq, void *userdata, int result)
 void my_subscribe_callback(struct mosquitto *mosq, void *userdata, int mid, int qos_count, const int *granted_qos)
 {
         int i;
-        printf("Subscribed (mid: %d): %d", mid, granted_qos[0]);
+//         printf("CLIENTMQTT: Subscribed (mid: %d): %d", mid, granted_qos[0]);
         for(i=1; i<qos_count; i++){
-            printf(", %d", granted_qos[i]);
+//             printf("CLIENTMQTT: , %d", granted_qos[i]);
         }
-        printf("\n");
+//         printf("CLIENTMQTT: \n");
 }
 
 void my_log_callback(struct mosquitto *mosq, void *obj, int level, const char *str)
 {
-        printf("%s\n", str);
+        printf("CLIENTMQTT: %s\n", str);
 }
 
 void my_publish_callback(struct mosquitto *mosq, void *obj, int mid)
 {
-      //printf("richiamato publish callback\n");
+      //printf("CLIENTMQTT: richiamato publish callback\n");
         connected = false;
         last_mid_sent = mid;
 
@@ -139,7 +139,7 @@ int client_subscribe(ClientMqtt sender, char* _userName, char* _password){
 
         mosq = mosquitto_new(client, clean_session, &sender);
         if(!mosq){
-                printf("Error: Impossible create struct mosquitto.\n");
+//                 printf("CLIENTMQTT: Error: Impossible create struct mosquitto.\n");
                 return ERROR_MOSQUITTO;
         }
         mosquitto_username_pw_set(mosq, userName, password) ;
@@ -148,7 +148,7 @@ int client_subscribe(ClientMqtt sender, char* _userName, char* _password){
         mosquitto_subscribe_callback_set(mosq, my_subscribe_callback);
 
         if(mosquitto_connect(mosq, host, port, keepalive)){
-                fprintf(stderr, "Unable to connect.\n");
+//                 printf("CLIENTMQTT: Unable to connect.\n");
                 return ERROR_CONNECT;
         }
 
@@ -172,7 +172,7 @@ int client_publish(ClientMqtt sender, char *_message, char* _userName, char* _pa
         password = _password;      
         int keepalive = 60;
         connected = true;
-
+        int debug = 0;
         message = _message;
         msglen = strlen(message);
         retain = 1;
@@ -182,10 +182,12 @@ int client_publish(ClientMqtt sender, char *_message, char* _userName, char* _pa
         mosquitto_lib_init();
         mosq = mosquitto_new(client, true, NULL);
         if(!mosq){
-                printf("Error: Impossible create struct mosquitto.\n");
+//                 printf("CLIENTMQTT: Error: Impossible create struct mosquitto.\n");
                 return ERROR_MOSQUITTO;
         }
-        mosquitto_log_callback_set(mosq, my_log_callback);
+
+        if(debug==1)
+           mosquitto_log_callback_set(mosq, my_log_callback);
         mosquitto_username_pw_set(mosq, userName, password);//	
         int max_inflight = 20;
         mosquitto_max_inflight_messages_set(mosq, max_inflight);
@@ -195,7 +197,7 @@ int client_publish(ClientMqtt sender, char *_message, char* _userName, char* _pa
 
         int rc = mosquitto_connect(mosq, host, port, keepalive);
             if(rc == MOSQ_ERR_ERRNO){
-                printf("Error to connect\n");
+//                 printf("CLIENTMQTT: Error to connect\n");
                 return ERROR_CONNECT;
             }
         int lp=1;
@@ -205,7 +207,7 @@ int client_publish(ClientMqtt sender, char *_message, char* _userName, char* _pa
             if(p!=0){
                 p = mosquitto_publish( mosq, &lp, topic,strlen(message),(uint8_t *)message, qos, 0);
                 if(p){
-                    printf( "Error: Publish returned %d, disconnecting.\n", p);
+//                     printf( "Error: Publish returned %d, disconnecting.\n", p);
                     mosquitto_disconnect(mosq);
                 }/*else{
                     printf( "Error: Impossible publish the message.\n");  
@@ -220,11 +222,11 @@ int client_publish(ClientMqtt sender, char *_message, char* _userName, char* _pa
         }while(rc1 == MOSQ_ERR_SUCCESS && connected);	    
 	
         mosquitto_loop_stop(mosq, false);
-        printf("Publish at the topic=%s with qos=%d\n",topic,qos);
+//         printf("CLIENTMQTT: Publish at the topic=%s with qos=%d\n",topic,qos);
         mosquitto_disconnect(mosq);
 
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
-        printf("Publish End\n");
+//         printf("CLIENTMQTT: Publish End\n");
         return PUBLISH_CORRECT;
 }        
