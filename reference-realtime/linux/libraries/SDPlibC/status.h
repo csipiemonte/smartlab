@@ -1,5 +1,11 @@
-#include "observation.h"
-#include "senderHttp.h"
+/**
+ * @file status.h
+ * @author Leonardo Sileo
+ * @date 26 Novembre 2014
+ * @brief Allows you to sending and receiving the message of status. 
+ * Manages the configuration of the gateway.
+ * 
+ */
 #include "cJSON.h"
 #include "clientMqtt.h"
 #include <stdio.h>

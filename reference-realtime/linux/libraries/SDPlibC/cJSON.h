@@ -22,7 +22,7 @@
 
 #ifndef cJSON__h
 #define cJSON__h
-
+#include <stdio.h>
 #ifdef __cplusplus
 extern "C"
 {
