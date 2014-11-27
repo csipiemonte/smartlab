@@ -71,20 +71,60 @@ Value addComponetsAtValue(Value val, Component component){
 }
 
 
-Component newComponent(char *name, float value/*char* value*/){
+Component newComponentValue(char *name, double value/*char* value*/){
         Component comp;
         comp.sensor_name = name;
         comp.sensor_value = value;
+        comp.stringValue = "";
+        comp.type='f';
         return comp;
 }
 
-Component newComponentDefault( float value/*char* value*/){
+Component newComponentDefaultValue( double value/*char* value*/){
         Component comp;
-        comp.sensor_name = "0";
+        comp.sensor_name = "c0";
         comp.sensor_value = value;
+        comp.stringValue = "";
+        comp.type='f';
         return comp;
 }
 
+Component newComponentString(char *name, char* stringVal){
+        Component comp;
+        comp.sensor_name = name;
+        comp.sensor_value = 0;
+        comp.stringValue = stringVal;
+        comp.type='s';
+        return comp;
+}
+
+Component newComponentDefaultString( char* stringVal){
+        Component comp;
+        comp.sensor_name = "c0";
+        comp.sensor_value = 0;
+        comp.stringValue = stringVal;
+        comp.type='s';
+        return comp;
+}
+
+Component newComponentBoolean(char* name, int boolVal)
+{
+        Component comp;
+        comp.sensor_name = name;
+        comp.sensor_value = boolVal;
+        comp.stringValue = "";
+        comp.type='b';
+        return comp;
+}
+
+Component newComponentDefaultBoolean( int boolVal){
+        Component comp;
+        comp.sensor_name = "c0";
+        comp.sensor_value = boolVal;
+        comp.stringValue = "";
+        comp.type='b';
+        return comp;
+}
 char* toJson(Observation observation, char *sendMessage){
 	//printf("JSON completo con contValues=%d e contComponents=%d\n", observation.contValues, observation.mValues->contComponents);;
 //         char *sendMessage;
@@ -99,8 +139,18 @@ char* toJson(Observation observation, char *sendMessage){
             sprintf(sendMessage,"%s{\"time\":\"%s\",\"components\":{",sendMessage,observation.mValues[lValue].time);
             int lComp = 0;
             while(lComp<observation.mValues[lValue].contComponents){
-                sprintf(sendMessage,"%s\"%s\":%.2f",sendMessage, 
-                observation.mValues[lValue].components[lComp].sensor_name,observation.mValues[lValue].components[lComp].sensor_value);
+                sprintf(sendMessage,"%s\"%s\":",sendMessage, observation.mValues[lValue].components[lComp].sensor_name);
+                if(sendMessage,observation.mValues[lValue].components[lComp].type == 'f')
+                    sprintf(sendMessage,"%s%.2lf",sendMessage,observation.mValues[lValue].components[lComp].sensor_value);
+                else if(sendMessage,observation.mValues[lValue].components[lComp].type == 's')
+                         sprintf(sendMessage,"%s\"%s\"",sendMessage,observation.mValues[lValue].components[lComp].stringValue);
+                else if(sendMessage,observation.mValues[lValue].components[lComp].type == 'b'){
+                         if(observation.mValues[lValue].components[lComp].sensor_value==0)
+                             sprintf(sendMessage,"%s\"false\"",sendMessage,observation.mValues[lValue].components[lComp].stringValue);
+                         else
+                             sprintf(sendMessage,"%s\"true\"",sendMessage,observation.mValues[lValue].components[lComp].stringValue);
+                }
+
                 lComp++;
                 if(lComp==observation.mValues[lValue].contComponents){
                     sprintf(sendMessage,"%s },\"validaty\":\"%s\"}",sendMessage,observation.mValues[lValue].validity);

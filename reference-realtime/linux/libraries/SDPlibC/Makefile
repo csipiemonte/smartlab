@@ -24,5 +24,5 @@ install:
 	cp observation.h senderHttp.h clientMqtt.h mqttSecure.h mqtt.h cJSON.h gw_firmware.h status.h /usr/local/include/SDPlib
 
 uninstall:
-	rm /usr/local/include/SDPlib/*
+	rm /usr/local/include/SDPlib/*.h
 	rm /usr/local/lib/libsdpC.so

@@ -39,7 +39,9 @@ typedef struct
 typedef struct 
 {
   char *sensor_name; /**< The type of sensor */
-  float /*char* */sensor_value; /**< The value of the sensor */
+  double sensor_value; /**< The value of the sensor */
+  char* stringValue; /**< The string of the sensor */
+  char type; /**< The type of the value (double=f, string=s, boolean=b) */
 } Component;
 
 /**
@@ -108,7 +110,7 @@ Observation newObservation(char *idStream, char *idSensor);
  * Add a values at Observation 
  * @param obs the observation 
  * @param value the object value to add al observation
- * @return l'observation with new value
+ * @return the observation with new value
  */
 Observation observationAddValue(Observation obs, Value value);
 
@@ -145,27 +147,74 @@ Value addComponetsAtValue(Value value, Component component);
  * Create a new component
  * @param name the name of component
  * @param value the value of component
- * @return l'oggetto component
+ * @return the object component
  */
-Component newComponent(char *name,float value/*char* value*/);
+Component newComponentValue(char *name,double value);
 
 /**
  * @brief Create a new component
  * 
- * Create a new component with default name ZERO
+ * Create a new component with default name c0
  * @param value the value of component
- * @return l'object component
+ * @return the object component
  */
-Component newComponentDefault( float value/*char* value*/);
+Component newComponentDefaultValue( double value);
 
+/**
+ * @brief Create a new component
+ * 
+ * Create a new component
+ * @param name the name of component
+ * @param stringVal the string of component
+ * @return the object component
+ */
+Component newComponentString(char *name, char* stringVal);
+
+/**
+ * @brief Create a new component
+ * 
+ * Create a new component with default name c0
+ * @param stringVal the string of component
+ * @return the object component
+ */
+Component newComponentDefaultString( char* stringVal);
 /**
  * @brief Create the json
  * 
  * Create the json from observation for send message
- * @param obs l'observation
+ * @param obs the observation
  * @param sendMessage the container of the message 
  * @return the message
  */
+
+/**
+ * @brief Create a new component
+ * 
+ * Create a new component
+ * @param name the name of component
+ * @param boolVal the boolean rappresentation of component ( 0=false 1=true)
+ * @return the object component
+ */
+Component newComponentBoolean(char *name, int boolVal);
+
+/**
+ * @brief Create a new component
+ * 
+ * Create a new component with default name c0
+ * @param boolVal the boolean rappresentation of component ( 0=false 1=true)
+ * @return the object component
+ */
+Component newComponentDefaultBoolean( int boolVal);
+
+/**
+ * @brief Create a new component
+ * 
+ * Create a new component
+ * @param name the name of component
+ * @param stringVal the string of component
+ * @return the object component
+ */
+Component newComponentString(char *name, char* stringVal);
 char* toJson(Observation obs, char *sendMessage);
 
 #endif /* JSON_H_ */
