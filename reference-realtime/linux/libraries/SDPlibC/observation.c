@@ -153,7 +153,8 @@ char* toJson(Observation observation, char *sendMessage){
 
                 lComp++;
                 if(lComp==observation.mValues[lValue].contComponents){
-                    sprintf(sendMessage,"%s },\"validaty\":\"%s\"}",sendMessage,observation.mValues[lValue].validity);
+                    sprintf(sendMessage,"%s },\"validity\":\"%s\"}",sendMessage,observation.mValues[lValue].validity);
+		  //sprintf(sendMessage,"%s }}",sendMessage,observation.mValues[lValue].validity);
                 }
                 else{
                     sprintf(sendMessage,"%s ,",sendMessage);
