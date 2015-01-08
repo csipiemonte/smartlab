@@ -16,6 +16,7 @@ Python 2.6 or 2.7
 GNU Make 3.81 or newer
 Library cURL (libcurl)
 Mosquitto-1.3.2
+libares (fox x64 only)
 ```
 
  *  Installation of library
