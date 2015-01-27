@@ -3,9 +3,9 @@ Smart Data Platform (SDP)
 
 Arduino Yun and Yucca
 --------------
-This code is an example how to send a message to Yucca platform using an Arduino Yun.
+This code is an example how send a message to Yucca platform using an Arduino Yun.
 
-- *sketch/* directory has got an example of sketch that sends a message to Yucca server.
+- *sketch/*: example of sketch that sends a message to Yucca server.
 
 Requirement
 --------------
@@ -18,7 +18,7 @@ Libraries required are:
 Install libraries
 --------------
 To install a library, you have to copy the directory that contains all source files into your libraries folder. Restart Arduino to rescan for new libraries. For more information look Arduino [guide](http://arduino.cc/en/Guide/Libraries).
-Install all required and SDP libraries. For example, if you have installed Arduino IDE in /opt directory, you can use the following instructions:
+Install all required libraries. For example, if you have installed Arduino IDE in /opt directory, you can use the following instructions:
 
 ```
 cd libraries/
