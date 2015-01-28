@@ -48,7 +48,7 @@ This sketch sends a constants JSON to the Yucca server.
 ```
 
 
-To customize your message, you ave to change your sensor id and stream name:
+To customize your message, you have to change your sensor-id and stream-name:
 
 ```
 //! Stream
@@ -57,7 +57,7 @@ char* stream = "flussoProva";
 char* id = "6e6fdf33-e8f0-4ee8-ba35-386de213e722";
 ```
 
-and modify the createMsg function, changing components:
+and modify the _createMsg_ function, changing the components:
 
 ```
           
