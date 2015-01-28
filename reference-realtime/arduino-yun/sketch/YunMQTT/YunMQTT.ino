@@ -79,6 +79,10 @@ void deleteMsg(aJsonObject* msg);
  */
 void callback(char* topic, byte* payload, unsigned int length);
 
+
+/******************************************
+* Globlals
+******************************************/
 // Update these with values suitable for your network.
 char * server = "stream.smartdatanet.it";
 
