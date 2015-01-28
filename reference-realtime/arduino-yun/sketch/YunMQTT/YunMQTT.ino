@@ -22,34 +22,6 @@
 #include <MemoryFree.h>
 #endif
 
-// Update these with values suitable for your network.
-char * server = "stream.smartdatanet.it";
-
-// MQTT username
-char * userid = "sandbox";
-// MQTT password
-char * psw = "sandbox$1";
-// MQTT Topic
-char * topic = "input/sandbox";
-// MQTT client identifier
-char * clientID = "yunTEST";
-
-
-//! Stream
-char* stream = "flussoProva";
-// Sensor identifier
-char* id = "6e6fdf33-e8f0-4ee8-ba35-386de213e722";
-//char* json =  "{\"stream\":\"flussoProva\",\"sensor\":\"6e6fdf33-e8f0-4ee8-ba35-386de213e722\",\"values\":[{\"time\":\"2014-05-13T17:08:58+0200\",\"components\":{\"valoreDouble\":\"17.4\",\"valoreString\":\"51\"}}]}";
-
-// buffer to store the timestamp
-char timestamp[20] = {0};
-
-// Yun network client
-YunClient yunClient;
-
-// MQTT client
-PubSubClient client(server, 1883, callback, yunClient);
-
 /******************************************
  * Functions
  ******************************************/
@@ -105,7 +77,36 @@ void deleteMsg(aJsonObject* msg);
  * \param payload message buffer
  * \param length number of byte received
  */
-void callback(char* topic, byte* payload, unsigned int length) {
+void callback(char* topic, byte* payload, unsigned int length);
+
+// Update these with values suitable for your network.
+char * server = "stream.smartdatanet.it";
+
+// MQTT username
+char * userid = "sandbox";
+// MQTT password
+char * psw = "sandbox$1";
+// MQTT Topic
+char * topic = "input/sandbox";
+// MQTT client identifier
+char * clientID = "yunTEST";
+
+
+//! Stream
+char* stream = "flussoProva";
+
+// Sensor identifier
+char* id = "6e6fdf33-e8f0-4ee8-ba35-386de213e722";
+//char* json =  "{\"stream\":\"flussoProva\",\"sensor\":\"6e6fdf33-e8f0-4ee8-ba35-386de213e722\",\"values\":[{\"time\":\"2014-05-13T17:08:58+0200\",\"components\":{\"valoreDouble\":\"17.4\",\"valoreString\":\"51\"}}]}";
+
+// buffer to store the timestamp
+char timestamp[20] = {0};
+
+// Yun network client
+YunClient yunClient;
+
+// MQTT client
+PubSubClient client(server, 1883, callback, yunClient);
 
 
 /******************************************
