@@ -1,6 +1,11 @@
 freeboard
 ==========
 
+Customization of freeboard:
+
+1. Added websocket_stomp_plugin to read data from stomp over websocket (tested on Yucca Smartdata platform: wwww.smartdatanet.it)
+2. Preloaded dashboard with some text widget connected to Yucca Smartdata platform (sandbox tenant)
+
 **free·board** (noun) *\ˈfrē-ˌbȯrd\*
 
 1. the distance between the waterline and the main deck or weather deck of a ship or between the level of the water and the upper edge of the side of a small boat.
