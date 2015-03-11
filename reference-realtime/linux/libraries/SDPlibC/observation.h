@@ -215,6 +215,24 @@ Component newComponentDefaultBoolean( int boolVal);
  * @return the object component
  */
 Component newComponentString(char *name, char* stringVal);
+
+/**
+ * @brief Calculate the length of message
+ * 
+ * Calculate the length of message
+ * @param observation the observation
+  * @return the the length of observation
+ */
+int* toLengthJson(Observation observation);
+/**
+ * @brief Create the message
+ * 
+ * Create the messega
+ * @param observation the observation
+ * @param sendMessage the buffer of array 
+  * @return the the length of observation
+ */
+
 char* toJson(Observation obs, char *sendMessage);
 
 #endif /* JSON_H_ */

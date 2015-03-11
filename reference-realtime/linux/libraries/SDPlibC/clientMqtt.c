@@ -41,10 +41,10 @@ int message_mqtt_state_cb( message_mqtt_cb_t cb){
 void my_message_callback(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message)
 {
       //printf("CLIENTMQTT: callback  my_message_callback\n");
-        char bufferJson[512];
+        char bufferJson[1024];
         if(message->payloadlen){
             state_message.auth_sts=0;
-            memset(state_message.message,0,512);
+            memset(state_message.message,0,1024);
             int cp = 0;
             sprintf(state_message.message, "%s", message->payload);          
             state_callback_message(&state_message);

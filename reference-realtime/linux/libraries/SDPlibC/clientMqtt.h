@@ -59,7 +59,7 @@ ClientMqtt newClientMqtt(char* _ip, char* _port, char* _client, char* _topic, in
 typedef struct {
 
 int auth_sts; /**<Status of message (not used) */
-char message[512]; /**<The message received */
+char message[1024]; /**<The message received */
 } message__mqtt_t;
 
 /**

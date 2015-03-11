@@ -50,7 +50,7 @@ Value newValue(char *time){
         val.time = getTime(time);   
 //         }
         val.contComponents = 0;
-        val.validity = "unknown";
+        val.validity = "valid";
         val.components = (struct Component*)malloc(100*sizeof*val.components);
         return val;
 }
@@ -59,7 +59,7 @@ Value newValueWithTime(char *time){
         Value val;
         val.time = time;
         val.contComponents = 0;
-        val.validity = "unknown";
+        val.validity = "valid";
         val.components = (struct Component*)malloc(100*sizeof*val.components);
         return val;
 }
@@ -125,6 +125,58 @@ Component newComponentDefaultBoolean( int boolVal){
         comp.type='b';
         return comp;
 }
+
+int* toLengthJson(Observation observation){
+	//printf("JSON completo con contValues=%d e contComponents=%d\n", observation.contValues, observation.mValues->contComponents);;
+         char *sendMessage;
+         sendMessage = malloc(1000*sizeof(char));
+        int lValue=0;
+
+        sprintf(sendMessage,"{\"stream\":\"%s\",",observation.mStream.idStream);
+        sprintf(sendMessage,"%s\"sensor\":\"%s\",",sendMessage, observation.mSensor.idSensor);
+        sprintf(sendMessage,"%s\"values\": [",sendMessage);
+
+        while(lValue<observation.contValues){
+            sprintf(sendMessage,"%s{\"time\":\"%s\",\"components\":{",sendMessage,observation.mValues[lValue].time);
+            int lComp = 0;
+            while(lComp<observation.mValues[lValue].contComponents){
+                sprintf(sendMessage,"%s\"%s\":",sendMessage, observation.mValues[lValue].components[lComp].sensor_name);
+                if(sendMessage,observation.mValues[lValue].components[lComp].type == 'f')
+                    sprintf(sendMessage,"%s%.2lf",sendMessage,observation.mValues[lValue].components[lComp].sensor_value);
+                else if(sendMessage,observation.mValues[lValue].components[lComp].type == 's')
+                         sprintf(sendMessage,"%s\"%s\"",sendMessage,observation.mValues[lValue].components[lComp].stringValue);
+                else if(sendMessage,observation.mValues[lValue].components[lComp].type == 'b'){
+                         if(observation.mValues[lValue].components[lComp].sensor_value==0)
+                             sprintf(sendMessage,"%s\"false\"",sendMessage,observation.mValues[lValue].components[lComp].stringValue);
+                         else
+                             sprintf(sendMessage,"%s\"true\"",sendMessage,observation.mValues[lValue].components[lComp].stringValue);
+                }
+
+                lComp++;
+                if(lComp==observation.mValues[lValue].contComponents){
+                    sprintf(sendMessage,"%s },\"validity\":\"%s\"}",sendMessage,observation.mValues[lValue].validity);
+		  //sprintf(sendMessage,"%s }}",sendMessage,observation.mValues[lValue].validity);
+                }
+                else{
+                    sprintf(sendMessage,"%s ,",sendMessage);
+                }
+            }
+
+            lValue++;
+            if(lValue==observation.contValues){
+                sprintf(sendMessage,"%s ]",sendMessage);
+            }
+            else{
+                sprintf(sendMessage,"%s ,",sendMessage);
+            }		  
+        }
+        sprintf(sendMessage,"%s}",sendMessage);
+//         printf("valore del messaggio:\n%s\n\n",sendMessage);
+        int lenght = strlen(sendMessage);
+	free(sendMessage);
+	return lenght;
+}
+
 char* toJson(Observation observation, char *sendMessage){
 	//printf("JSON completo con contValues=%d e contComponents=%d\n", observation.contValues, observation.mValues->contComponents);;
 //         char *sendMessage;
