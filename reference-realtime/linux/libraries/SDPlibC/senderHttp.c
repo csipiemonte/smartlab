@@ -1,5 +1,10 @@
 #include "senderHttp.h"
 #include <stdint.h>
+#include <fcntl.h>
+
+/*
+#define DEBUG_SOCKET
+ */
 
 SenderHttp newSenderHttp(char* _ip, char* _port, char* _service, char* _key, char* _destination){
         SenderHttp sender;
@@ -19,79 +24,126 @@ void timeNow(){
         time(&curtime);
         timeTF = localtime( &curtime );
         strftime(buffer,30,"%Y-%m-%dT%XZ",timeTF);
+#ifdef DEBUG_SOCKET
         printf ("\n\n\nTEMPO di invio/ricezioone messaggio:=%s\n\n\n\n",buffer);
+#endif
 }
+
 int test=0;
 
-int sendMessageHttp(SenderHttp sender, char *message){
-        int sockfd,confd;
-        struct sockaddr_in servaddr;
-        char sendline[MAXLINE], recvline[MAXLINE];
-        ssize_t n;
-        char portS[4];    
-        sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        if(sockfd<0)
-            printf("Errore nell'invio del messaggio. Socket non aperto\n");
+int sendMessageHttp(SenderHttp sender, char *message)
+{
+  int sockfd, confd;
+  struct sockaddr_in servaddr;
+  fd_set fdset;
+  struct timeval tv;
 
-        bzero(&servaddr, sizeof(servaddr));
-        servaddr.sin_family = AF_INET;
+  char sendline[MAXLINE], recvline[MAXLINE];
+  ssize_t n;
 
-        servaddr.sin_port = htons(atoi(sender.port));
-        inet_pton(AF_INET, sender.ip, &servaddr.sin_addr);
-        confd = connect(sockfd, (SA *) &servaddr, sizeof(servaddr));
-        if(confd<0)
-            printf("Errore nell'invio del messaggio. Connessione non stabilita\n");    
-//         test++;
-// 
-//         char testS[4];
-//         sprintf(testS,"%d",test);
-        strcpy(sendline,"POST ");
-        strcat(sendline,sender.service);
-        strcat(sendline, " HTTP/1.1\r\n");
-        strcat(sendline,"Host:");
-        strcat(sendline,sender.ip);
-        strcat(sendline,":");
-        strcat(sendline,sender.port);
-        strcat(sendline,"\r\n");
-        strcat(sendline,"Content-Type: application/x-www-form-urlencoded\r\n");//json/application
-        strcat(sendline,"User-Agent: sdp_to_iot\r\n");
-        strcat(sendline,"Referer:");
-        strcat(sendline,"fromSDPtoIOT");
-        strcat(sendline,"\r\n");
-        strcat(sendline,"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n");
-        strcat(sendline,"Keep-Alive: 115\r\n");
-        strcat(sendline,"Content-length: ");
 
-        char length[10];
-        sprintf(length,"%d",strlen(message)+strlen(sender.key)+10);
-        strcat(sendline,length);
-        strcat(sendline,"\r\n\r\n");
-//strcat(sendline,"data={\"Name\":\"SDP_T_550e8400-e29b-41d4-a716-446655440000\",\"Model\":\"Arduino\",\"Location\":[\"45.0395710\",\"7.6683410\",\"200\"],\"Description\":\"ArduinoReference\",\"Type\":\"Sensor\",\"ObservedProperty\":\"AirTemperatureA\",\"Unit\":\"C\",\"Allowance\":\"0.1\",\"Frequency\":\"5sec\",\"Author\":\"csp\",\"Refer\":\"SmartDataPlatform\",\"Supply\":\"none\",\"Timestamp\":\"10/14/2014 12:39:25\",\"Value\":\"23.437500\"}&key=494419b8682deef895f06e42cb6ec988");
-        if(!strcmp(sender.destination, "iot"))
-            strcat(sendline,"data=");
-        strcat(sendline,message);
-        if(strlen(sender.key)>0){
-            strcat(sendline,"&key=");
-            strcat(sendline,sender.key); 
-        }
-//         strcat(sendline,"\r\n");
-        timeNow();
-        printf("valore finale della post:%s\n",sendline);
-//         if(write(sockfd, sendline, strlen(sendline))<0)
-        if (send(sockfd, sendline, strlen(sendline), 0) < 0) {
-            printf("errore nell'invio del messaggio\n");
-        }
-        else{
-//             shutdown(sockfd, 1);
-            while ( ( n = read((sockfd), recvline, MAXLINE)) != 0 ){
-                recvline[n]='\0';
-                printf("%s",recvline);
-                break;
-          }   
-        }
-        timeNow();
-        printf("\n\n\n\n\nFINE METODO SENDHTTP\n\n\n\n\n");
-        close(sockfd);
+
+  servaddr.sin_family = AF_INET;
+  servaddr.sin_port = htons(atoi(sender.port));            /* translate int2port num */
+  inet_pton(AF_INET, sender.ip, &servaddr.sin_addr);
+
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  fcntl(sockfd, F_SETFL, O_NONBLOCK);
+
+  connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+
+  FD_ZERO(&fdset);
+  FD_SET(sockfd, &fdset);
+  tv.tv_sec = 5;             /* 10 second timeout */
+  tv.tv_usec = 0;
+
+  if (select(sockfd + 1, NULL, &fdset, NULL, &tv) == 1)
+  {
+      int so_error;
+      socklen_t len = sizeof so_error;
+
+      getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &so_error, &len);
+
+      if (so_error == 0) {
+#ifdef DEBUG_SOCKET
+          printf("connection is open\n");
+#endif
+      }
+  }
+  else
+  {
+#ifdef DEBUG_SOCKET
+    fprintf(stderr, "Connection timeout\n");
+#endif
+
+    close(sockfd);
+    return 0;
+  }
+
+
+  strcpy(sendline,"POST ");
+  strcat(sendline,sender.service);
+  strcat(sendline, " HTTP/1.1\r\n");
+  strcat(sendline,"Host:");
+  strcat(sendline,sender.ip);
+  strcat(sendline,":");
+  strcat(sendline,sender.port);
+  strcat(sendline,"\r\n");
+  strcat(sendline,"Content-Type: application/x-www-form-urlencoded\r\n");//json/application
+  strcat(sendline,"User-Agent: sdp_to_iot\r\n");
+  strcat(sendline,"Referer:");
+  strcat(sendline,"fromSDPtoIOT");
+  strcat(sendline,"\r\n");
+  strcat(sendline,"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n");
+  strcat(sendline,"Keep-Alive: 115\r\n");
+  strcat(sendline,"Content-length: ");
+
+  char length[10] = {0};
+  sprintf(length,"%d",strlen(message)+strlen(sender.key)+10);
+  strcat(sendline,length);
+  strcat(sendline,"\r\n\r\n");
+  //strcat(sendline,"data={\"Name\":\"SDP_T_550e8400-e29b-41d4-a716-446655440000\",\"Model\":\"Arduino\",\"Location\":[\"45.0395710\",\"7.6683410\",\"200\"],\"Description\":\"ArduinoReference\",\"Type\":\"Sensor\",\"ObservedProperty\":\"AirTemperatureA\",\"Unit\":\"C\",\"Allowance\":\"0.1\",\"Frequency\":\"5sec\",\"Author\":\"csp\",\"Refer\":\"SmartDataPlatform\",\"Supply\":\"none\",\"Timestamp\":\"10/14/2014 12:39:25\",\"Value\":\"23.437500\"}&key=494419b8682deef895f06e42cb6ec988");
+  if(!strcmp(sender.destination, "iot"))
+  {
+    strcat(sendline,"data=");
+  }
+  strcat(sendline,message);
+  if(strlen(sender.key)>0)
+  {
+    strcat(sendline,"&key=");
+    strcat(sendline,sender.key);
+  }
+  //strcat(sendline,"\r\n");
+  timeNow();
+
+#ifdef DEBUG_SOCKET
+  printf("valore finale della post:%s\n",sendline);
+#endif
+
+  //if(write(sockfd, sendline, strlen(sendline))<0)
+  if ( send(sockfd, sendline, strlen(sendline), 0) < 0 )
+  {
+    fprintf(stderr, "Error: impossible send data\n");
+    close(sockfd);
+    return 0;
+  }
+  else
+  {
+    //shutdown(sockfd, 1);
+    while ( ( n = read((sockfd), recvline, MAXLINE)) != 0 )
+    {
+      recvline[n]='\0';
+      printf("%s",recvline);
+      break;
+    }
+  }
+
+  timeNow();
+#ifdef DEBUG_SOCKET
+  printf("\n\n\n\n\nFINE METODO SENDHTTP\n\n\n\n\n");
+#endif
+  close(sockfd);
+  return 1;
 }
 
 struct string {
